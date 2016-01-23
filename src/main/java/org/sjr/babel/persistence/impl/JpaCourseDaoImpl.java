@@ -11,17 +11,12 @@ import org.sjr.babel.persistence.CourseDao;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class JpaCourseDaoImpl implements CourseDao {
+public class JpaCourseDaoImpl extends AbstractJpaDao<Course> implements CourseDao {
 
 	@PersistenceContext(type = PersistenceContextType.TRANSACTION)
 	EntityManager em;
 
 
-	@Override
-	public Course getById(Integer id) {
-		Course result = em.find(Course.class, id);
-		return result;
-	}
 
 	@Override
 	public List<Course> find(String city) {
@@ -33,18 +28,9 @@ public class JpaCourseDaoImpl implements CourseDao {
 
 	}
 
-	@Override
-	public Course save(Course cour) {
-		if (cour.getId() != null) {
-			if (em.contains(cour)) {
-				// lorsque lobjet est connu de l entity manager, tout les changement sont detecte par l entity manager
-				// et ce dernier synchronisera la base (si necessaire) just avant le commit de la transaction.
-			} else
-				cour = em.merge(cour);
-		} else {
-			em.persist(cour);
-		}
-		return cour;
-	}
 
+	@Override
+	Class<Course> getEntityClass() {
+		return Course.class;
+	}
 }

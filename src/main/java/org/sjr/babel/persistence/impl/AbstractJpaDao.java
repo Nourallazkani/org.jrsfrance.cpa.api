@@ -1,15 +1,11 @@
 package org.sjr.babel.persistence.impl;
 
-import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.sjr.babel.entity.AbstractEntity;
-import org.sjr.babel.entity.Course;
-import org.sjr.babel.entity.Organisation;
-
 public abstract class AbstractJpaDao<T extends AbstractEntity> {
 
 	@PersistenceContext(type = PersistenceContextType.TRANSACTION)
@@ -48,7 +44,7 @@ public abstract class AbstractJpaDao<T extends AbstractEntity> {
 	}
 
 
-	public void delete(Class<T> clazz, int id) {
+	public void delete(int id) {
 		//em.remove(em.find(getEntityClass(), id));
 		T entity = getById(id);
 		delete(entity);

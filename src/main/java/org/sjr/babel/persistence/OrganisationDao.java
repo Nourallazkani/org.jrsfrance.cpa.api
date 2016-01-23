@@ -14,5 +14,5 @@ public interface OrganisationDao {
 	
 	void delete(Organisation o);
 
-	void delete(Class<Organisation> clazz, int id);
+	void delete(int id);
 }

@@ -11,5 +11,7 @@ public interface CursusDao {
 	public Cursus getById(int id);
 
 	public Cursus save (Cursus cur);
+	
+	 void delete (int id);
 
 }

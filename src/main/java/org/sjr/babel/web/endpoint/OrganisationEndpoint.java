@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.OkHttpClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class OrganisationEndpoint{
+public class OrganisationEndpoint extends AbstractEndpoint{
 	
 	@Autowired
 	private OrganisationDao dao;
@@ -38,8 +39,7 @@ public class OrganisationEndpoint{
 	@Transactional
 	public ResponseEntity<?> org(@PathVariable Integer id){
 		logger.info("entering org ");
-		Organisation org = dao.getById(id);
-		return org ==null ? ResponseEntity.status(HttpStatus.NOT_FOUND).build() : ResponseEntity.status(HttpStatus.OK).body(org);
+		return okOrNotFound(dao.getById(id));
 		//return org ==null ? ResponseEntity.notFound().build() : ResponseEntity.ok(org);
 	} 
 	
@@ -67,9 +67,9 @@ public class OrganisationEndpoint{
 	@Transactional
 	@ResponseStatus(code=HttpStatus.NO_CONTENT)
 	public void /*ResponseEntity<Void>*/ delete (@PathVariable int id){
-		dao.delete(Organisation.class, id);
+		dao.delete( id);
 		//return ResponseEntity.noContent().build();
 	}
 	
-	
+
 }

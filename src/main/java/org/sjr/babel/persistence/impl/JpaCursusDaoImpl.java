@@ -32,6 +32,8 @@ public class JpaCursusDaoImpl extends AbstractJpaDao<Cursus> implements CursusDa
 		return Cursus.class;
 	}
 
+
+
 	
 }
 

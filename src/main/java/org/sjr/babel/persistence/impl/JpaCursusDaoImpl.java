@@ -1,6 +1,8 @@
 package org.sjr.babel.persistence.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -32,6 +34,18 @@ public class JpaCursusDaoImpl extends AbstractJpaDao<Cursus> implements CursusDa
 		return Cursus.class;
 	}
 
+	
+	
+	
+	public static void main(String[] args) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("n", "%a%");
+		map.put("c", "Paris");
+		
+		for(String s: map.keySet()){
+			System.out.println(s+ " : "+map.get(s));
+		}
+	}
 
 
 	

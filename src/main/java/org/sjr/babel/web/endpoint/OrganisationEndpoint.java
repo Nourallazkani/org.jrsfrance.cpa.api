@@ -1,9 +1,12 @@
 package org.sjr.babel.web.endpoint;
 
-import java.lang.annotation.Repeatable;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.transaction.Transactional;
+
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.persistence.OrganisationDao;
 import org.slf4j.Logger;
@@ -11,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.OkHttpClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,15 +33,18 @@ public class OrganisationEndpoint extends AbstractEndpoint{
 	@RequestMapping(path="/organisations", method=RequestMethod.GET)
 	@Transactional
 	public List<Organisation> list (@RequestParam(name="name") String name){
-		List<Organisation> org = dao.find(name);
-		return org;
+		//List<Organisation> org = dao.find(name);
+		Map<String, Object> args = new HashMap<>();
+		args.put("n", name);
+		return superDao.find("select o from Organisation o where o.name like :n", args, Organisation.class);
 	}
 	
 	@RequestMapping(path="/organisations/{id}", method=RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> org(@PathVariable Integer id){
 		logger.info("entering org ");
-		return okOrNotFound(dao.getById(id));
+		return okOrNotFound(superDao.getById(Organisation.class, id));
+		//return okOrNotFound(dao.getById(id));
 		//return org ==null ? ResponseEntity.notFound().build() : ResponseEntity.ok(org);
 	} 
 	

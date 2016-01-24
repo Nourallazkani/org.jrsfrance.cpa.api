@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
@@ -41,7 +42,10 @@ public class WebAppInitializer implements WebApplicationInitializer
 	@Import(ApplicationConfig.class)
 	@ComponentScan(basePackages="org.sjr.babel.web.endpoint")
 	public static class RestConfiguration extends WebMvcConfigurerAdapter{
-		
+		@Override
+		public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
+			configurer.enable();
+		}
 
 	}
 	

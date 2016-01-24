@@ -1,0 +1,23 @@
+<div ng-controller="OrganisationsController">
+	<form>
+		<input type="text" ng-model="filter.name" />
+		<button ng-click="find()">Find</button>
+	</form>
+
+	<hr />
+
+	<div style="text-align:right">
+		<a href="#/organisations/new">new organisation</a>
+	</div>
+	
+	<table style="width:100%">
+		<tr ng-repeat="r in results">
+			<td style="width:35%">{{r.name}}</td>
+			<td style="width:35%">{{r.address.city}}</td>
+			<td style="width:15%"><a href="#/organisations/{{r.id}}">edit</a></td>
+			<td style="width:15%"><button ng-click="delete(r)">delete</button></td>
+		</tr>
+	</table>
+
+
+</div>

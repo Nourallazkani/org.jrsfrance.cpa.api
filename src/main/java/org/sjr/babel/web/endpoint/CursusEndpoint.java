@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping(path="cursus")
+@RequestMapping("cursus") // équivalent à @RequestMapping(path="cursus") et équivalent à @RequestMapping(value="cursus")
 public class CursusEndpoint  {
 	
 	

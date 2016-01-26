@@ -43,7 +43,6 @@ public abstract class AbstractJpaDao<T extends AbstractEntity> {
 		}
 	}
 
-
 	public void delete(int id) {
 		//em.remove(em.find(getEntityClass(), id));
 		T entity = getById(id);

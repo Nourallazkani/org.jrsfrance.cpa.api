@@ -37,7 +37,7 @@ public class JpaCursusDaoImpl extends AbstractJpaDao<Cursus> implements CursusDa
 	
 	
 	
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("n", "%a%");
 		map.put("c", "Paris");
@@ -45,7 +45,7 @@ public class JpaCursusDaoImpl extends AbstractJpaDao<Cursus> implements CursusDa
 		for(String s: map.keySet()){
 			System.out.println(s+ " : "+map.get(s));
 		}
-	}
+	}*/
 
 
 	

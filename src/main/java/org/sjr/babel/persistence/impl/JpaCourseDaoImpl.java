@@ -17,7 +17,6 @@ public class JpaCourseDaoImpl extends AbstractJpaDao<Course> implements CourseDa
 	EntityManager em;
 
 
-
 	@Override
 	public List<Course> find(String city) {
 		String hql = " select cr from Course cr where cr.address.city like :city";

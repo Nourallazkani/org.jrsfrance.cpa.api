@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.sjr.babel.entity.AbstractEntity;
 
-public interface SuperDao {
+public interface ObjectStore {
 
 	<T extends AbstractEntity> T save(T entity);
 	
@@ -15,8 +15,15 @@ public interface SuperDao {
 	
 	<T extends AbstractEntity> T getById(Class<T> clazz, int id);
 	
+	/**
+	 * abcd
+	 * @param hql xya
+	 * @param args
+	 * @param clazz
+	 * @return
+	 */
 	<T extends AbstractEntity> List<T> find(String hql ,Map<String, Object> args, Class<T> clazz );
-	
+
 	<T extends AbstractEntity> List<T> find(String hql , Class<T> clazz );
 	
 }

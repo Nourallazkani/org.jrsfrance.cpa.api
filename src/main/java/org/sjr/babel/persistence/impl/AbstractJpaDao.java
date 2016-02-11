@@ -4,15 +4,16 @@ package org.sjr.babel.persistence.impl;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-
 import org.sjr.babel.entity.AbstractEntity;
+
+
 public abstract class AbstractJpaDao<T extends AbstractEntity> {
 
 	@PersistenceContext(type = PersistenceContextType.TRANSACTION)
 	protected EntityManager em;
 
 	public T save(T entity) {
-		System.out.println("i am about to save "+entity);
+		/*System.out.println("i am about to save "+entity);*/
 		if (entity.getId() != null) {
 			if (em.contains(entity)) {
 				// lorsque lobjet est connu de l entity manager, tout les

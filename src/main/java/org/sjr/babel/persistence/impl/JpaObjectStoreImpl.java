@@ -9,13 +9,16 @@ import javax.persistence.PersistenceContextType;
 import javax.persistence.TypedQuery;
 
 import org.sjr.babel.entity.AbstractEntity;
-import org.sjr.babel.entity.Cursus;
-import org.sjr.babel.persistence.SuperDao;
+import org.sjr.babel.persistence.ObjectStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class SuperDaoImpl implements SuperDao {
+public class JpaObjectStoreImpl implements ObjectStore {
 
+	private Logger logger = LoggerFactory.getLogger(getClass());
+	
 	@PersistenceContext(type = PersistenceContextType.TRANSACTION)
 	protected EntityManager em;
 
@@ -37,12 +40,19 @@ public class SuperDaoImpl implements SuperDao {
 
 	@Override
 	public <T extends AbstractEntity> void delete(T entity) {
-
+		logger.debug("about to delete "+ entity.getClass().getName()+ "#"+entity.getId());
+		if( em.contains(entity)){
+			this.em.remove(entity);
+		} else {
+			// bad signal
+			this.delete(entity.getClass(), entity.getId());
+		}
 	}
 
 	@Override
 	public <T extends AbstractEntity> void delete(Class<T> clazz, int id) {
-
+		T entity = getById(clazz, id);
+		delete(entity);
 	}
 
 	@Override // pour l appelant : Organisation o = superdao.getById(Organisation.class, 3);
@@ -58,14 +68,18 @@ public class SuperDaoImpl implements SuperDao {
 	// List<Organisation> orgs = find(hql, args, Organisation.class);
 	//
 	//
-	
+	/**
+	 * 
+	 * 
+	 */
 	@Override
 	public <T extends AbstractEntity> List<T> find(String hql, Map<String, Object> args, Class<T> clazz) {
 		TypedQuery<T> query = em.createQuery(hql, clazz);
-		System.out.println(query.toString());
 		if (args != null) {
 			for( String argKey : args.keySet()){
-				query.setParameter(argKey, args.get(argKey));
+				Object value = args.get(argKey);
+				logger.debug("about to bind param "+ argKey+" with value "+ value);
+				query.setParameter(argKey, value);
 			};
 		}
 		List<T> results = query.getResultList();

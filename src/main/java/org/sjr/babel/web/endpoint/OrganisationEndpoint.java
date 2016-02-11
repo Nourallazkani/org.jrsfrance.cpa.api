@@ -28,6 +28,9 @@ public class OrganisationEndpoint extends AbstractEndpoint{
 	@Autowired
 	private OrganisationDao dao;
 	
+	public OrganisationEndpoint() {
+		System.out.println("inside ctor");
+	}
 	private Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@RequestMapping(path="/organisations", method=RequestMethod.GET)
@@ -36,14 +39,14 @@ public class OrganisationEndpoint extends AbstractEndpoint{
 		//List<Organisation> org = dao.find(name);
 		Map<String, Object> args = new HashMap<>();
 		args.put("n", name);
-		return superDao.find("select o from Organisation o where o.name like :n", args, Organisation.class);
+		return objectStore.find("select o from Organisation o where o.name like :n", args, Organisation.class);
 	}
 	
 	@RequestMapping(path="/organisations/{id}", method=RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> org(@PathVariable Integer id){
 		logger.info("entering org ");
-		return okOrNotFound(superDao.getById(Organisation.class, id));
+		return okOrNotFound(objectStore.getById(Organisation.class, id));
 		//return okOrNotFound(dao.getById(id));
 		//return org ==null ? ResponseEntity.notFound().build() : ResponseEntity.ok(org);
 	} 
@@ -63,7 +66,7 @@ public class OrganisationEndpoint extends AbstractEndpoint{
 		if(o.getId()==null || !o.getId().equals(id)){ 
 			return ResponseEntity.badRequest().body("Id is not correct!");
 		}
-		dao.save(o);
+		objectStore.save(o);
 		return ResponseEntity.noContent().build();
 	}
 	
@@ -72,7 +75,8 @@ public class OrganisationEndpoint extends AbstractEndpoint{
 	@Transactional
 	@ResponseStatus(code=HttpStatus.NO_CONTENT)
 	public void /*ResponseEntity<Void>*/ delete (@PathVariable int id){
-		dao.delete( id);
+		//dao.delete( id);
+		objectStore.delete(Organisation.class, id);
 		//return ResponseEntity.noContent().build();
 	}
 	

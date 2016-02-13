@@ -2,9 +2,14 @@ package org.sjr.babel.entity;
 
 import java.util.Date;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Transient;
-@Entity
+@Entity //@Table(name="Course")
 public class Course extends AbstractEntity {
 
 	
@@ -13,8 +18,10 @@ public class Course extends AbstractEntity {
 	private Date startDate;
 	@Transient
 	private Date endDate;
-	@Transient
+	@ManyToOne (fetch=FetchType.EAGER) //@JoinColumn(name="cursus_id")
 	private Cursus cursus;
+	
+	@Embedded
 	private Address address;
 
 	

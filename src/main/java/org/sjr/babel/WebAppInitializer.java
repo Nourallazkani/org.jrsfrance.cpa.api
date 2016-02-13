@@ -1,5 +1,8 @@
 package org.sjr.babel;
 
+import java.util.Arrays;
+
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.servlet.ServletContext;
@@ -27,6 +30,13 @@ public class WebAppInitializer implements WebApplicationInitializer
 		@Bean
 		public EntityManagerFactory xyz(){
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory("abcd");
+			EntityManager em = emf.createEntityManager();
+			
+			Arrays.asList("Country", "Organisation").forEach(x->em.createQuery("select o from "+x+" o").getResultList());
+			//em.createQuery("select c from Country c").getResultList();
+			//em.createQuery("select o from Organisation o").getResultList();
+			
+			em.close();
 			return emf;
 		}
 		

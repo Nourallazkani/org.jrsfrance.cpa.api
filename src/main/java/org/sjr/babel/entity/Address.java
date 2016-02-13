@@ -1,6 +1,7 @@
 package org.sjr.babel.entity;
 
 import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
@@ -8,7 +9,7 @@ import javax.persistence.Transient;
 public class Address {
 	private String street1, street2, zipcode, city;
 	
-	@ManyToOne
+	@ManyToOne(fetch=FetchType.EAGER)
 	private Country country;
 	
 	@Transient
@@ -17,20 +18,6 @@ public class Address {
 	public Address() {
 		// TODO Auto-generated constructor stub
 	}
-	
-	
-	public Address(String street1, String street2, String zipcode, String city, Country country, Long lat, Long lng) {
-		super();
-		this.street1 = street1;
-		this.street2 = street2;
-		this.zipcode = zipcode;
-		this.city = city;
-		this.country = country;
-		this.lat = lat;
-		this.lng = lng;
-	}
-
-
 
 	public String getStreet1() {
 		return street1;

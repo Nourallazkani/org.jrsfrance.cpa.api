@@ -2,19 +2,27 @@ package org.sjr.babel.entity;
 
 import java.util.List;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-@Entity //@Table(name= "Cursus")
+
+@Entity @Cacheable //@Table(name= "Cursus")
 public class Cursus extends AbstractEntity {
 	
 	private String name;
-	@Transient
+	
+	@ManyToOne(fetch=FetchType.EAGER) @JoinColumn(name="organisation_id")
 	private Organisation org;
-	@Transient
+
+	@OneToMany(fetch=FetchType.LAZY, mappedBy="cursus")
 	private List<Course> courses;
 	
 	@Embedded

@@ -39,7 +39,9 @@ public class OrganisationEndpoint extends AbstractEndpoint{
 		//List<Organisation> org = dao.find(name);
 		Map<String, Object> args = new HashMap<>();
 		args.put("n", name);
-		return objectStore.find("select o from Organisation o where o.name like :n", args, Organisation.class);
+		List<Organisation> results = objectStore.find("select o from Organisation o where o.name like :n", args, Organisation.class);
+		
+		return results;
 	}
 	
 	@RequestMapping(path="/organisations/{id}", method=RequestMethod.GET)

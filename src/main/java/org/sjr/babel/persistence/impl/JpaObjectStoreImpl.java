@@ -2,6 +2,7 @@ package org.sjr.babel.persistence.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,15 +16,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class JpaObjectStoreImpl implements ObjectStore {
+class JpaObjectStoreImpl implements ObjectStore {
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
-	
+
 	@PersistenceContext(type = PersistenceContextType.TRANSACTION)
 	protected EntityManager em;
 
 	@Override
 	public <T extends AbstractEntity> T save(T entity) {
+		if (entity == null) {
+			throw new IllegalArgumentException("entity cannot be null");
+		}
 		if (entity.getId() != null) {
 			if (em.contains(entity)) {
 				// lorsque lobjet est connu de l entity manager, tout les
@@ -40,8 +44,8 @@ public class JpaObjectStoreImpl implements ObjectStore {
 
 	@Override
 	public <T extends AbstractEntity> void delete(T entity) {
-		logger.debug("about to delete "+ entity.getClass().getName()+ "#"+entity.getId());
-		if( em.contains(entity)){
+		logger.debug("about to delete " + entity.getClass().getName() + "#" + entity.getId());
+		if (em.contains(entity)) {
 			this.em.remove(entity);
 		} else {
 			// bad signal
@@ -51,18 +55,26 @@ public class JpaObjectStoreImpl implements ObjectStore {
 
 	@Override
 	public <T extends AbstractEntity> void delete(Class<T> clazz, int id) {
-		T entity = getById(clazz, id);
-		delete(entity);
+		Optional<T> entity = getById(clazz, id);
+		if (entity.isPresent()) {
+			delete(entity.get());
+		}
 	}
 
-	@Override // pour l appelant : Organisation o = superdao.getById(Organisation.class, 3);
-	public <T extends AbstractEntity> T getById(Class<T> clazz, int id) {
+	@Override // pour l appelant : Organisation o =
+				// superdao.getById(Organisation.class, 3);
+	public <T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id) {
 		T entity = em.find(clazz, id);
-		return entity;
+		if (entity != null) {
+			return Optional.of(entity);
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	// pour l appelant :
-	// String hql = "select o from Organisation o where o.address.country.name like :x";
+	// String hql = "select o from Organisation o where o.address.country.name
+	// like :x";
 	// Map<String, Object> args = new HashMap<String, Object>();
 	// args.put("x", "France");
 	// List<Organisation> orgs = find(hql, args, Organisation.class);
@@ -73,22 +85,29 @@ public class JpaObjectStoreImpl implements ObjectStore {
 	 * 
 	 */
 	@Override
-	public <T extends AbstractEntity> List<T> find(String hql, Map<String, Object> args, Class<T> clazz) {
+	public <T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Map<String, Object> args) {
 		TypedQuery<T> query = em.createQuery(hql, clazz);
 		if (args != null) {
-			for( String argKey : args.keySet()){
+			for (String argKey : args.keySet()) {
 				Object value = args.get(argKey);
-				logger.debug("about to bind param "+ argKey+" with value "+ value);
+				logger.debug("about to bind param " + argKey + " with value " + value);
 				query.setParameter(argKey, value);
-			};
+			}
+			;
 		}
 		List<T> results = query.getResultList();
 		return results;
 	}
 
 	@Override
-	public <T extends AbstractEntity> List<T> find(String hql, Class<T> clazz) {
-		return find(hql, null, clazz);
+	public <T extends AbstractEntity> List<T> find(Class<T> clazz, String hql) {
+		return find(clazz, hql, null);
 	}
 
+	@Override
+	public <T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Object paramValue) {
+		TypedQuery<T> query = em.createQuery(hql, clazz);
+		query.setParameter(1, paramValue);
+		return query.getResultList();
+	}
 }

@@ -1,28 +1,15 @@
 package org.sjr.babel.entity;
 
-public class Level {
+import javax.persistence.Cacheable;
+import javax.persistence.Entity;
 
-	private Integer id;
+@Entity @Cacheable
+public class Level extends AbstractEntity {
+
 	private String name, description;
-	private Level next, previous;
-
 	
-	public Level (Integer id, String name, String description , Level next , Level previous){
-		super();
-		this.id = id;
-		this.name = name;
-		this.description = description;
-		this.next= next;
-		this.previous = previous;
-	}; 
-	
-	public Integer getId() {
-		return id;
-	}
+	//private Level next, previous;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
 
 	public String getName() {
 		return name;
@@ -39,7 +26,7 @@ public class Level {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-
+/*
 	public Level getNext() {
 		return next;
 	}
@@ -54,6 +41,5 @@ public class Level {
 
 	public void setPrevious(Level previous) {
 		this.previous = previous;
-	}
-
+	} */
 }

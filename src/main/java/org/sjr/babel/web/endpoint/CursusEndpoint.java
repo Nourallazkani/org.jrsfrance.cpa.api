@@ -1,62 +1,82 @@
 package org.sjr.babel.web.endpoint;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Cursus;
-import org.sjr.babel.persistence.CursusDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
-@RequestMapping("cursus") // équivalent à @RequestMapping(path="cursus") et équivalent à @RequestMapping(value="cursus")
-public class CursusEndpoint  {
-	
-	
-	private @Autowired CursusDao dao;
-	
-	public CursusEndpoint() {
-		System.out.println("inside counst");
+@RequestMapping("cursus") // quivalent à @RequestMapping(path="cursus") et
+							// équivalent à @RequestMapping(value="cursus")
+public class CursusEndpoint extends AbstractEndpoint {
+
+	// http://dosjds./cursus?city=Paris
+	@RequestMapping(method = RequestMethod.GET)
+	@Transactional
+	public List<Cursus> list(@RequestParam(name = "city") String city) {
+		List<Cursus> list = objectStore.find(Cursus.class, "select c from Cursus c where c.address.city like ?", city);
+		System.out.println(list.size());
+		return list;
+
 	}
 
-	//http://dosjds./cursus?city=Paris
-	@RequestMapping(method=RequestMethod.GET)
-	public List<Cursus> list(@RequestParam(name="city") String city){
-		List<Cursus> cur = dao.find(city);
-		return cur;
+	@RequestMapping(path = "{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> cursus(@PathVariable Integer id) {
+		System.out.println(id);
+		// return okOrNotFound(objectStore.getById(Cursus.class, id));
+		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
+		if (c.isPresent()) {
+			System.out.println("inside if");
+			return ResponseEntity.ok().body(c.get());
+		}
+		return ResponseEntity.notFound().build();
+
 	}
-	
-	@RequestMapping(path="{id}", method=RequestMethod.GET)
-	public Cursus cursus(@PathVariable Integer id ,Model model){
-		return dao.getById(id);
-	}
-	
-	@RequestMapping(path="{id}", method= RequestMethod.PUT)
+
+	@RequestMapping(path = "{id}", method = RequestMethod.PUT)
 	@Transactional
-	public  ResponseEntity<?> saveCur (@RequestBody Cursus cur, @PathVariable int id){
-		if(cur.getId()==null || !cur.getId().equals(id)){ 
+	public ResponseEntity<?> saveCur(@RequestBody Cursus cur, @PathVariable int id) {
+		if (cur.getId() == null || !cur.getId().equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
 		}
-		dao.save(cur);
+		objectStore.save(cur);
 		return ResponseEntity.noContent().build();
 	}
-	@RequestMapping(path="{id}", method = RequestMethod.DELETE)
-	@ResponseStatus(code=HttpStatus.NO_CONTENT)
+
+	@RequestMapping(path = "{id}", method = RequestMethod.DELETE)
 	@Transactional
-	public void delete (@PathVariable int id){
-		dao.delete(id);
+	public ResponseEntity<?> delete(@PathVariable int id) {
+		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
+		if (c.isPresent()) {
+			Cursus cursus = c.get();
+			if (!cursus.getCourses().isEmpty()) {
+				int n = cursus.getCourses().size();
+				return ResponseEntity.badRequest().body("This cursus has "+n+" dependant courses");
+			}
+			objectStore.delete(cursus);
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.badRequest().build();
 	}
+	
+	@RequestMapping(method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> save (@RequestBody Cursus c){
+		if(c.getId()!= null){
+			return ResponseEntity.badRequest().build();
+		}
+		objectStore.save(c);
+		return ResponseEntity.created(URI.create("/cursus/"+c.getId())).body(c);
+	}
+	
 }

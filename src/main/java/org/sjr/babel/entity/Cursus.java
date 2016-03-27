@@ -14,6 +14,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity @Cacheable //@Table(name= "Cursus")
 public class Cursus extends AbstractEntity {
 	
@@ -23,11 +25,12 @@ public class Cursus extends AbstractEntity {
 	private Organisation org;
 
 	@OneToMany(fetch=FetchType.LAZY, mappedBy="cursus")
+	@JsonIgnore
 	private List<Course> courses;
 	
 	@Embedded
 	private Address address;
-	@Transient
+	@ManyToOne
 	private Level level;
 
 

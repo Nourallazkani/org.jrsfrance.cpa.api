@@ -2,14 +2,11 @@ package org.sjr.babel.web.endpoint;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Course;
-import org.sjr.babel.entity.Organisation;
-import org.sjr.babel.persistence.CourseDao;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,52 +14,54 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public  class  CourseEndpoint extends AbstractEndpoint {
-	
-	@Autowired
-	private CourseDao dao;
-	
-	@RequestMapping(path= "courses", method=RequestMethod.GET)
-	public List<Course> list(@RequestParam(required=false, name="city") String city ){
-		List<Course> coures = dao.find(city);
-		return coures;
-		
+@RequestMapping(path = "courses")
+public class CourseEndpoint extends AbstractEndpoint {
+
+	@RequestMapping(method = RequestMethod.GET)
+	public List<Course> list(@RequestParam(required = false, name = "city") String ci) {
+		return objectStore.find(Course.class, "select c from Course c where c.address.city like :c", ci);
+
 	}
-	
-	@RequestMapping(path="courses/{id}", method=RequestMethod.GET)
+
+	@RequestMapping(path = "{id}", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> cr(@PathVariable Integer id ,Model model){
-		return okOrNotFound(dao.getById(id));
+	public ResponseEntity<?> cr(@PathVariable Integer id, Model model) {
+		return okOrNotFound(objectStore.getById(Course.class, id));
 	}
-	
-	@RequestMapping(path="/courses/{id}" , method = RequestMethod.PUT)
+
+	@RequestMapping(path = "{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateOrg(@RequestBody Course cour , @PathVariable int id){
-		if(cour.getId()==null || !cour.getId().equals(id)){ 
+	public ResponseEntity<?> updateOrg(@RequestBody Course cour, @PathVariable int id) {
+		if (cour.getId() == null || !cour.getId().equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
 		}
-		dao.save(cour);
+		objectStore.save(cour);
 		return ResponseEntity.noContent().build();
 	}
-	
-	@RequestMapping(path="/courses" , method = RequestMethod.POST)
+
+	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<Course> save (@RequestBody Course cour){
-		Course afterSave = dao.save(cour);
-		return ResponseEntity.created(URI.create("http://localhost:8080/courses/"+afterSave.getId())).body(afterSave);
+	public ResponseEntity<?> save(@RequestBody Course cour) {
+		if (cour.getId() != null) {
+			return ResponseEntity.badRequest().build();
+		}
+		Course afterSave = objectStore.save(cour);
+		return ResponseEntity.created(URI.create("http://localhost:8080/courses/" + afterSave.getId())).body(afterSave);
 	}
-	
-	@RequestMapping (path="/courses/{id}",method = RequestMethod.DELETE)
+
+	@RequestMapping(path = "{id}", method = RequestMethod.DELETE)
 	@Transactional
-	@ResponseStatus(code=HttpStatus.NO_CONTENT)
-	public void delete (@PathVariable int id){
-		dao.delete(id);
+	public ResponseEntity<Void> delete(@PathVariable int id) {
+		Optional<Course> c = objectStore.getById(Course.class, id);
+		if (c.isPresent()) {
+			objectStore.delete(c.get());
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+
 	}
-	
 
 }

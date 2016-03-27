@@ -1,10 +1,13 @@
 package org.sjr.babel;
 
 import java.util.Arrays;
+import java.util.Set;
 
+import javax.persistence.Cacheable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.metamodel.EntityType;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration.Dynamic;
@@ -31,8 +34,16 @@ public class WebAppInitializer implements WebApplicationInitializer
 		public EntityManagerFactory xyz(){
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory("abcd");
 			EntityManager em = emf.createEntityManager();
+			Set<EntityType<?>> entities = emf.getMetamodel().getEntities();
+			for (EntityType<?> entityType : entities) {
+				if (entityType.getJavaType().isAnnotationPresent(Cacheable.class) )
+				{
+					em.createQuery("select o from "+entityType.getJavaType().getName()+" o").getResultList();
+					System.out.println("xxx");
+				}
+			}
 			
-			Arrays.asList("Country", "Organisation").forEach(x->em.createQuery("select o from "+x+" o").getResultList());
+			//Arrays.asList("Country", "OrganisationCategory", "Civility","Language","Organisation","FieldOfStudy","Level").forEach(x->em.createQuery("select o from "+x+" o").getResultList());
 			//em.createQuery("select c from Country c").getResultList();
 			//em.createQuery("select o from Organisation o").getResultList();
 			

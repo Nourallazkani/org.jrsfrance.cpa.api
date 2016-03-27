@@ -5,6 +5,8 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import org.sjr.babel.entity.reference.Country;
+
 @Embeddable
 public class Address {
 	private String street1, street2, zipcode, city;

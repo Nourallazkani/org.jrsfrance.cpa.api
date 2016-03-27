@@ -1,16 +1,17 @@
 package org.sjr.babel.entity;
 
-import java.util.Date;
-
 import javax.persistence.Basic;
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
+
+import org.sjr.babel.entity.reference.OrganisationCategory;
 
 @Entity //@Table(name="Organisation")
+@Cacheable
 public class Organisation extends AbstractEntity{
 	
 	@Basic @Column(name="name")	
@@ -19,18 +20,11 @@ public class Organisation extends AbstractEntity{
 	@Embedded
 	private Address address;
 	
-	@Transient
-	private String  description;
-	
-	@Transient
 	private String password;
 	
-	@Transient
-	private Boolean modeInscriptionAuto;
+	@ManyToOne(fetch=FetchType.EAGER)
+	private OrganisationCategory category;
 	
-	@Transient
-	private Date registrationDate;
-
 	public String getName() {
 		return name;
 	}
@@ -47,14 +41,6 @@ public class Organisation extends AbstractEntity{
 		this.address = address;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public String getPassword() {
 		return password;
 	}
@@ -63,20 +49,12 @@ public class Organisation extends AbstractEntity{
 		this.password = password;
 	}
 
-	public Boolean getModeInscriptionAuto() {
-		return modeInscriptionAuto;
+	public OrganisationCategory getCategory() {
+		return category;
 	}
 
-	public void setModeInscriptionAuto(Boolean modeInscriptionAuto) {
-		this.modeInscriptionAuto = modeInscriptionAuto;
-	}
-
-	public Date getRegistrationDate() {
-		return registrationDate;
-	}
-
-	public void setRegistrationDate(Date registrationDate) {
-		this.registrationDate = registrationDate;
+	public void setCategory(OrganisationCategory category) {
+		this.category = category;
 	}
 
 }

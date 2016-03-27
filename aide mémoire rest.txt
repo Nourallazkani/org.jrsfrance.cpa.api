@@ -1,0 +1,42 @@
+REST par du principe que les ressources d'une organisation doivent pouvoir être accessibles. Pour cela nous utilisons le protocle HTTP. 
+
+4 notions centrales sur le protocole HTTP : 
+	- URI (Uniform Resource Identifier : l'adresse de la ressource), qui donne l'adresse de la ressource.
+		Exemple : /organisations/1 est l'adresse de l'organisation n°1
+		
+	- le verb, qui exprime l'action que nous voulons faire sur une ressource.
+		GET pour accéder à une ressource en lecture
+			Exemple : GET sur /organisations/1
+		PUT pour remplacer la ressource.  Possibilité de passer un body dans la requête HTTP (ce body doit être la nouvelle représentation de la ressource).
+			Exemple : PUT sur /organisations/1 avec dans le body de la requête la représentation nouvelle et complète de l'organisation n°1
+		DELETE pour supprimer la ressource. 
+			Exemple : DELETE sur /organisations/1.
+		POST pour effectuer un traitement sur la ressource. Possibilité de passer un body dans la requête HTTP
+			Exemple : GET sur /organisations, avec dans le body de la requête des informations permettant de créer une nouvelle organisations
+	
+					
+La requête HTTP se compose de plusieurs choses (en plus de l'URI et du verbe)
+	- les paramètres. Exemple le paramètres 'name' dans /organisations?name=x
+	- les en-tête des la requête HTTP (exemple : l'en-tête accept dans la requête).
+	- le body de la requête (facultatif mais presque toujours présent pour les POST ou les PUT, presque jamais pour les DELETE et jamais pour les GET)
+	
+La réponse HTTP se compose de plusieurs choses : 
+	- le code de retour
+		La requête doit donner lieu à une réponse. Celle-ci
+			- peut avoir un body (par exemple : GET sur organisations renvoie la liste des organisations).
+			- doit avoir un statut
+				si tout s'est bien passé le code commence par 200
+					200 : OK
+					201 : CREATED (une ressource a été créée, suite à un POST sur /organisations par exemple).
+					204 : NO_CONTENT (tout s'est bien passé, il n'y a pas de body dans la réponse mais ca ne doit pas être considéré comme un problème).
+				s'il y eu un problème d'accès à la ressource, le code commence par 400
+					400 : bad request
+					401 : utilisateur non identifié
+					403 : utilisateur non autorisé
+					404 : resource non trouvée
+					405 : méthode (c'est à dire le verbe) non supportée
+				s'il y a un problème qui s'apparente à un plantage de l'application :
+					500
+	- un body, qui seria serialisé au format indiqué par l'en-tête Accept de la requête http entrante.
+		
+	- des en-têtes

@@ -1,0 +1,35 @@
+Soit une classe A : 
+
+	si A est une entité : annotation @Entity (et éventuellement @Table).
+		si a A des sous classes : 
+			@Inheritance(strategy=InheritanceType.JOINED) si celles-ci voient leurs instances stockées dans des tables dédiées.
+			@Inheritance(strategy=InheritanceType.SINGLE_TABLE) si celles-ci voient leurs instances stockées dans la même table (il faut alors une colonne discriminante)
+
+	si A est un composant : annotation @Embeddable
+
+	précision : nous reconnaissons les composants au fait qu'ils n'ont pas d'id, ils sont toujours rattachés à une entité (@Entity, qui elle en a forcémment un, annoté par @Id)
+
+
+
+	pour chaque champ  d'une classe : 
+
+		si le type est simple (primitifs, String, Date) : 
+			@Id pour l'un d'entre eux  (et éventuellement @Column), avec @Temporal quand le champ est de type date
+			@Basic pour les autres champs mappés  (et éventuellement @Column), avec @Temporal quand le champ est de type date
+			@Transient si le champ n'est pas mappé
+
+		si le type est une classe que nous avons créée :
+			@Embedded si le type est un composant
+			@ManyToOne* si le type est une entité (et éventuellement @JoinColumn)
+
+		si le type est un agrégat (list, set, map) :
+			@ElementCollection* si le type des éléments de l'agrégat est un composant (et éventuellement @CollectionTable)
+			@OneToMany* si le type  des éléments de l'agrégat est une entité (et éventuellement @JoinColumn)
+			ou
+			@ManyToMany* si le type  des éléments de l'agrégat est une entité (et éventuellement @JoinTable)
+
+	* : attention au fetchType : lazy (lazy loading) ou eager (eager loading).
+		eager pour les manyToOne qui pointe vers une classe annotée par @Cacheable en plus de @Entity
+		lazy pour les autres (autres @ManyToOne, @ElementCollection, @OneToMany, @ManyToMany) avec join fetch dans la requête hql si besoin.
+
+

@@ -1,0 +1,67 @@
+classes de J2SE utilisées (en plus des primitifs) : String, Date, List, Set, Map
+
+Autres objets : 
+	org.springframework.context.ApplicationContext pour le contexte spring
+	org.springframework.core.env.Environment pour l'environnement
+	javax.sql.DataSource pour la connexion à la base, 
+	javax.persistence.EntityManagerFactory et javax.persistence.EntityManager pour JPA
+	PlatformTransactionManager pour la gestion de transactions.
+	ResponseEntity pour REST
+	ModelAndView pour les IHM
+
+
+Les annotations : 
+
+	configuration générale : 
+		@Configuration pour la classe de configuration
+		@ComponentScan pour activer la détection des @Component et dérivés de @Component (@Service, @Repository, etc...).
+		@EnableTransactionManagement pour activer la prise en charge des transactions avec l'annotation @Transactional
+			cela suppose d'avoir inscrit dans le contexte spring un PlatformTransactionManager (et donc la dépendance maven vers spring-orm)
+		@EnableScheduling pour activer les invocations planifiées
+
+	pour confier nos objets à Spring :
+		les dérivés de @Component : 
+		  @Service (pour les services), 
+		  @Repository (pour l'accès aux données) 
+		  @Handler (fait maison)
+		  @RestController (pour les endpoints REST)
+		  @Controller (pour les controleurs IHM)
+
+	pour les injections
+		@Inject 
+		@Autowired (au lieu de @Inject) pour les injections facultatives (voir l'attribut required)
+		@PersistenceContext pour obtenir l'EntityManager lié à la transaction en cours
+		@PersistenceUnit pour obtenir l'entityManagerFactory
+		L'ApplicationContext spring et l'Environment spring sont injectable partout de manière automatique. 
+	
+	pour les callbacks :
+		@PostConstruct sur une méthode qui doit être invoquée après la préparation de l'objet (c'est à dire après instanciation et injection)
+		@PreDestroy sur une méthode qui doit être invoquée à l'arrêt de l'application.
+	
+	pour les invocations planifiées
+		@Schedule pour planifier l'invocation de la méthode.
+	
+	pour les interceptions
+		@javax.transaction.Transactional pour les transactions : 
+		  propagation REQUIRED pour le service
+		  propagation MANDATORY pour la couche business et persistence.
+		  prérequis pour les transactions : 
+			- la présence d'un PlatformTransactionManager dans le contexte
+			- l'annotation @EnableTransactionManagement sur la classe de config.
+		@javax.annotation.security.RolesAllowed ou @Secured pour la sécurité
+		  prérequis pour la sécurité :
+			- un authenticationManager
+			- un référentiels utilisateur (in memory, ldap, jdbc...).
+
+	pour l'aguillage des requêtes http vers les méthodes : 
+		@RequestMapping et, sur les paramètre annotée par @RequestMapping :
+			- pour récupérer une partie du path de l'URI : @PathVariable
+			- pour récupérer un paramètre de la requête : @RequestParam
+			- pour récupérer un en-tête de la requête : @RequestHeader
+			- pour récupérer le body de la requête (déserialisé) : @RequestBody
+			- pour récupérer une valeur dans la session : @SessionAttribute
+			- pour récupérer une valeur dans le cookie : @CookieValue
+
+	pour les tests : 
+		@RunWith pour lier Spring à Junit
+		@ContextConfiguration pour indiquer à Spring quel(s) contexte(s) utiliser.

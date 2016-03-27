@@ -1,7 +1,5 @@
 package org.sjr.babel.entity;
 
-import javax.persistence.Cacheable;
-import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass

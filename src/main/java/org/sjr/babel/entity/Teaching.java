@@ -1,7 +1,6 @@
 package org.sjr.babel.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
 import org.sjr.babel.entity.reference.FieldOfStudy;

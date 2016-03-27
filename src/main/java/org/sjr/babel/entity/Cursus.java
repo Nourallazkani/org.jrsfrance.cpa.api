@@ -3,16 +3,12 @@ package org.sjr.babel.entity;
 import java.util.List;
 
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 

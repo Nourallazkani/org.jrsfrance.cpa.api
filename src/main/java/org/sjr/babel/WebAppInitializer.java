@@ -1,7 +1,6 @@
 package org.sjr.babel;
 
 import java.util.Set;
-import java.util.function.Consumer;
 
 import javax.persistence.Cacheable;
 import javax.persistence.EntityManager;

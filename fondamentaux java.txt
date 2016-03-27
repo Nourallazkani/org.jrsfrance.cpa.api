@@ -1,0 +1,20 @@
+Les principes de base du language :
+
+- primitifs
+- les blocs (for, if, while, switch)
+- la classe Object, dont toutes les classes héritent.
+- les niveaux de visibilités (private, public, protected)
+- la gestion des exceptions (throw, throws, try, catch, finally, try with resources)
+- les classes de base (java.lang.String, java.lang.Integer, java.lang.Double, java.lang.Long, java.lang.Boolean, java.util.Date)
+- les collections (java.util.List, java.util.Set), les maps (java.util.Map)
+
+depuis java 5 :
+- les enums
+- les varargs
+- les types génériques
+- les annotations
+
+depuis java 8 :
+- les expressions lambda
+- les streams
+- les Optional

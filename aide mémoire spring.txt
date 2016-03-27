@@ -7,7 +7,6 @@ Autres objets :
 	javax.persistence.EntityManagerFactory et javax.persistence.EntityManager pour JPA
 	PlatformTransactionManager pour la gestion de transactions.
 	ResponseEntity pour REST
-	ModelAndView pour les IHM
 
 
 Les annotations : 
@@ -21,11 +20,9 @@ Les annotations :
 
 	pour confier nos objets à Spring :
 		les dérivés de @Component : 
-		  @Service (pour les services), 
 		  @Repository (pour l'accès aux données) 
-		  @Handler (fait maison)
 		  @RestController (pour les endpoints REST)
-		  @Controller (pour les controleurs IHM)
+		  D'autres existes : @Service, @Controller
 
 	pour les injections
 		@Inject 
@@ -54,7 +51,7 @@ Les annotations :
 			- un référentiels utilisateur (in memory, ldap, jdbc...).
 
 	pour l'aguillage des requêtes http vers les méthodes : 
-		@RequestMapping et, sur les paramètre annotée par @RequestMapping :
+		@RequestMapping et, sur les paramètres annotés par @RequestMapping :
 			- pour récupérer une partie du path de l'URI : @PathVariable
 			- pour récupérer un paramètre de la requête : @RequestParam
 			- pour récupérer un en-tête de la requête : @RequestHeader

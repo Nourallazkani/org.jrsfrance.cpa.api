@@ -1,7 +1,7 @@
 REST par du principe que les ressources d'une organisation doivent pouvoir être accessibles. Pour cela nous utilisons le protocle HTTP. 
 
 4 notions centrales sur le protocole HTTP : 
-	- URI (Uniform Resource Identifier : l'adresse de la ressource), qui donne l'adresse de la ressource.
+	- URI (Uniform Resource Identifier), qui donne l'adresse de la ressource.
 		Exemple : /organisations/1 est l'adresse de l'organisation n°1
 		
 	- le verb, qui exprime l'action que nous voulons faire sur une ressource.
@@ -17,7 +17,7 @@ REST par du principe que les ressources d'une organisation doivent pouvoir être
 					
 La requête HTTP se compose de plusieurs choses (en plus de l'URI et du verbe)
 	- les paramètres. Exemple le paramètres 'name' dans /organisations?name=x
-	- les en-tête des la requête HTTP (exemple : l'en-tête accept dans la requête).
+	- les en-tête des la requête HTTP (exemple : l'en-tête Accept dans la requête).
 	- le body de la requête (facultatif mais presque toujours présent pour les POST ou les PUT, presque jamais pour les DELETE et jamais pour les GET)
 	
 La réponse HTTP se compose de plusieurs choses : 
@@ -34,7 +34,7 @@ La réponse HTTP se compose de plusieurs choses :
 					401 : utilisateur non identifié
 					403 : utilisateur non autorisé
 					404 : resource non trouvée
-					405 : méthode (c'est à dire le verbe) non supportée
+					405 : méthode (c'est à dire le verbe) noèn supportée
 				s'il y a un problème qui s'apparente à un plantage de l'application :
 					500
 	- un body, qui seria serialisé au format indiqué par l'en-tête Accept de la requête http entrante.

@@ -1,9 +1,9 @@
-classes de J2SE utilisées (en plus des primitifs) : String, Date, List, Set, Map
+classes de J2SE utilisÃ©es (en plus des primitifs) : String, Date, List, Set, Map
 
 Autres objets : 
 	org.springframework.context.ApplicationContext pour le contexte spring
 	org.springframework.core.env.Environment pour l'environnement
-	javax.sql.DataSource pour la connexion à la base, 
+	javax.sql.DataSource pour la connexion Ã  la base, 
 	javax.persistence.EntityManagerFactory et javax.persistence.EntityManager pour JPA
 	PlatformTransactionManager pour la gestion de transactions.
 	ResponseEntity pour REST
@@ -12,17 +12,17 @@ Autres objets :
 
 Les annotations : 
 
-	configuration générale : 
+	configuration gÃ©nÃ©rale : 
 		@Configuration pour la classe de configuration
-		@ComponentScan pour activer la détection des @Component et dérivés de @Component (@Service, @Repository, etc...).
+		@ComponentScan pour activer la dÃ©tection des @Component et dÃ©rivÃ©s de @Component (@Service, @Repository, etc...).
 		@EnableTransactionManagement pour activer la prise en charge des transactions avec l'annotation @Transactional
-			cela suppose d'avoir inscrit dans le contexte spring un PlatformTransactionManager (et donc la dépendance maven vers spring-orm)
-		@EnableScheduling pour activer les invocations planifiées
+			cela suppose d'avoir inscrit dans le contexte spring un PlatformTransactionManager (et donc la dÃ©pendance maven vers spring-orm)
+		@EnableScheduling pour activer les invocations planifiÃ©es
 
-	pour confier nos objets à Spring :
-		les dérivés de @Component : 
+	pour confier nos objets Ã  Spring :
+		les dÃ©rivÃ©s de @Component : 
 		  @Service (pour les services), 
-		  @Repository (pour l'accès aux données) 
+		  @Repository (pour l'accÃ¨s aux donnÃ©es) 
 		  @Handler (fait maison)
 		  @RestController (pour les endpoints REST)
 		  @Controller (pour les controleurs IHM)
@@ -30,38 +30,38 @@ Les annotations :
 	pour les injections
 		@Inject 
 		@Autowired (au lieu de @Inject) pour les injections facultatives (voir l'attribut required)
-		@PersistenceContext pour obtenir l'EntityManager lié à la transaction en cours
+		@PersistenceContext pour obtenir l'EntityManager liÃ© Ã  la transaction en cours
 		@PersistenceUnit pour obtenir l'entityManagerFactory
-		L'ApplicationContext spring et l'Environment spring sont injectable partout de manière automatique. 
+		L'ApplicationContext spring et l'Environment spring sont injectable partout de maniÃ¨re automatique. 
 	
 	pour les callbacks :
-		@PostConstruct sur une méthode qui doit être invoquée après la préparation de l'objet (c'est à dire après instanciation et injection)
-		@PreDestroy sur une méthode qui doit être invoquée à l'arrêt de l'application.
+		@PostConstruct sur une mÃ©thode qui doit Ãªtre invoquÃ©e aprÃ¨s la prÃ©paration de l'objet (c'est Ã  dire aprÃ¨s instanciation et injection)
+		@PreDestroy sur une mÃ©thode qui doit Ãªtre invoquÃ©e Ã  l'arrÃªt de l'application.
 	
-	pour les invocations planifiées
-		@Schedule pour planifier l'invocation de la méthode.
+	pour les invocations planifiÃ©es
+		@Schedule pour planifier l'invocation de la mÃ©thode.
 	
 	pour les interceptions
 		@javax.transaction.Transactional pour les transactions : 
 		  propagation REQUIRED pour le service
 		  propagation MANDATORY pour la couche business et persistence.
-		  prérequis pour les transactions : 
-			- la présence d'un PlatformTransactionManager dans le contexte
+		  prÃ©requis pour les transactions : 
+			- la prÃ©sence d'un PlatformTransactionManager dans le contexte
 			- l'annotation @EnableTransactionManagement sur la classe de config.
-		@javax.annotation.security.RolesAllowed ou @Secured pour la sécurité
-		  prérequis pour la sécurité :
+		@javax.annotation.security.RolesAllowed ou @Secured pour la sÃ©curitÃ©
+		  prÃ©requis pour la sÃ©curitÃ© :
 			- un authenticationManager
-			- un référentiels utilisateur (in memory, ldap, jdbc...).
+			- un rÃ©fÃ©rentiels utilisateur (in memory, ldap, jdbc...).
 
-	pour l'aguillage des requêtes http vers les méthodes : 
-		@RequestMapping et, sur les paramètre annotée par @RequestMapping :
-			- pour récupérer une partie du path de l'URI : @PathVariable
-			- pour récupérer un paramètre de la requête : @RequestParam
-			- pour récupérer un en-tête de la requête : @RequestHeader
-			- pour récupérer le body de la requête (déserialisé) : @RequestBody
-			- pour récupérer une valeur dans la session : @SessionAttribute
-			- pour récupérer une valeur dans le cookie : @CookieValue
+	pour l'aguillage des requÃªtes http vers les mÃ©thodes : 
+		@RequestMapping et, sur les paramÃ¨tre annotÃ©e par @RequestMapping :
+			- pour rÃ©cupÃ©rer une partie du path de l'URI : @PathVariable
+			- pour rÃ©cupÃ©rer un paramÃ¨tre de la requÃªte : @RequestParam
+			- pour rÃ©cupÃ©rer un en-tÃªte de la requÃªte : @RequestHeader
+			- pour rÃ©cupÃ©rer le body de la requÃªte (dÃ©serialisÃ©) : @RequestBody
+			- pour rÃ©cupÃ©rer une valeur dans la session : @SessionAttribute
+			- pour rÃ©cupÃ©rer une valeur dans le cookie : @CookieValue
 
 	pour les tests : 
-		@RunWith pour lier Spring à Junit
-		@ContextConfiguration pour indiquer à Spring quel(s) contexte(s) utiliser.
+		@RunWith pour lier Spring Ã  Junit
+		@ContextConfiguration pour indiquer Ã  Spring quel(s) contexte(s) utiliser.

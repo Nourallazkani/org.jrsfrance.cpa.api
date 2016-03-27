@@ -3,7 +3,9 @@ package org.sjr.babel.entity;
 import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 
-@Entity @Cacheable
+import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
+
+@Entity @Cacheable @CacheOnStartup(order = 0)
 public class Level extends AbstractEntity {
 
 	private String name, description;

@@ -1,14 +1,21 @@
 package org.sjr.babel.web.endpoint;
 
+import java.net.URI;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.sjr.babel.entity.AbstractEntity;
-import org.sjr.babel.entity.Education;
 import org.sjr.babel.persistence.ObjectStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public abstract class AbstractEndpoint {
 
@@ -31,6 +38,7 @@ public abstract class AbstractEndpoint {
 		}
 	}
 	
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public static class Link {
 		public String title,href,rel;
 		public Link(String title, String href, String rel) {
@@ -39,4 +47,17 @@ public abstract class AbstractEndpoint {
 			this.rel= rel;
 		}
 	}
+	
+	@Autowired
+	private HttpServletRequest currentRequest;
+	
+	protected HttpServletRequest currentRequest(){
+		return currentRequest;
+	}
+	
+	protected URI getUri(String path){
+		HttpRequest httpRequest = new ServletServerHttpRequest(currentRequest());
+		return UriComponentsBuilder.fromHttpRequest(httpRequest).fragment(path).build().toUri();
+	}
+	
 }

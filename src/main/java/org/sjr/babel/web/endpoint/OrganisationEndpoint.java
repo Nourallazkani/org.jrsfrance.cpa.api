@@ -26,9 +26,9 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		// List<Organisation> org = dao.find(name);
 		Map<String, Object> args = new HashMap<>();
 		args.put("n", name);
-		List<Organisation> results = objectStore.find(Organisation.class,
-				"select o from Organisation o where o.name like :n", args);
+		List<Organisation> results = objectStore.find(Organisation.class, "select o from Organisation o where o.name like :n", args);
 
+		System.out.println(getUri("abcd"));
 		return results;
 	}
 
@@ -38,8 +38,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		logger.info("entering org ");
 		return okOrNotFound(objectStore.getById(Organisation.class, id));
 		// return okOrNotFound(dao.getById(id));
-		// return org ==null ? ResponseEntity.notFound().build() :
-		// ResponseEntity.ok(org);
+		// return org ==null ? ResponseEntity.notFound().build() : ResponseEntity.ok(org);
 	}
 
 	@RequestMapping(path = "/organisations", method = RequestMethod.POST)

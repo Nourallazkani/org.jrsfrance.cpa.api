@@ -14,9 +14,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Entity @Cacheable //@Table(name= "Cursus")
+@Entity @Cacheable @CacheOnStartup(order = 2) //@Table(name= "Cursus")
 public class Cursus extends AbstractEntity {
 	
 	private String name;

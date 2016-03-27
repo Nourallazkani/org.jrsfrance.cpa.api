@@ -8,10 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
+import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 import org.sjr.babel.entity.reference.OrganisationCategory;
 
 @Entity //@Table(name="Organisation")
-@Cacheable
+@Cacheable @CacheOnStartup(order = 1)
 public class Organisation extends AbstractEntity{
 	
 	@Basic @Column(name="name")	

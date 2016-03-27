@@ -6,7 +6,7 @@ import javax.persistence.ManyToOne;
 
 import org.sjr.babel.entity.reference.FieldOfStudy;
 @Entity
-public class Education extends AbstractEntity {
+public class Teaching extends AbstractEntity {
 	@ManyToOne
 	private FieldOfStudy fieldOfStudy;
 	

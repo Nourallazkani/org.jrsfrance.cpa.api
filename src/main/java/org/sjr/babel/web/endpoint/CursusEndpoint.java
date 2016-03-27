@@ -16,27 +16,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("cursus") // quivalent à @RequestMapping(path="cursus") et
-							// équivalent à @RequestMapping(value="cursus")
+@RequestMapping("cursus") // équivalent à @RequestMapping(path="cursus") et équivalent à @RequestMapping(value="cursus")
 public class CursusEndpoint extends AbstractEndpoint {
 
 	// http://dosjds./cursus?city=Paris
 	@RequestMapping(method = RequestMethod.GET)
 	@Transactional
 	public List<Cursus> list(@RequestParam(name = "city") String city) {
-		List<Cursus> list = objectStore.find(Cursus.class, "select c from Cursus c where c.address.city like ?", city);
-		System.out.println(list.size());
-		return list;
-
+		return objectStore.find(Cursus.class, "select c from Cursus c where c.address.city like ?", city);
 	}
 
 	@RequestMapping(path = "{id}", method = RequestMethod.GET)
 	public ResponseEntity<?> cursus(@PathVariable Integer id) {
-		System.out.println(id);
+		
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
 		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
 		if (c.isPresent()) {
-			System.out.println("inside if");
 			return ResponseEntity.ok().body(c.get());
 		}
 		return ResponseEntity.notFound().build();

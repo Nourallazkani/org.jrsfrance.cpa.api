@@ -1,5 +1,8 @@
 package org.sjr.babel.entity;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,5 +19,11 @@ public abstract class AbstractEntity {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface CacheOnStartup{
+		int order();
+		
 	}
 }

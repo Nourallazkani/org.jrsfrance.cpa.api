@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sjr.babel.entity.AbstractEntity;
+import org.sjr.babel.entity.Address;
 import org.sjr.babel.persistence.ObjectStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public abstract class AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
+	/*
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public static class Link {
 		public String title,href,rel;
@@ -46,7 +47,7 @@ public abstract class AbstractEndpoint {
 			this.title = title;
 			this.rel= rel;
 		}
-	}
+	}*/
 	
 	@Autowired
 	private HttpServletRequest currentRequest;
@@ -60,4 +61,17 @@ public abstract class AbstractEndpoint {
 		return UriComponentsBuilder.fromHttpRequest(httpRequest).path(path).build().toUri();
 	}
 	
+	protected static class AddressSummary {
+		public String street1, street2, zipcpde, city, country;
+		public Double lat,lng; 
+		public AddressSummary(Address a ) {
+			this.street1 = a.getStreet1();
+			this.street2 = a.getStreet2();
+			this.zipcpde = a.getZipcode();
+			this.city = a.getCity();
+			this.country = a.getCountry().getName();
+			this.lat = a.getLat();
+			this.lng = a.getLng();
+		}
+	}
 }

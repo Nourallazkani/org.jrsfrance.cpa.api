@@ -15,7 +15,7 @@ public class Address {
 	private Country country;
 	
 	@Transient
-	private Long lat, lng;
+	private Double lat, lng;
 
 	public Address() {
 		// TODO Auto-generated constructor stub
@@ -61,19 +61,19 @@ public class Address {
 		this.country = country;
 	}
 
-	public Long getLat() {
+	public Double getLat() {
 		return lat;
 	}
 
-	public void setLat(Long lat) {
+	public void setLat(Double lat) {
 		this.lat = lat;
 	}
 
-	public Long getLng() {
+	public Double getLng() {
 		return lng;
 	}
 
-	public void setLng(Long lng) {
+	public void setLng(Double lng) {
 		this.lng = lng;
 	}
 }

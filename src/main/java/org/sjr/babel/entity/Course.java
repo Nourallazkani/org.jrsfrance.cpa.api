@@ -2,24 +2,37 @@ package org.sjr.babel.entity;
 
 import java.util.Date;
 
+import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
-@Entity //@Table(name="Course")
-public class Course extends AbstractEntity {
+@Embeddable//@Entity //@Table(name="Course")
+public class Course {
 
-	
-	private String name;
-	@Transient
+	@Temporal(TemporalType.DATE)
 	private Date startDate;
-	@Transient
-	private Date endDate;
-	@ManyToOne (fetch=FetchType.EAGER) //@JoinColumn(name="cursus_id")
-	private Cursus cursus;
 	
+	@Temporal(TemporalType.DATE)
+	private Date endDate;
+	
+	@ManyToOne
+	private Level level;
+	
+	//@ManyToOne (fetch=FetchType.EAGER) //@JoinColumn(name="cursus_id")
+	//private Cursus cursus;
+	
+	public Level getLevel() {
+		return level;
+	}
+
+	public void setLevel(Level level) {
+		this.level = level;
+	}
+
 	@Embedded
+	@Transient
 	private Address address;
 
 	public Address getAddress() {
@@ -30,15 +43,6 @@ public class Course extends AbstractEntity {
 		this.address = address;
 	}
 
-
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public Date getStartDate() {
 		return startDate;
@@ -55,7 +59,7 @@ public class Course extends AbstractEntity {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-
+/*
 	public Cursus getCursus() {
 		return cursus;
 	}
@@ -63,5 +67,6 @@ public class Course extends AbstractEntity {
 	public void setCursus(Cursus cursus) {
 		this.cursus = cursus;
 	}
+	*/
 
 }

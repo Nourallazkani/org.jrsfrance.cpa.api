@@ -1,5 +1,6 @@
 package org.sjr.babel;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -17,6 +18,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -26,6 +29,9 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 
 public class WebAppInitializer implements WebApplicationInitializer
 {
@@ -75,11 +81,19 @@ public class WebAppInitializer implements WebApplicationInitializer
 	@Configuration 
 	@EnableWebMvc 
 	@Import(ApplicationConfig.class)
-	@ComponentScan(basePackages="org.sjr.babel.web.endpoint")
+	@ComponentScan(basePackages="org.sjr.babel.web")
 	public static class RestConfiguration extends WebMvcConfigurerAdapter{
 		@Override
 		public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 			configurer.enable();
+		}
+		
+		@Override
+		public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+			ObjectMapper jackson = new ObjectMapper();
+			jackson.registerModule(new Hibernate5Module());
+			MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(jackson);
+			converters.add(converter);
 		}
 
 	}

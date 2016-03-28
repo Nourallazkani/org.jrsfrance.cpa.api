@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Teaching;
@@ -21,7 +22,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	class TeachingSummary {
 		public int id;
-		public String organisation,fieldOfStudy, lanuageLevelRequired, city, country;
+		public String organisation, fieldOfStudy, lanuageLevelRequired;
+		public AddressSummary address;
 		//public List<Link> links;
 
 		public TeachingSummary(Teaching e) {
@@ -30,8 +32,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			this.lanuageLevelRequired = e.getLanguageLevelRequired().getName();
 			this.organisation = e.getOrganisation().getName();
 			if (e.getOrganisation().getAddress() != null) {
-				this.city = e.getOrganisation().getAddress().getCity();
-				this.country = e.getOrganisation().getAddress().getCountry().getName();
+				this.address = new AddressSummary(e.getOrganisation().getAddress());
 			}
 			/*
 			this.links = Arrays.asList(
@@ -52,6 +53,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.GET)
 	@Transactional
+	@RolesAllowed({"ADMIN"})
 	public ResponseEntity<?> get(@PathVariable int id) {
 
 		Optional<Teaching> e = objectStore.getById(Teaching.class, id);
@@ -75,6 +77,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	}
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.DELETE)
 	@Transactional
+	@RolesAllowed({"ADMIN"})
 	public ResponseEntity<Void> delete(@PathVariable int id) {
 		// return deleteIfExists(Education.class, id);
 
@@ -89,6 +92,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.PUT)
 	@Transactional
+	@RolesAllowed({"ADMIN"})
 	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody Teaching e) {
 		if (e.getId() == null || !(e.getId().equals(id))) {
 			return ResponseEntity.badRequest().build();
@@ -101,6 +105,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/teachings", method = RequestMethod.POST)
 	@Transactional
+	@RolesAllowed({"ADMIN"})
 	public ResponseEntity<?> create(@RequestBody Teaching e) {
 		if (e.getId() != null) {
 			return ResponseEntity.badRequest().build();

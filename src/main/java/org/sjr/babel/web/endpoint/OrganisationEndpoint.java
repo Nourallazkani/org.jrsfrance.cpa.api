@@ -1,6 +1,5 @@
 package org.sjr.babel.web.endpoint;
 
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,8 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 
 	class OrganisationSummary {
 		public int id;
-		public String name,city,country,category;
+		public String name, category;
+		public AddressSummary address;
 		
 		public OrganisationSummary( Organisation o ) {
 			this.id = o.getId();
@@ -36,10 +36,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 				this.country = o.getAddress().getCountry().getName();
 			}
 			*/
-			Optional.ofNullable(o.getAddress()).ifPresent(a->{
-				this.city = a.getCity();
-				this.country = a.getCountry().getName();
-			});
+			Optional.ofNullable(o.getAddress()).ifPresent(a -> this.address = new AddressSummary(a));
 			
 		}
 		
@@ -60,7 +57,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed("ADMIN")
+	@RolesAllowed({"ADMIN"})
 	public ResponseEntity<?> org(@PathVariable Integer id) {
 		logger.info("entering org ");
 		return okOrNotFound(objectStore.getById(Organisation.class, id));

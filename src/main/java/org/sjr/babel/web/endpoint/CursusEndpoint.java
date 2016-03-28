@@ -71,7 +71,7 @@ public class CursusEndpoint extends AbstractEndpoint {
 			return ResponseEntity.badRequest().build();
 		}
 		objectStore.save(c);
-		return ResponseEntity.created(URI.create("/cursus/"+c.getId())).body(c);
+		return ResponseEntity.created(getUri("/cursus/"+c.getId())).body(c);
 	}
 	
 }

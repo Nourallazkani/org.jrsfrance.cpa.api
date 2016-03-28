@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Organisation;
@@ -20,39 +22,76 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class OrganisationEndpoint extends AbstractEndpoint {
 
+	class OrganisationSummary {
+		public int id;
+		public String name,city,country,category;
+		
+		public OrganisationSummary( Organisation o ) {
+			this.id = o.getId();
+			this.name = o.getName();
+			this.category = o.getCategory().getName();
+			/*
+			if (o.getAddress() != null) {
+				this.city = o.getAddress().getCity();
+				this.country = o.getAddress().getCountry().getName();
+			}
+			*/
+			Optional.ofNullable(o.getAddress()).ifPresent(a->{
+				this.city = a.getCity();
+				this.country = a.getCountry().getName();
+			});
+			
+		}
+		
+	} 
+	
+	
 	@RequestMapping(path = "/organisations", method = RequestMethod.GET)
 	@Transactional
-	public List<Organisation> list(@RequestParam(name = "name") String name) {
+	public List<OrganisationSummary> list(@RequestParam(name = "name", defaultValue="%") String name) {
 		// List<Organisation> org = dao.find(name);
 		Map<String, Object> args = new HashMap<>();
 		args.put("n", name);
 		List<Organisation> results = objectStore.find(Organisation.class, "select o from Organisation o where o.name like :n", args);
+		//return results.stream().map(x -> new OrganisationSummary(x)).collect(Collectors.toList());
+		return results.stream().map(OrganisationSummary::new).collect(Collectors.toList());
 
-		System.out.println(getUri("abcd"));
-		return results;
 	}
 
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.GET)
 	@Transactional
+	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> org(@PathVariable Integer id) {
 		logger.info("entering org ");
 		return okOrNotFound(objectStore.getById(Organisation.class, id));
 		// return okOrNotFound(dao.getById(id));
 		// return org ==null ? ResponseEntity.notFound().build() : ResponseEntity.ok(org);
 	}
+	
+	
+	@RequestMapping(path = "/organisations/{id}/summary", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<?> orgSummary(@PathVariable Integer id) {
+		logger.info("entering org ");
+		Optional<Organisation> org = objectStore.getById(Organisation.class, id);
+		Optional<OrganisationSummary> orgSummary = org.map(x-> new OrganisationSummary(x));
+		return okOrNotFound(orgSummary);
+	}
 
 	@RequestMapping(path = "/organisations", method = RequestMethod.POST)
 	@Transactional
+	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> org(@RequestBody Organisation o) {
 		if (o.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
 		objectStore.save(o);
-		return ResponseEntity.created(URI.create("/organisations/" + o.getId())).body(o);
+		return ResponseEntity.created(getUri("/organisations/" + o.getId())).body(o);
 	}
 
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.PUT)
 	@Transactional
+	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> updateOrg(@RequestBody Organisation o, @PathVariable int id) {
 		if (o.getId() == null || !o.getId().equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
@@ -63,6 +102,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.DELETE)
 	@Transactional
+	@RolesAllowed("ADMIN")
 	/// @ResponseStatus(code=HttpStatus.NO_CONTENT)
 	public ResponseEntity<Void> delete(@PathVariable int id) {
 		// dao.delete( id);

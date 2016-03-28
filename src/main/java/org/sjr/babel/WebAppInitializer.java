@@ -49,9 +49,9 @@ public class WebAppInitializer implements WebApplicationInitializer
 			
 			
 			entities.stream()
-				.map(x -> x.getJavaType())
-				.filter(x -> x.isAnnotationPresent(Cacheable.class) && x.isAnnotationPresent(CacheOnStartup.class))
-				.sorted((x, y) -> x.getAnnotation(CacheOnStartup.class).order() - y.getAnnotation(CacheOnStartup.class).order())
+				.map(e -> e.getJavaType())
+				.filter(c -> c.isAnnotationPresent(Cacheable.class) && c.isAnnotationPresent(CacheOnStartup.class))
+				.sorted((c1, c2) -> c1.getAnnotation(CacheOnStartup.class).order() - c2.getAnnotation(CacheOnStartup.class).order())
 				.forEach((x)-> em.createQuery("select o from "+x.getName()+" o").getResultList());
 			
 			

@@ -57,7 +57,7 @@ public abstract class AbstractEndpoint {
 	
 	protected URI getUri(String path){
 		HttpRequest httpRequest = new ServletServerHttpRequest(currentRequest());
-		return UriComponentsBuilder.fromHttpRequest(httpRequest).fragment(path).build().toUri();
+		return UriComponentsBuilder.fromHttpRequest(httpRequest).path(path).build().toUri();
 	}
 	
 }

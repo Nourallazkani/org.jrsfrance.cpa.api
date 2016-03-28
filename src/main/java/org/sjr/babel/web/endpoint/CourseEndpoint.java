@@ -49,7 +49,7 @@ public class CourseEndpoint extends AbstractEndpoint {
 			return ResponseEntity.badRequest().build();
 		}
 		Course afterSave = objectStore.save(cour);
-		return ResponseEntity.created(URI.create("http://localhost:8080/courses/" + afterSave.getId())).body(afterSave);
+		return ResponseEntity.created(getUri("/courses/" + afterSave.getId())).body(afterSave);
 	}
 
 	@RequestMapping(path = "{id}", method = RequestMethod.DELETE)

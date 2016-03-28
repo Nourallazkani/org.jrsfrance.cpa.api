@@ -19,33 +19,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TeachingEndpoint extends AbstractEndpoint {
 
-	class EducationSummary {
+	class TeachingSummary {
 		public int id;
-		public String fieldOfStudy, lanuageLevelRequired, city, country;
-		public List<Link> links;
+		public String organisation,fieldOfStudy, lanuageLevelRequired, city, country;
+		//public List<Link> links;
 
-		public EducationSummary(Teaching e) {
+		public TeachingSummary(Teaching e) {
 			this.id = e.getId();
 			this.fieldOfStudy = e.getFieldOfStudy().getName();
 			this.lanuageLevelRequired = e.getLanguageLevelRequired().getName();
-			this.links = Arrays.asList(
-					new Link(e.getOrganisation().getName(),	"/organisations/" + e.getOrganisation().getId(), "organisation"),
-					new Link(null, "/educations/" + e.getId(), "self")
-				);
-
+			this.organisation = e.getOrganisation().getName();
 			if (e.getOrganisation().getAddress() != null) {
 				this.city = e.getOrganisation().getAddress().getCity();
 				this.country = e.getOrganisation().getAddress().getCountry().getName();
 			}
+			/*
+			this.links = Arrays.asList(
+					new Link(e.getOrganisation().getName(),	"/organisations/" + e.getOrganisation().getId(), "organisation"),
+					new Link(null, "/educations/" + e.getId(), "self")
+				);*/
 		}
 	}
 
 	@RequestMapping(path = "/teachings", method = RequestMethod.GET)
 	@Transactional
-	public List<EducationSummary> list() {
+	public List<TeachingSummary> list() {
 		return objectStore.find(Teaching.class, "select t from Teaching t ")
 				.stream()
-				.map(e -> new EducationSummary(e))
+				.map(e -> new TeachingSummary(e))
 				.collect(Collectors.toList());
 	}
 
@@ -61,6 +62,17 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 	}
 
+	@RequestMapping(path = "/teachings/{id}/summary", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<?> getSummary(@PathVariable int id) {
+
+		Optional<TeachingSummary> e = objectStore.getById(Teaching.class, id).map(t->new TeachingSummary(t));
+		if (e.isPresent()) {
+			return ResponseEntity.ok(e.get());
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+	}
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.DELETE)
 	@Transactional
 	public ResponseEntity<Void> delete(@PathVariable int id) {
@@ -94,6 +106,6 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			return ResponseEntity.badRequest().build();
 		}
 		objectStore.save(e);
-		return ResponseEntity.created(URI.create("/teachings/" + e.getId())).build();
+		return ResponseEntity.created(getUri("/teachings/" + e.getId())).build();
 	}
 }

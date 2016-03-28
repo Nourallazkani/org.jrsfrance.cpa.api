@@ -15,6 +15,7 @@ import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -31,6 +32,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 	@Configuration 
 	@ComponentScan(basePackages="org.sjr.babel.persistence") 
 	@EnableTransactionManagement
+	@EnableAspectJAutoProxy
 	public static class ApplicationConfig{
 		
 		@Bean

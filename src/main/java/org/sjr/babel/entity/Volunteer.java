@@ -3,6 +3,7 @@ package org.sjr.babel.entity;
 import java.sql.Date;
 import java.util.List;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
@@ -16,14 +17,18 @@ public class Volunteer extends AbstractEntity {
 
 	private String firstName;
 	private String lastName;
-	private Date birhtday;
+	private Date birthDate;
 	private String email;
-	private String tel;
-	private String password;
+	private String phoneNumber;
 	private String comments;
+	
+	@Embedded
+	private Account account;
+	
+	
 	@ManyToMany(fetch=FetchType.LAZY)
-	//@JoinTable(name="V_L",joinColumns=@JoinColumn(name="V_id"),inverseJoinColumns=@JoinColumn(name="L_id"))
 	private List<Language> languages;
+	
 	@ManyToOne(fetch=FetchType.EAGER)
 	private Civility civility;
 
@@ -43,12 +48,12 @@ public class Volunteer extends AbstractEntity {
 		this.lastName = lastName;
 	}
 
-	public Date getBirhtday() {
-		return birhtday;
+	public Date getBirthDate() {
+		return birthDate;
 	}
 
-	public void setBirhtday(Date birhtday) {
-		this.birhtday = birhtday;
+	public void setBirthDate(Date birthDate) {
+		this.birthDate = birthDate;
 	}
 
 	public String getEmail() {
@@ -59,20 +64,12 @@ public class Volunteer extends AbstractEntity {
 		this.email = email;
 	}
 
-	public String getTel() {
-		return tel;
+	public String getPhoneNumber() {
+		return phoneNumber;
 	}
 
-	public void setTel(String tel) {
-		this.tel = tel;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
 	public String getComments() {
@@ -99,4 +96,13 @@ public class Volunteer extends AbstractEntity {
 		this.civility = civility;
 	}
 
+	public Account getAccount() {
+		return account;
+	}
+
+	public void setAccount(Account account) {
+		this.account = account;
+	}
+	
+	
 }

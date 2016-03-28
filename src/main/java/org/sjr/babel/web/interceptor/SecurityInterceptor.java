@@ -1,6 +1,5 @@
 package org.sjr.babel.web.interceptor;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 

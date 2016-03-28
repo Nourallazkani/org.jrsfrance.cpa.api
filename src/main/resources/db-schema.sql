@@ -85,40 +85,45 @@ create table Cursus (
     lng BIGint,
     organisation_id int,
     level_id int,
+    startDate datetime,
+    endDate datetime,
     foreign key (country_id) references Country (id),
     foreign key (organisation_id) references Organisation(id),
     foreign key (level_id) references Level (id)
 );
 
-create table Course (
-	id int auto_increment primary key,
-    name varchar (255),
+create table Cursus_courses (
+	Cursus_id int not null,
     startDate datetime default now(),
 	endDate datetime default now(),
-	street1 varchar(255) null,
-    street2 varchar(255) null,
-    zipcode varchar(255) null,
-    city varchar(255) null,
-    country_id int,
-    cursus_id int,
+    level_id  int not null,
     translatorRequired bool default false,
-    foreign key (country_id) references Country (id),
-    foreign key (cursus_id) references Cursus (id)
+    foreign key (Cursus_id) references Cursus (id),
+    foreign key (level_id) references Level (id)
 );
 
 create table Volunteer(
 	id int auto_increment PRIMARY key,
-	firstname varchar (255),
-	lastname varchar(255),
-	birthdate date,
+	firstName varchar (255),
+	lastName varchar(255),
+	birthDate date,
 	mail varchar (255),
-	tel int,
+	phoneNumber int,
+	accessKey varchar(255),
 	password varchar (255),
+	role varchar (255),
 	civility_id int,
 	nationality_id int,
     comments varchar(1000),
 	foreign key (civility_id) references Civility (id),
 	foreign key (nationality_id) references Country (id)
+);
+
+create table Volunteer_Language(
+	Volunteer_id int not null,
+    language_id int not null,
+    foreign key (Volunteer_id) references Volunteer(id),
+    foreign key (language_id) references Language(id)
 );
 
 /*
@@ -176,12 +181,7 @@ create table WorkshopRegistration (
     foreign key (student_id) references Student(id)
 );
 
-create table Volunteer_Language(
-	volunteer_id int not null,
-    language_id int not null,
-    foreign key (Volunteer_id) references Volunteer(id),
-    foreign key (language_id) references language(id)
-);
+
 
 
 */

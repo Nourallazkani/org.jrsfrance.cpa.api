@@ -16,8 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 public abstract class AbstractEndpoint {
 
 	@Autowired

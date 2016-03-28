@@ -29,8 +29,8 @@ insert into Organisation(name, street1, country_id, zipcode, category_id) values
 insert into Cursus(name,country_id,organisation_id,level_id) values('A1',1,1,1);
 insert into Cursus(name,country_id,organisation_id,level_id) values('B1',2,3,3);
 
-insert into Course(name, zipcode , country_id , cursus_id, translatorRequired) values('A1.1','75006',1,1,true );
-insert into Course(id,name, zipcode , country_id , cursus_id, translatorRequired) values(2,'B1.1','099',1,2,false );
+insert into Cursus_courses(Cursus_id, level_id, translatorRequired) values(1, 1, true );
+insert into Cursus_courses(Cursus_id, level_id, translatorRequired) values(2, 1, false );
 
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (1,0,1,2,1);
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (0,1,2,1,2);

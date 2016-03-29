@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -48,6 +49,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 				.map(e -> new TeachingSummary(e))
 				.collect(Collectors.toList());
 	}
+	
+	// the new end point 
 
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.GET)
 	@Transactional

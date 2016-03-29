@@ -18,7 +18,7 @@ public class Volunteer extends AbstractEntity {
 	private String firstName;
 	private String lastName;
 	private Date birthDate;
-	private String email;
+	private String mailAddress;
 	private String phoneNumber;
 	private String comments;
 	
@@ -56,12 +56,12 @@ public class Volunteer extends AbstractEntity {
 		this.birthDate = birthDate;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getMailAddress() {
+		return mailAddress;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setMailAddress(String email) {
+		this.mailAddress = email;
 	}
 
 	public String getPhoneNumber() {

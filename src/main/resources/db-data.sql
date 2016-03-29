@@ -37,5 +37,5 @@ insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,org
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (1,0,3,3,3);
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (0,1,1,2,1);
 
-insert into volunteer(firstname,lastname,birthdate,mail,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
-values ('Nour','ALLAZKANI',date(now()),'nourallazkani@gmail.com',0782836691,'xyz','123456789','ADMIN',2,1,'working for JRS');
+insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
+values ('Nour','ALLAZKANI',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',2,1,'working for JRS');

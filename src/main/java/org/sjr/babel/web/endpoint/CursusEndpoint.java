@@ -4,10 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
-
 import org.sjr.babel.entity.Cursus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

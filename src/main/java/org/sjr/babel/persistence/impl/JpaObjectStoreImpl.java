@@ -92,8 +92,7 @@ class JpaObjectStoreImpl implements ObjectStore {
 				Object value = args.get(argKey);
 				logger.debug("about to bind param " + argKey + " with value " + value);
 				query.setParameter(argKey, value);
-			}
-			;
+			};
 		}
 		List<T> results = query.getResultList();
 		return results;
@@ -109,5 +108,10 @@ class JpaObjectStoreImpl implements ObjectStore {
 		TypedQuery<T> query = em.createQuery(hql, clazz);
 		query.setParameter(1, paramValue);
 		return query.getResultList();
+	}
+
+	@Override
+	public <T extends AbstractEntity> List<T> findAll(Class<T> clazz) {
+		return find(clazz, "select c from "+clazz.getName()+" c ");
 	}
 }

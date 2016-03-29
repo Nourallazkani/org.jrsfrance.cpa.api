@@ -18,7 +18,10 @@ insert into Civility(name) values ( 'Mr' );
 insert into Country(name ,isoCode) values ('France', 'FR');
 insert into Country(name , isoCode) values ('Syrie' , 'SYR');
 
-
+insert into Language(name) values('Français');
+insert into Language(name) values('Anglais');
+insert into Language(name) values('Arabe');
+insert into Language(name) values('Dari');
 
 
 insert into Organisation(name, street1, country_id, zipcode, category_id) values ('science po','1 rue Pasteur',1,'75006', 1);
@@ -40,3 +43,5 @@ insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,org
 insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
 values ('Nour','ALLAZKANI',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',2,1,'working for JRS');
 
+insert into Volunteer_Language(Volunteer_id, language_id) values(1,1);
+insert into Volunteer_Language(Volunteer_id, language_id) values(1,2);

@@ -6,6 +6,8 @@ import java.util.List;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
@@ -26,7 +28,8 @@ public class Volunteer extends AbstractEntity {
 	private Account account;
 	
 	
-	@ManyToMany(fetch=FetchType.LAZY)
+	@ManyToMany(fetch=FetchType.LAZY) 
+	@JoinTable(inverseJoinColumns=@JoinColumn(name="language_id"))
 	private List<Language> languages;
 	
 	@ManyToOne(fetch=FetchType.EAGER)

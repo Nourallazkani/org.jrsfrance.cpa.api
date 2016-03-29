@@ -31,5 +31,7 @@ public interface ObjectStore {
 	<T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Object paramValue);
 
 	<T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Map<String, Object> args);
+	
+	<T extends AbstractEntity> List<T> findAll (Class <T> clazz);
 
 }

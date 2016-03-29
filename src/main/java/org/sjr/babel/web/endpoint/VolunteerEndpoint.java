@@ -47,7 +47,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		args.put("name", name );
 		return objectStore.find(Volunteer.class, "select v from Volunteer v where v.firstName like :name or v.lastName like :name ",args)
 				.stream()
-				.map(VolunteerSummary::new)
+				.map(VolunteerSummary::new) /*ou bien .map(x -> new VolunteerSummary(x))*/
 				.collect(Collectors.toList());
 	}
 	
@@ -58,10 +58,11 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> getFullVolunteer(@PathVariable int id) {
 		/*
-		 * //Other way to create this method if
-		 * (objectStore.getById(Volunteer.class, id) == null){ return
-		 * ResponseEntity.badRequest().build(); } return
-		 * ResponseEntity.ok(objectStore.getById(Volunteer.class, id));
+		 //Other way to create this method 
+		 if(objectStore.getById(Volunteer.class, id) == null){ 
+		 	return ResponseEntity.badRequest().build(); 
+		 } 
+		 return ResponseEntity.ok(objectStore.getById(Volunteer.class, id));
 		 */
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (v.isPresent()) {

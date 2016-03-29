@@ -56,9 +56,9 @@ create table Organisation(
     city varchar(255) null,
     accessKey varchar (255) null,
     role varchar (255) null,
-    contact varchar(255);
-	phoneNumber varchar(255);
-	mailAddress varchar(255);
+    contact varchar(255),
+	phoneNumber varchar(255),
+	mailAddress varchar(255),
     category_id int not null,
     country_id int null,
     foreign key (country_id) references Country (id),

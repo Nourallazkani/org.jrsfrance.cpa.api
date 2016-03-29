@@ -23,17 +23,19 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 
 	class VolunteerSummary {
 
+		public int id;
 		public String civility, firstName, lastName, phoneNumber;
-		public List<Language> languages;
+		public List<String> languages;
 		public Date birthDate ;
 
 		public VolunteerSummary(Volunteer v) {
+			this.id = v.getId();
 			this.civility = v.getCivility().getName();
 			this.firstName = v.getFirstName();
 			this.lastName = v.getLastName();
 			this.birthDate = v.getBirthDate();
 			this.phoneNumber = v.getPhoneNumber();
-			this.languages = v.getLanguages();
+			this.languages = v.getLanguages().stream().map(x-> x.getName()).collect(Collectors.toList());
 		}
 
 	}
@@ -91,10 +93,10 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.badRequest().build();
 		}
 		objectStore.save(v);
-		return ResponseEntity.created(getUri("/volunteer" + v.getId())).build();
+		return ResponseEntity.created(getUri("/volunteers/" + v.getId())).body(v);
 	}
 
-	@RequestMapping(path = "/volunteer/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody Volunteer v) {

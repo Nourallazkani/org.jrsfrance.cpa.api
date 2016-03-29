@@ -39,3 +39,4 @@ insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,org
 
 insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
 values ('Nour','ALLAZKANI',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',2,1,'working for JRS');
+

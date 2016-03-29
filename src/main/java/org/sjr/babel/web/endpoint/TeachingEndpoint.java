@@ -36,7 +36,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			/*
 			this.links = Arrays.asList(
 					new Link(e.getOrganisation().getName(),	"/organisations/" + e.getOrganisation().getId(), "organisation"),
-					new Link(null, "/educations/" + e.getId(), "self")
+					new Link(null, "/education s/" + e.getId(), "self")
 				);*/
 		}
 	}
@@ -112,6 +112,6 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			return ResponseEntity.badRequest().build();
 		}
 		objectStore.save(e);
-		return ResponseEntity.created(getUri("/teachings/" + e.getId())).build();
+		return ResponseEntity.created(getUri("/teachings/" + e.getId())).body(e);
 	}
 }

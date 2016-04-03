@@ -107,5 +107,8 @@ public class Volunteer extends AbstractEntity {
 		this.account = account;
 	}
 	
+	public String getFullName (){
+		return this.firstName+" "+ this.lastName;
+	}
 	
 }

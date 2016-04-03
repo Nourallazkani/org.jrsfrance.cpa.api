@@ -20,7 +20,7 @@ public interface ObjectStore {
 	 * abcd
 	 * 
 	 * @param hql
-	 *            xya
+	 * 			xya
 	 * @param args
 	 * @param clazz
 	 * @return

@@ -43,5 +43,7 @@ insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,org
 insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
 values ('Nour','ALLAZKANI',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',2,1,'working for JRS');
 
+insert into administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
+values('Alaric','Hermant','alaric_hermant@yahoo.fr','xyz','ADMIN','07123456','123456789',2);
 insert into Volunteer_Language(Volunteer_id, language_id) values(1,1);
 insert into Volunteer_Language(Volunteer_id, language_id) values(1,2);

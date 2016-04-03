@@ -1,7 +1,9 @@
 package org.sjr.babel.web.endpoint;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -9,11 +11,13 @@ import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Teaching;
+import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,7 +27,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public int id;
 		public String organisation, fieldOfStudy, lanuageLevelRequired;
 		public AddressSummary address;
-		//public List<Link> links;
+		// public List<Link> links;
 
 		public TeachingSummary(Teaching e) {
 			this.id = e.getId();
@@ -33,28 +37,39 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			if (e.getOrganisation().getAddress() != null) {
 				this.address = new AddressSummary(e.getOrganisation().getAddress());
 			}
-			/*
-			this.links = Arrays.asList(
-					new Link(e.getOrganisation().getName(),	"/organisations/" + e.getOrganisation().getId(), "organisation"),
-					new Link(null, "/education s/" + e.getId(), "self")
-				);*/
 		}
 	}
 
 	@RequestMapping(path = "/teachings", method = RequestMethod.GET)
 	@Transactional
-	public List<TeachingSummary> list() {
-		return objectStore.find(Teaching.class, "select t from Teaching t ")
-				.stream()
-				.map(e -> new TeachingSummary(e))
+	public List<TeachingSummary> list(
+			@RequestParam(required = false) Integer organisationId,
+			@RequestParam(required = false) Integer fieldOfStudyId, 
+			@RequestParam(required = false) String city) {
+		
+		StringBuffer hql = new StringBuffer("select t from Teaching t where 0=0 ") ;
+		Map<String, Object> args = new HashMap<>();
+		if (organisationId != null ) {
+			args.put("oId" , organisationId);
+			hql.append(" and t.organisation.id = :oId");
+		}
+		if (fieldOfStudyId != null ) {
+			args.put("fId" , fieldOfStudyId);
+			hql.append(" and t.fieldOfStudy.id = :fId");
+		}
+		if (city != null && !city.trim().equals("")) {
+			args.put("name" , city);
+			hql.append(" and  t.organisation.address.city like :name");
+		}
+		return objectStore.find(Teaching.class, hql.toString() , args ).stream().map(e -> new TeachingSummary(e))
 				.collect(Collectors.toList());
 	}
-	
-	// the new end point 
+
+	// the new end point
 
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
+	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> get(@PathVariable int id) {
 
 		Optional<Teaching> e = objectStore.getById(Teaching.class, id);
@@ -69,16 +84,17 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> getSummary(@PathVariable int id) {
 
-		Optional<TeachingSummary> e = objectStore.getById(Teaching.class, id).map(t->new TeachingSummary(t));
+		Optional<TeachingSummary> e = objectStore.getById(Teaching.class, id).map(t -> new TeachingSummary(t));
 		if (e.isPresent()) {
 			return ResponseEntity.ok(e.get());
 		} else {
 			return ResponseEntity.notFound().build();
 		}
 	}
+
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
+	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<Void> delete(@PathVariable int id) {
 		// return deleteIfExists(Education.class, id);
 
@@ -93,7 +109,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.PUT)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
+	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody Teaching e) {
 		if (e.getId() == null || !(e.getId().equals(id))) {
 			return ResponseEntity.badRequest().build();
@@ -106,7 +122,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/teachings", method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
+	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> create(@RequestBody Teaching e) {
 		if (e.getId() != null) {
 			return ResponseEntity.badRequest().build();

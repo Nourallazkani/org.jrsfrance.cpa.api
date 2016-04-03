@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
+
+import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Language;
 import org.springframework.http.ResponseEntity;
@@ -26,7 +29,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		public int id;
 		public String civility, firstName, lastName, phoneNumber;
 		public List<String> languages;
-		public Date birthDate ;
+		public Date birthDate;
 
 		public VolunteerSummary(Volunteer v) {
 			this.id = v.getId();
@@ -35,34 +38,35 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			this.lastName = v.getLastName();
 			this.birthDate = v.getBirthDate();
 			this.phoneNumber = v.getPhoneNumber();
-			this.languages = v.getLanguages().stream().map(x-> x.getName()).collect(Collectors.toList());
+			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 		}
 
 	}
 
 	@RequestMapping(path = "/volunteers", method = RequestMethod.GET)
 	@Transactional
-	public List<VolunteerSummary> list(@RequestParam ( name = "name" , defaultValue = "%",required=false) String name ) {
+	public List<VolunteerSummary> list(@RequestParam(name = "name", defaultValue = "%", required = false) String name) {
 		Map<String, Object> args = new HashMap<>();
-		args.put("name", name );
-		return objectStore.find(Volunteer.class, "select v from Volunteer v where v.firstName like :name or v.lastName like :name ",args)
-				.stream()
-				.map(VolunteerSummary::new) /*ou bien .map(x -> new VolunteerSummary(x))*/
+		args.put("name", name);
+		return objectStore
+				.find(Volunteer.class,
+						"select v from Volunteer v where v.firstName like :name or v.lastName like :name ", args)
+				.stream().map(VolunteerSummary::new) /*
+														 * ou bien .map(x -> new
+														 * VolunteerSummary(x))
+														 */
 				.collect(Collectors.toList());
 	}
-	
-	
 
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.GET)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> getFullVolunteer(@PathVariable int id) {
 		/*
-		 //Other way to create this method 
-		 if(objectStore.getById(Volunteer.class, id) == null){ 
-		 	return ResponseEntity.badRequest().build(); 
-		 } 
-		 return ResponseEntity.ok(objectStore.getById(Volunteer.class, id));
+		 * //Other way to create this method
+		 * if(objectStore.getById(Volunteer.class, id) == null){ return
+		 * ResponseEntity.badRequest().build(); } return
+		 * ResponseEntity.ok(objectStore.getById(Volunteer.class, id));
 		 */
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (v.isPresent()) {
@@ -93,6 +97,10 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (v.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
+		if (v.getAccount() == null) {
+			v.setAccount(new Account());
+		}
+		v.getAccount().setAccessKey("V-"+UUID.randomUUID().toString());
 		objectStore.save(v);
 		return ResponseEntity.created(getUri("/volunteers/" + v.getId())).body(v);
 	}

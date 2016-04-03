@@ -4,11 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
+import org.apache.commons.codec.digest.DigestUtils;
+import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Organisation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,53 +28,53 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		public int id;
 		public String name, category;
 		public AddressSummary address;
-		
-		public OrganisationSummary( Organisation o ) {
+
+		public OrganisationSummary(Organisation o) {
 			this.id = o.getId();
 			this.name = o.getName();
 			this.category = o.getCategory().getName();
 			/*
-			if (o.getAddress() != null) {
-				this.city = o.getAddress().getCity();
-				this.country = o.getAddress().getCountry().getName();
-			}
-			*/
+			 * if (o.getAddress() != null) { this.city =
+			 * o.getAddress().getCity(); this.country =
+			 * o.getAddress().getCountry().getName(); }
+			 */
 			Optional.ofNullable(o.getAddress()).ifPresent(a -> this.address = new AddressSummary(a));
-			
+
 		}
-		
-	} 
-	
-	
+
+	}
+
 	@RequestMapping(path = "/organisations", method = RequestMethod.GET)
 	@Transactional
-	public List<OrganisationSummary> list(@RequestParam(name = "name", defaultValue="%") String name) {
+	public List<OrganisationSummary> list(@RequestParam(name = "name", defaultValue = "%") String name) {
 		// List<Organisation> org = dao.find(name);
 		Map<String, Object> args = new HashMap<>();
 		args.put("n", name);
-		List<Organisation> results = objectStore.find(Organisation.class, "select o from Organisation o where o.name like :n", args);
-		//return results.stream().map(x -> new OrganisationSummary(x)).collect(Collectors.toList());
+		List<Organisation> results = objectStore.find(Organisation.class,
+				"select o from Organisation o where o.name like :n", args);
+		// return results.stream().map(x -> new
+		// OrganisationSummary(x)).collect(Collectors.toList());
 		return results.stream().map(OrganisationSummary::new).collect(Collectors.toList());
 
 	}
 
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
+	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> org(@PathVariable Integer id) {
 		logger.info("entering org ");
 		return okOrNotFound(objectStore.getById(Organisation.class, id));
 		// return okOrNotFound(dao.getById(id));
-		// return org ==null ? ResponseEntity.notFound().build() : ResponseEntity.ok(org);
+		// return org ==null ? ResponseEntity.notFound().build() :
+		// ResponseEntity.ok(org);
 	}
-	
-	
+
 	@RequestMapping(path = "/organisations/{id}/summary", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> orgSummary(@PathVariable Integer id) {
 		logger.info("entering org ");
 		Optional<Organisation> org = objectStore.getById(Organisation.class, id);
-		Optional<OrganisationSummary> orgSummary = org.map(x-> new OrganisationSummary(x));
+		Optional<OrganisationSummary> orgSummary = org.map(x -> new OrganisationSummary(x));
 		return okOrNotFound(orgSummary);
 	}
 
@@ -82,8 +85,18 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		if (o.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
+		if (o.getAccount() == null) {
+			o.setAccount(new Account());
+		}
+		o.getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
+		String password = o.getAccount().getPassword();
+		if (password == null || password.equals("")) {
+			password = UUID.randomUUID().toString().substring(0, 8);
+		}
+		o.getAccount().setPassword(DigestUtils.sha256Hex(password));
 		objectStore.save(o);
 		return ResponseEntity.created(getUri("/organisations/" + o.getId())).body(o);
+
 	}
 
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.PUT)

@@ -131,6 +131,19 @@ create table Volunteer_Language(
     foreign key (language_id) references Language(id)
 );
 
+create table Administrator (
+id int auto_increment primary key ,
+firstName varchar(255),
+lastName varchar(255),
+mailAddress varchar(255),
+phoneNumber varchar(255),
+password varchar(255),
+accessKey varchar(255),
+role varchar(255),
+civility_id int ,
+foreign key (civility_id) references civility(id)
+);
+
 /*
 CREATE TABLE Student (
     id int AUTO_INCREMENT PRIMARY KEY,
@@ -185,6 +198,7 @@ create table WorkshopRegistration (
     foreign key (workshop_id) references Workshop (id),
     foreign key (student_id) references Student(id)
 );
+
 
 
 

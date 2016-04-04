@@ -24,10 +24,10 @@ insert into Language(name) values('Arabe');
 insert into Language(name) values('Dari');
 
 
-insert into Organisation(name, street1, country_id, zipcode, category_id) values ('science po','1 rue Pasteur',1,'75006', 1);
-insert into Organisation(name, street1, country_id, zipcode, category_id) values ('JRS','5 rue assas', 1, '75005',2);
-insert into Organisation(name, street1, country_id, zipcode, category_id) values ('SRS','8 boulvard Mazzeh', 2, '099', 3);
-insert into Organisation(name, street1, country_id, zipcode, category_id) values ('DamasLanguageCenter','10 rue Damas', 2, '099', 1);
+insert into Organisation(name, street1, country_id, zipcode, contact, category_id) values ('science po','1 rue Pasteur',1,'75006', '{"name":"a","phoneNumber":"b","mailAddress":"c"}', 1);
+insert into Organisation(name, street1, country_id, zipcode, contact, category_id) values ('JRS','5 rue assas', 1, '75005','{"name":"e","phoneNumber":"f","mailAddress":"g"}', 2);
+insert into Organisation(name, street1, country_id, zipcode, contact, category_id) values ('SRS','8 boulvard Mazzeh', 2, '099', '{"name":"i","phoneNumber":"j","mailAddress":"k"}', 3);
+insert into Organisation(name, street1, country_id, zipcode, contact, category_id) values ('DamasLanguageCenter','10 rue Damas', 2, '099', '{"name":"l","phoneNumber":"m","mailAddress":"n"}', 1);
 
 insert into Cursus(name,country_id,organisation_id,level_id) values('A1',1,1,1);
 insert into Cursus(name,country_id,organisation_id,level_id) values('B1',2,3,3);
@@ -43,14 +43,14 @@ insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,org
 insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
 values ('Nour','ALLAZKANI',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',2,1,'working for JRS');
 
-insert into administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
+insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
 values('Alaric','Hermant','alaric_hermant@yahoo.fr','xyz','ADMIN','07123456','123456789',2);
-insert into administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
+insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
 values('Irinda','riquelme','irinda.r@gmail.com','xyz','ADMIN','07123456','123456789',1);
 
 insert into Volunteer_Language(Volunteer_id, language_id) values(1,1);
 insert into Volunteer_Language(Volunteer_id, language_id) values(1,2);
 
-update teaching set teaching.contactName = 'Irinda' ,teaching.contactPhone = '07123456', teaching.contactMailAddress='irinda.r@gmail.com' where id =1 ;
-update teaching set teaching.contactName = 'Nour' ,teaching.contactPhone = '07123456', teaching.contactMailAddress='nourallazkani@gmail.com' where id =2 ;
-update teaching set teaching.contactName = 'Irinda' ,teaching.contactPhone = '07123456', teaching.contactMailAddress='alaric_hermant@yahoo.fr' where id =3 ;
+update Teaching set contactName = 'Irinda' , contactPhone = '07123456', contactMailAddress='irinda.r@gmail.com' where id =1 ;
+update Teaching set contactName = 'Nour' , contactPhone = '07123456', contactMailAddress='nourallazkani@gmail.com' where id =2 ;
+update Teaching set contactName = 'Irinda' ,contactPhone = '07123456', contactMailAddress='alaric_hermant@yahoo.fr' where id =3 ;

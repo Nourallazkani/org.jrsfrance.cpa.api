@@ -120,9 +120,15 @@ create table Volunteer(
 	accessKey varchar(255),
 	password varchar (255),
 	role varchar (255),
-	civility_id int,
-	nationality_id int,
     comments varchar(1000),
+    street1 varchar(255),
+    street2 varchar(255),
+    zipcode varchar(255),
+    city varchar(255),
+    civility_id int,
+    country_id int,
+	nationality_id int,
+    foreign key (country_id) references Country(id),
 	foreign key (civility_id) references Civility (id),
 	foreign key (nationality_id) references Country (id)
 );
@@ -135,16 +141,16 @@ create table Volunteer_Language(
 );
 
 create table Administrator (
-id int auto_increment primary key ,
-firstName varchar(255),
-lastName varchar(255),
-mailAddress varchar(255),
-phoneNumber varchar(255),
-password varchar(255),
-accessKey varchar(255),
-role varchar(255),
-civility_id int ,
-foreign key (civility_id) references civility(id)
+	id int auto_increment primary key ,
+	firstName varchar(255),
+	lastName varchar(255),
+	mailAddress varchar(255),
+	phoneNumber varchar(255),
+	password varchar(255),
+	accessKey varchar(255),
+	role varchar(255),
+	civility_id int ,
+	foreign key (civility_id) references Civility(id)
 );
 
 /*

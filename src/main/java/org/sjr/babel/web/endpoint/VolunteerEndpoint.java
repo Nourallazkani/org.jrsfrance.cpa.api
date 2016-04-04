@@ -45,7 +45,11 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/volunteers", method = RequestMethod.GET)
 	@Transactional
-	public List<VolunteerSummary> list(@RequestParam(name = "name", defaultValue = "%", required = false) String name) {
+	public List<VolunteerSummary> list(
+			@RequestParam(name = "name", defaultValue = "%", required = false) String name,
+			@RequestParam(required = false) Integer languageId,
+			@RequestParam(required = false) String city, 
+			@RequestParam(required = false) String zipcode)	 {
 		Map<String, Object> args = new HashMap<>();
 		args.put("name", name);
 		return objectStore

@@ -25,6 +25,9 @@ public class Volunteer extends AbstractEntity {
 	private String comments;
 	
 	@Embedded
+	private Address address;
+	
+	@Embedded
 	private Account account;
 	
 	

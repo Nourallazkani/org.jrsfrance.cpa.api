@@ -26,7 +26,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) {
 		String encodedPassword = DigestUtils.sha256Hex(input.password);
 		if ("A".equals(input.realm)) {
-
+				
 			if (false) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			} else {

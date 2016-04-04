@@ -2,12 +2,9 @@ package org.sjr.babel.entity;
 
 import java.util.UUID;
 
-import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.PrePersist;
-
-import org.apache.commons.codec.digest.DigestUtils;import com.fasterxml.jackson.databind.ser.impl.FailingSerializer;
 
 @Embeddable
 public class Account {

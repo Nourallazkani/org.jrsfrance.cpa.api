@@ -1,6 +1,5 @@
 package org.sjr.babel.web.endpoint;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Teaching;
-import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,17 +23,20 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	class TeachingSummary {
 		public int id;
-		public String organisation, fieldOfStudy, lanuageLevelRequired;
+		public String organisation, fieldOfStudy, languageLevelRequired ,contactName,contactPhone,contactMailAddress;
 		public AddressSummary address;
 		// public List<Link> links;
 
-		public TeachingSummary(Teaching e) {
-			this.id = e.getId();
-			this.fieldOfStudy = e.getFieldOfStudy().getName();
-			this.lanuageLevelRequired = e.getLanguageLevelRequired().getName();
-			this.organisation = e.getOrganisation().getName();
-			if (e.getOrganisation().getAddress() != null) {
-				this.address = new AddressSummary(e.getOrganisation().getAddress());
+		public TeachingSummary(Teaching t) {
+			this.id = t.getId();
+			this.fieldOfStudy = t.getFieldOfStudy().getName();
+			this.languageLevelRequired  = t.getLanguageLevelRequired().getName();
+			this.organisation = t.getOrganisation().getName();
+			this.contactName = t.getContactName();
+			this.contactPhone = t.getContactPhone();
+			this.contactMailAddress = t.getContactMailAddress();
+			if (t.getOrganisation().getAddress() != null) {
+				this.address = new AddressSummary(t.getOrganisation().getAddress());
 			}
 		}
 	}
@@ -72,9 +73,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> get(@PathVariable int id) {
 
-		Optional<Teaching> e = objectStore.getById(Teaching.class, id);
-		if (e.isPresent()) {
-			return ResponseEntity.ok(e.get());
+		Optional<Teaching> t = objectStore.getById(Teaching.class, id);
+		if (t.isPresent()) {
+			return ResponseEntity.ok(t.get());
 		} else {
 			return ResponseEntity.notFound().build();
 		}
@@ -84,9 +85,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> getSummary(@PathVariable int id) {
 
-		Optional<TeachingSummary> e = objectStore.getById(Teaching.class, id).map(t -> new TeachingSummary(t));
-		if (e.isPresent()) {
-			return ResponseEntity.ok(e.get());
+		Optional<TeachingSummary> t = objectStore.getById(Teaching.class, id).map(te -> new TeachingSummary(te));
+		if (t.isPresent()) {
+			return ResponseEntity.ok(t.get());
 		} else {
 			return ResponseEntity.notFound().build();
 		}
@@ -98,9 +99,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	public ResponseEntity<Void> delete(@PathVariable int id) {
 		// return deleteIfExists(Education.class, id);
 
-		Optional<Teaching> e = objectStore.getById(Teaching.class, id);
-		if (e.isPresent()) {
-			objectStore.delete(e.get());
+		Optional<Teaching> t = objectStore.getById(Teaching.class, id);
+		if (t.isPresent()) {
+			objectStore.delete(t.get());
 			return ResponseEntity.noContent().build();
 		} else {
 			return ResponseEntity.notFound().build();
@@ -110,11 +111,11 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody Teaching e) {
-		if (e.getId() == null || !(e.getId().equals(id))) {
+	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody Teaching t) {
+		if (t.getId() == null || !(t.getId().equals(id))) {
 			return ResponseEntity.badRequest().build();
 		} else {
-			objectStore.save(e);
+			objectStore.save(t);
 			return ResponseEntity.noContent().build();
 		}
 
@@ -123,11 +124,11 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "/teachings", method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> create(@RequestBody Teaching e) {
-		if (e.getId() != null) {
+	public ResponseEntity<?> create(@RequestBody Teaching t) {
+		if (t.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
-		objectStore.save(e);
-		return ResponseEntity.created(getUri("/teachings/" + e.getId())).body(e);
+		objectStore.save(t);
+		return ResponseEntity.created(getUri("/teachings/" + t.getId())).body(t);
 	}
 }

@@ -45,5 +45,12 @@ values ('Nour','ALLAZKANI',date(now()),'nourallazkani@gmail.com','0782836691','x
 
 insert into administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
 values('Alaric','Hermant','alaric_hermant@yahoo.fr','xyz','ADMIN','07123456','123456789',2);
+insert into administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
+values('Irinda','riquelme','irinda.r@gmail.com','xyz','ADMIN','07123456','123456789',1);
+
 insert into Volunteer_Language(Volunteer_id, language_id) values(1,1);
 insert into Volunteer_Language(Volunteer_id, language_id) values(1,2);
+
+update teaching set teaching.contactName = 'Irinda' ,teaching.contactPhone = '07123456', teaching.contactMailAddress='irinda.r@gmail.com' where id =1 ;
+update teaching set teaching.contactName = 'Nour' ,teaching.contactPhone = '07123456', teaching.contactMailAddress='nourallazkani@gmail.com' where id =2 ;
+update teaching set teaching.contactName = 'Irinda' ,teaching.contactPhone = '07123456', teaching.contactMailAddress='alaric_hermant@yahoo.fr' where id =3 ;

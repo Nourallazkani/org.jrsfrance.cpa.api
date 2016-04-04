@@ -9,6 +9,8 @@ public class Teaching extends AbstractEntity {
 	@ManyToOne
 	private FieldOfStudy fieldOfStudy;
 	
+	private String contactName,contactPhone,contactMailAddress;
+	
 	@ManyToOne
 	private Level languageLevelRequired;
 	
@@ -19,6 +21,33 @@ public class Teaching extends AbstractEntity {
 	private String link;
 
 
+	
+	
+	public String getContactName() {
+		return contactName;
+	}
+
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public String getContactPhone() {
+		return contactPhone;
+	}
+
+	public void setContactPhone(String contactPhone) {
+		this.contactPhone = contactPhone;
+	}
+
+	public String getContactMailAddress() {
+		return contactMailAddress;
+	}
+
+	public void setContactMailAddress(String contactMailAddress) {
+		this.contactMailAddress = contactMailAddress;
+	}
+
+	
 	public Boolean getMaster() {
 		return master;
 	}

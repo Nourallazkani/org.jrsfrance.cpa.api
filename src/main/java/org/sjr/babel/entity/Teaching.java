@@ -18,23 +18,6 @@ public class Teaching extends AbstractEntity {
 	private Boolean licence;
 	private String link;
 
-
-	public Boolean getMaster() {
-		return master;
-	}
-
-	public void setMaster(Boolean master) {
-		this.master = master;
-	}
-
-	public Boolean getLicence() {
-		return licence;
-	}
-
-	public void setLicence(Boolean licence) {
-		this.licence = licence;
-	}
-
 	public Organisation getOrganisation() {
 		return organisation;
 	}
@@ -82,5 +65,4 @@ public class Teaching extends AbstractEntity {
 	public void setLink(String link) {
 		this.link = link;
 	}
-
 }

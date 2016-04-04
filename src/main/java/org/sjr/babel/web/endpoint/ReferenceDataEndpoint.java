@@ -1,17 +1,16 @@
 package org.sjr.babel.web.endpoint;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
-import org.sjr.babel.entity.AbstractEntity;
+import org.sjr.babel.entity.Level;
 import org.sjr.babel.entity.reference.Civility;
 import org.sjr.babel.entity.reference.Country;
 import org.sjr.babel.entity.reference.FieldOfStudy;
+import org.sjr.babel.entity.reference.Language;
 import org.sjr.babel.entity.reference.OrganisationCategory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,10 +36,11 @@ public class ReferenceDataEndpoint extends AbstractEndpoint{
 		
 		*/
 		map.put("countries", objectStore.findAll(Country.class));
+		map.put("levels", objectStore.findAll(Level.class));
 		map.put("civilities", objectStore.findAll(Civility.class));
 		map.put("organisationCategories", objectStore.findAll(OrganisationCategory.class));
-		map.put("fieldsOfStudy", objectStore.findAll(Country.class));
-		map.put("languages", objectStore.findAll(Civility.class));
+		map.put("fieldsOfStudies", objectStore.findAll(FieldOfStudy.class));
+		map.put("languages", objectStore.findAll(Language.class));
 	}
 	
 	@RequestMapping(method=RequestMethod.GET)

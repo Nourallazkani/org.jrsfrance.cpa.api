@@ -88,22 +88,6 @@ public class Teaching extends AbstractEntity {
 		this.languageLevelRequired = languageLevelRequierd;
 	}
 
-	public boolean isMaster() {
-		return master;
-	}
-
-	public void setMaster(boolean master) {
-		this.master = master;
-	}
-
-	public boolean isLicence() {
-		return licence;
-	}
-
-	public void setLicence(boolean licence) {
-		this.licence = licence;
-	}
-
 	public String getLink() {
 		return link;
 	}

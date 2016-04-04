@@ -3,12 +3,14 @@ package org.sjr.babel.entity;
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
+import org.sjr.babel.entity.Contact.ContactConverter;
 import org.sjr.babel.entity.reference.OrganisationCategory;
 
 @Entity // @Table(name="Organisation")
@@ -17,10 +19,10 @@ import org.sjr.babel.entity.reference.OrganisationCategory;
 public class Organisation extends AbstractEntity {
 
 	@Basic
-	@Column(name = "name")
 	private String name;
 
-	private String contact, phoneNumber, mailAddress;
+	@Convert(converter=ContactConverter.class)
+	private Contact contact;
 
 	@Embedded
 	private Address address;
@@ -39,29 +41,15 @@ public class Organisation extends AbstractEntity {
 		this.name = name;
 	}
 
-	public String getContact() {
+	public Contact getContact() {
 		return contact;
 	}
 
-	public void setContact(String contact) {
+	public void setContact(Contact contact) {
 		this.contact = contact;
 	}
 
-	public String getPhoneNumber() {
-		return phoneNumber;
-	}
 
-	public void setPhoneNumber(String phoneNumber) {
-		this.phoneNumber = phoneNumber;
-	}
-
-	public String getMailAddress() {
-		return mailAddress;
-	}
-
-	public void setMailAddress(String mailAddress) {
-		this.mailAddress = mailAddress;
-	}
 
 	public Address getAddress() {
 		return address;

@@ -67,10 +67,7 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 		if (ad.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
-		if (ad.getAccount() == null) {
-			ad.setAccount(new Account());
-		}
-		ad.getAccount().setAccessKey("A-" + UUID.randomUUID().toString());
+		
 		String password = ad.getAccount().getPassword();
 		if (password == null || password.equals("")) {
 			password = UUID.randomUUID().toString().substring(0, 8);

@@ -88,7 +88,6 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		if (o.getAccount() == null) {
 			o.setAccount(new Account());
 		}
-		o.getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
 		String password = o.getAccount().getPassword();
 		if (password == null || password.equals("")) {
 			password = UUID.randomUUID().toString().substring(0, 8);

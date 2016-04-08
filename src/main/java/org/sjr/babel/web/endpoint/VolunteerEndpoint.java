@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Account;
@@ -43,22 +44,40 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 
 	}
 
+
+
 	@RequestMapping(path = "/volunteers", method = RequestMethod.GET)
 	@Transactional
 	public List<VolunteerSummary> list(
-			@RequestParam(name = "name", defaultValue = "%", required = false) String name,
-			@RequestParam(required = false) Integer languageId,
-			@RequestParam(required = false) String city, 
-			@RequestParam(required = false) String zipcode)	 {
+			@RequestParam(required = false) String name,
+			@RequestParam(required = false) Integer languageId, 
+			@RequestParam(required = false) String city,
+			@RequestParam(required = false) String zipcode) {
+
+		StringBuffer hql = new StringBuffer("select v from Volunteer v join fetch v.languages l  where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
-		args.put("name", name);
-		return objectStore
-				.find(Volunteer.class,
-						"select v from Volunteer v where v.firstName like :name or v.lastName like :name ", args)
-				.stream().map(VolunteerSummary::new) /*
-														 * ou bien .map(x -> new
-														 * VolunteerSummary(x))
-														 */
+		if (languageId != null) {
+			hql.append("and l.id = :languageId ");
+			args.put("languageId", languageId);
+		}
+		if (name != null) {
+			args.put("name", name);
+			hql.append(" and v.firstName like :name or v.lastName like :name ");
+		}
+		if (city != null) {
+			args.put("city", city);
+			hql.append(" and v.address.city like :city");
+		}
+		if (zipcode != null) {
+			args.put("zipcode", zipcode);
+			hql.append(" and v.address.zipcode like :zipcode");
+		}
+
+		return objectStore.find(Volunteer.class, hql.toString(),args).stream()
+				.map(VolunteerSummary::new) /*
+											 * ou bien .map(x -> new
+											 * VolunteerSummary(x))
+											 */
 				.collect(Collectors.toList());
 	}
 
@@ -101,10 +120,6 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (v.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
-		if (v.getAccount() == null) {
-			v.setAccount(new Account());
-		}
-		v.getAccount().setAccessKey("V-"+UUID.randomUUID().toString());
 		objectStore.save(v);
 		return ResponseEntity.created(getUri("/volunteers/" + v.getId())).body(v);
 	}

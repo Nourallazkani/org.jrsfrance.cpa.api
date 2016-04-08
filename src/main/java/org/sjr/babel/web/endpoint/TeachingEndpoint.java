@@ -46,7 +46,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	public List<TeachingSummary> list(
 			@RequestParam(required = false) Integer organisationId,
 			@RequestParam(required = false) Integer fieldOfStudyId, 
-			@RequestParam(required = false) String city) {
+			@RequestParam(required = false) String city,
+			@RequestParam(required = false) String zipcode) {
 		
 		StringBuffer hql = new StringBuffer("select t from Teaching t where 0=0 ") ;
 		Map<String, Object> args = new HashMap<>();
@@ -61,6 +62,10 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		if (city != null && !city.trim().equals("")) {
 			args.put("name" , city);
 			hql.append(" and  t.organisation.address.city like :name");
+		}
+		if (zipcode !=null){
+			args.put("zipcode", zipcode);
+			hql.append(" and t.organisation.address.zipcode like :zipcode");
 		}
 		return objectStore.find(Teaching.class, hql.toString() , args ).stream().map(e -> new TeachingSummary(e))
 				.collect(Collectors.toList());

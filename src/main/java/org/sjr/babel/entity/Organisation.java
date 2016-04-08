@@ -1,13 +1,15 @@
 package org.sjr.babel.entity;
 
+import java.util.UUID;
+
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
-import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 import org.sjr.babel.entity.Contact.ContactConverter;
@@ -19,9 +21,9 @@ import org.sjr.babel.entity.reference.OrganisationCategory;
 public class Organisation extends AbstractEntity {
 
 	@Basic
-	private String name;
+	private String name, mailAddress;
 
-	@Convert(converter=ContactConverter.class)
+	@Convert(converter = ContactConverter.class)
 	private Contact contact;
 
 	@Embedded
@@ -45,11 +47,17 @@ public class Organisation extends AbstractEntity {
 		return contact;
 	}
 
+	public String getMailAddress() {
+		return mailAddress;
+	}
+
+	public void setMailAddress(String mailAddress) {
+		this.mailAddress = mailAddress;
+	}
+
 	public void setContact(Contact contact) {
 		this.contact = contact;
 	}
-
-
 
 	public Address getAddress() {
 		return address;
@@ -73,6 +81,15 @@ public class Organisation extends AbstractEntity {
 
 	public void setCategory(OrganisationCategory category) {
 		this.category = category;
+	}
+
+	@PrePersist
+	public void prePersist() {
+		if (this.account == null) {
+			setAccount(new Account());
+		}
+		getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
+
 	}
 
 }

@@ -2,6 +2,7 @@ package org.sjr.babel.entity;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 
 import org.sjr.babel.entity.reference.Civility;
 import org.sjr.babel.entity.reference.Language;
@@ -23,20 +25,27 @@ public class Volunteer extends AbstractEntity {
 	private String mailAddress;
 	private String phoneNumber;
 	private String comments;
-	
+
 	@Embedded
 	private Address address;
-	
+
 	@Embedded
 	private Account account;
-	
-	
-	@ManyToMany(fetch=FetchType.LAZY) 
-	@JoinTable(inverseJoinColumns=@JoinColumn(name="language_id"))
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id") )
 	private List<Language> languages;
-	
-	@ManyToOne(fetch=FetchType.EAGER)
+
+	@ManyToOne(fetch = FetchType.EAGER)
 	private Civility civility;
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
 
 	public String getFirstName() {
 		return firstName;
@@ -109,9 +118,18 @@ public class Volunteer extends AbstractEntity {
 	public void setAccount(Account account) {
 		this.account = account;
 	}
-	
-	public String getFullName (){
-		return this.firstName+" "+ this.lastName;
+
+	public String getFullName() {
+		return this.firstName + " " + this.lastName;
 	}
 	
+	@PrePersist
+	public void prePersist() {
+		if (this.account == null) {
+			setAccount(new Account());
+		}
+		getAccount().setAccessKey("V-" + UUID.randomUUID().toString());
+
+	}
+
 }

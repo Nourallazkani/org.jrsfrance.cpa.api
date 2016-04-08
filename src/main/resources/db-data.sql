@@ -54,3 +54,11 @@ insert into Volunteer_Language(Volunteer_id, language_id) values(1,2);
 update Teaching set contactName = 'Irinda' , contactPhone = '07123456', contactMailAddress='irinda.r@gmail.com' where id =1 ;
 update Teaching set contactName = 'Nour' , contactPhone = '07123456', contactMailAddress='nourallazkani@gmail.com' where id =2 ;
 update Teaching set contactName = 'Irinda' ,contactPhone = '07123456', contactMailAddress='alaric_hermant@yahoo.fr' where id =3 ;
+
+insert into Volunteer_Language(Volunteer_id, language_id) values(1,1);
+insert into Volunteer_Language(Volunteer_id, language_id) values(1,2);
+
+insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
+values ('lucile','flo',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',1,1,'working for JRS');
+insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
+values ('jawad','dsa',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',2,1,'working for JRS');

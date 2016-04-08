@@ -10,6 +10,7 @@ import javax.persistence.PersistenceContextType;
 import javax.persistence.TypedQuery;
 
 import org.sjr.babel.entity.AbstractEntity;
+import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.persistence.ObjectStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,4 +115,14 @@ class JpaObjectStoreImpl implements ObjectStore {
 	public <T extends AbstractEntity> List<T> findAll(Class<T> clazz) {
 		return find(clazz, "select c from "+clazz.getName()+" c ");
 	}
+
+	@Override
+	public <T extends AbstractEntity> Optional<T> findOne(Class<T> clazz, String hql, Map<String, Object> args) {
+		List<T> items = find(clazz, hql, args);
+		if( items.isEmpty()){
+			return Optional.empty(); 
+		}
+		return Optional.of(items.get(0));
+	}
+
 }

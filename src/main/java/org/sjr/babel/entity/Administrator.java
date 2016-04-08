@@ -1,9 +1,12 @@
 package org.sjr.babel.entity;
 
+import java.util.UUID;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
 
 import org.sjr.babel.entity.reference.Civility;
 
@@ -41,6 +44,11 @@ public class Administrator extends AbstractEntity {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
+	
+	public String getFullName() {
+		return this.firstName + " " + this.lastName;
+	}
+
 
 	public String getPhoneNumber() {
 		return phoneNumber;
@@ -64,6 +72,15 @@ public class Administrator extends AbstractEntity {
 
 	public void setAccount(Account account) {
 		this.account = account;
+	}
+	
+	@PrePersist
+	public void prePersist() {
+		if (this.account == null) {
+			setAccount(new Account());
+		}
+		getAccount().setAccessKey("A-" + UUID.randomUUID().toString());
+
 	}
 
 }

@@ -15,6 +15,8 @@ public interface ObjectStore {
 	<T extends AbstractEntity> void delete(Class<T> clazz, int id);
 
 	<T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id);
+	
+	<T extends AbstractEntity> Optional<T>	findOne(Class<T> clazz, String hql	, Map<String, Object> args);
 
 	/**
 	 * abcd

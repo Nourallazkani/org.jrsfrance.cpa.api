@@ -1,8 +1,11 @@
+use babel;
 
 insert into Level(name,next_id,previous_id,description) values ('A1',2,null,' Debutant ');
 insert into Level(name,next_id,previous_id,description) values ('A2',3,1,'moyen');
 insert into Level(name,next_id,previous_id,description) values ('B1',4,2,'moyen');
 insert into Level(name,next_id,previous_id,description) values ('B2',null,3,'expaire');
+
+insert into EventType (name) values ('convesation');
 
 insert into FieldOfStudy(name) values ('IT engineering');
 insert into FieldOfStudy(name) values ('business');
@@ -62,3 +65,6 @@ insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,acces
 values ('lucile','flo',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',1,1,'working for JRS');
 insert into Volunteer(firstname,lastname,birthdate,mailAddress,phoneNumber,accessKey,password,role,civility_id,nationality_id,comments)
 values ('jawad','dsa',date(now()),'nourallazkani@gmail.com','0782836691','xyz','123456789','ADMIN',2,1,'working for JRS');
+
+insert into AbstractEvent(street1, country_id, zipcode, subject,description,organisation_id ,type_id ,DTYPE)
+values ('14 rue d''assas',1,'75006','Politique','  ',2,1,'O-E');

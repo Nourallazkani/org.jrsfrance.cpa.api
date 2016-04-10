@@ -21,7 +21,7 @@ import org.sjr.babel.entity.reference.OrganisationCategory;
 public class Organisation extends AbstractEntity {
 
 	@Basic
-	private String name, mailAddress;
+	private String name, userName;
 
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
@@ -47,12 +47,12 @@ public class Organisation extends AbstractEntity {
 		return contact;
 	}
 
-	public String getMailAddress() {
-		return mailAddress;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setMailAddress(String mailAddress) {
-		this.mailAddress = mailAddress;
+	public void setUserName(String mailAddress) {
+		this.userName = mailAddress;
 	}
 
 	public void setContact(Contact contact) {

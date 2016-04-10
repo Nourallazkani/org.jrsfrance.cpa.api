@@ -3,6 +3,7 @@ package org.sjr.babel.persistence.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -63,7 +64,7 @@ class JpaObjectStoreImpl implements ObjectStore {
 
 	@Override // pour l appelant : Organisation o =
 				// superdao.getById(Organisation.class, 3);
-	public <T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id) {
+	public <T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id, Function<T, ?>... fetchs) {
 		T entity = em.find(clazz, id);
 		if (entity != null) {
 			return Optional.of(entity);

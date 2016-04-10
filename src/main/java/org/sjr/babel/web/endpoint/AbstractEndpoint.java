@@ -16,10 +16,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public abstract class AbstractEndpoint {
 
 	@Autowired
 	protected ObjectStore objectStore;
+	
+	@Autowired
+	protected ObjectMapper jackson;
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -72,4 +77,20 @@ public abstract class AbstractEndpoint {
 			this.lng = a.getLng();
 		}
 	}
+	
+	public static class Error {
+		
+		public static final Error INVALID_DATE_RANGE = new Error("Date.Order.error","The Strating date must be befor the ending one");
+		public static final Error MAIL_ADDRESS_ALREADY_EXISTS = new Error("mailAddress.already.exsists", null) ;
+		
+		public String key, defaultMessage;
+
+		Error(String key, String defaultMessage) {
+			super();
+			this.key = key;
+			this.defaultMessage = defaultMessage;
+		}
+	}
+	
+	
 }

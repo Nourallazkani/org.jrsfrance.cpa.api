@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.List;
 import java.util.UUID;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -32,12 +33,15 @@ public class Volunteer extends AbstractEntity {
 	@Embedded
 	private Account account;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id") )
-	private List<Language> languages;
+	@ElementCollection
+	private List<Availability> availabilities;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Civility civility;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id"))
+	private List<Language> languages;
 
 	public Address getAddress() {
 		return address;
@@ -119,10 +123,18 @@ public class Volunteer extends AbstractEntity {
 		this.account = account;
 	}
 
+	public List<Availability> getAvailabilities() {
+		return availabilities;
+	}
+
+	public void setAvailabilities(List<Availability> availabilities) {
+		this.availabilities = availabilities;
+	}
+
 	public String getFullName() {
 		return this.firstName + " " + this.lastName;
 	}
-	
+
 	@PrePersist
 	public void prePersist() {
 		if (this.account == null) {

@@ -3,12 +3,10 @@ package org.sjr.babel.entity;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Cacheable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
@@ -16,14 +14,10 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @Entity
-@Cacheable
-@CacheOnStartup(order = 2) // @Table(name= "Cursus")
 public class Cursus extends AbstractEntity {
 
 	private String name;
@@ -35,8 +29,7 @@ public class Cursus extends AbstractEntity {
 	private Date endDate;
 
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "organisation_id")
-	private Organisation org;
+	private Organisation organisation;
 
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "cursus")
 	@ElementCollection
@@ -73,12 +66,12 @@ public class Cursus extends AbstractEntity {
 		this.endDate = endDate;
 	}
 
-	public Organisation getOrg() {
-		return org;
+	public Organisation getOrganisation() {
+		return organisation;
 	}
 
-	public void setOrg(Organisation org) {
-		this.org = org;
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
 	}
 
 	public List<Course> getCourses() {

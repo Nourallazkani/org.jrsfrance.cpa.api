@@ -1,15 +1,22 @@
 package org.sjr.babel.web.endpoint;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
+
+import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Cursus;
+import org.sjr.babel.entity.AbstractEvent;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,10 +36,21 @@ public class CursusEndpoint extends AbstractEndpoint {
 		public CursusSummary(Cursus c) {
 			this.id = c.getId();
 			this.level = c.getName();
-			this.organisation = c.getOrg().getName();
-			this.address = new  AddressSummary(c.getAddress());
+			this.organisation = c.getOrganisation().getName();
+			this.address = new AddressSummary(c.getAddress());
 			this.startDate = c.getStartDate();
 			this.endDate = c.getEndDate();
+		}
+	}
+
+	private boolean hasAccess(String accessKey, Cursus cursus) {
+		if (accessKey.startsWith("A-")) {
+			Map<String, Object> args = new HashMap<>();
+			args.put("accessKey", accessKey);
+			String hql = "select a from Administrator a where a.account.accessKey = :accessKey";
+			return objectStore.findOne(Administrator.class, hql, args).isPresent();
+		} else {
+			return cursus.getOrganisation().getAccount().getAccessKey().equals(accessKey);
 		}
 	}
 
@@ -45,25 +63,27 @@ public class CursusEndpoint extends AbstractEndpoint {
 	}
 
 	@RequestMapping(path = "{id}", method = RequestMethod.GET)
-	@RolesAllowed({"ADMIN"})
+	@RolesAllowed({ "ADMIN" })
 	@Transactional
-	public ResponseEntity<?> cursus(@PathVariable Integer id,@RequestParam(defaultValue="true") boolean withDetails) {
+	public ResponseEntity<?> getCursus(@PathVariable Integer id,
+			@RequestParam(defaultValue = "true") boolean withDetails, @RequestHeader String accessKey) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
-		System.out.println(withDetails);
 		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
 		if (c.isPresent()) {
-			Cursus cursus = c.get();
-			if (withDetails)
-			{
-				cursus.getCourses().size();
+			if (hasAccess(accessKey, c.get())) {
+				Cursus cursus = c.get();
+				if (withDetails) {
+					cursus.getCourses().size();
+				}
+				return ResponseEntity.ok().body(cursus);
 			}
-			return ResponseEntity.ok().body(cursus);
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		return ResponseEntity.notFound().build();
 	}
-	
-	
+
 	@RequestMapping(path = "{id}/summary", method = RequestMethod.GET)
+	@Transactional
 	public ResponseEntity<?> cursusSummary(@PathVariable Integer id) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
 		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
@@ -72,7 +92,6 @@ public class CursusEndpoint extends AbstractEndpoint {
 		}
 		return ResponseEntity.notFound().build();
 	}
-	
 
 	@RequestMapping(path = "{id}/courses", method = RequestMethod.GET)
 	@Transactional
@@ -89,42 +108,57 @@ public class CursusEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "{id}", method = RequestMethod.PUT)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
-	public ResponseEntity<?> saveCur(@RequestBody Cursus cur, @PathVariable int id) {
+	@RolesAllowed({ "ADMIN", "ORGANISATION" })
+	public ResponseEntity<?> saveCur(@RequestBody Cursus cur, @PathVariable int id, @RequestHeader String accessKey) {
 		if (cur.getId() == null || !cur.getId().equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
+		} else if (!hasAccess(accessKey, cur)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		if (cur.getEndDate().before(cur.getStartDate())) {
+			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
 		}
 		objectStore.save(cur);
 		return ResponseEntity.noContent().build();
+
 	}
 
 	@RequestMapping(path = "{id}", method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
-	public ResponseEntity<?> delete(@PathVariable int id) {
+	@RolesAllowed({ "ADMIN", "ORGANISATION" })
+	public ResponseEntity<?> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
-		if (c.isPresent()) {
-			Cursus cursus = c.get();
-			if (!cursus.getCourses().isEmpty()) {
-				int n = cursus.getCourses().size();
-				return ResponseEntity.badRequest().body("This cursus has " + n + " dependant courses");
-			}
-			objectStore.delete(cursus);
-			return ResponseEntity.noContent().build();
+		if (!c.isPresent()) {
+			return ResponseEntity.badRequest().build();
 		}
-		return ResponseEntity.badRequest().build();
+		Cursus cursus = c.get();
+		if (!hasAccess(accessKey, c.get())) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		if (!cursus.getCourses().isEmpty()) {
+			int n = cursus.getCourses().size();
+			return ResponseEntity.badRequest().body("This cursus has " + n + " dependant courses");
+		}
+		objectStore.delete(cursus);
+		return ResponseEntity.noContent().build();
+
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed({"ADMIN"})
-	public ResponseEntity<?> save(@RequestBody Cursus c) {
+	@RolesAllowed({ "ADMIN" })
+	public ResponseEntity<?> save(@RequestBody Cursus c, @RequestHeader String accessKey) {
 		if (c.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
-
-		objectStore.save(c);
-		return ResponseEntity.created(getUri("/cursus/" + c.getId())).body(c);
+		if (c.getEndDate().before(c.getStartDate())) {
+			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
+		}
+		if (hasAccess(accessKey, c)) {
+			objectStore.save(c);
+			return ResponseEntity.created(getUri("/cursus/" + c.getId())).body(c);
+		}
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	}
 
 }

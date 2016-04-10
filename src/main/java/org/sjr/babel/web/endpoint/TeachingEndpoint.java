@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
+@RestController @RequestMapping(path = "/teachings")
 public class TeachingEndpoint extends AbstractEndpoint {
 
 	class TeachingSummary {
@@ -40,8 +40,10 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			}
 		}
 	}
+	
+	
 
-	@RequestMapping(path = "/teachings", method = RequestMethod.GET)
+	@RequestMapping( method = RequestMethod.GET)
 	@Transactional
 	public List<TeachingSummary> list(
 			@RequestParam(required = false) Integer organisationId,
@@ -73,7 +75,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	// the new end point
 
-	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.GET)
+	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> get(@PathVariable int id) {
@@ -86,7 +88,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 	}
 
-	@RequestMapping(path = "/teachings/{id}/summary", method = RequestMethod.GET)
+	@RequestMapping(path = "/{id}/summary", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> getSummary(@PathVariable int id) {
 
@@ -98,7 +100,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 	}
 
-	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.DELETE)
+	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<Void> delete(@PathVariable int id) {
@@ -113,7 +115,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 	}
 
-	@RequestMapping(path = "/teachings/{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody Teaching t) {
@@ -126,7 +128,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	}
 
-	@RequestMapping(path = "/teachings", method = RequestMethod.POST)
+	@RequestMapping( method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> create(@RequestBody Teaching t) {

@@ -23,6 +23,7 @@ Soit une classe A :
 			@ManyToOne* si le type est une entité (et éventuellement @JoinColumn)
 
 		si le type est un agrégat (list, set, map) :
+		
 			@ElementCollection* si le type des éléments de l'agrégat est un composant (et éventuellement @CollectionTable)
 			@OneToMany* si le type  des éléments de l'agrégat est une entité (et éventuellement @JoinColumn)
 			ou

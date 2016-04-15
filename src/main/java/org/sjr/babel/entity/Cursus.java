@@ -21,6 +21,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class Cursus extends AbstractEntity {
 
 	private String name;
+	
+	private Date registrationStartDate ;
+	
+	private boolean openForRegistration;
 
 	@Temporal(TemporalType.DATE)
 	private Date startDate;
@@ -30,6 +34,8 @@ public class Cursus extends AbstractEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Organisation organisation;
+	
+	
 
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "cursus")
 	@ElementCollection
@@ -72,6 +78,24 @@ public class Cursus extends AbstractEntity {
 
 	public void setOrganisation(Organisation organisation) {
 		this.organisation = organisation;
+	}
+	
+	
+	
+	public Date getRegistrationStartDate() {
+		return registrationStartDate;
+	}
+
+	public void setRegistrationStartDate(Date registrationStartDate) {
+		this.registrationStartDate = registrationStartDate;
+	}
+
+	public boolean isOpenForRegistration() {
+		return openForRegistration;
+	}
+
+	public void setOpenForRegistration(boolean openForRegistration) {
+		this.openForRegistration = openForRegistration;
 	}
 
 	public List<Course> getCourses() {

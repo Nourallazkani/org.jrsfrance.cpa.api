@@ -19,9 +19,13 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	private String description, subject;
 
+	private Date registrationStartDate;
+
+	private boolean openForRegistration;
+
 	@Embedded
 	private Address address;
-	
+
 	@ManyToOne
 	private EventType type;
 
@@ -43,7 +47,6 @@ public abstract class AbstractEvent extends AbstractEntity {
 	public void setSubject(String subject) {
 		this.subject = subject;
 	}
-	
 
 	public EventType getType() {
 		return type;
@@ -76,6 +79,25 @@ public abstract class AbstractEvent extends AbstractEntity {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
+	
+
+	public Date getRegistrationStartDate() {
+		return registrationStartDate;
+	}
+
+	public void setRegistrationStartDate(Date registrationStartDate) {
+		this.registrationStartDate = registrationStartDate;
+	}
+
+	public boolean isOpenForRegistration() {
+		return openForRegistration;
+	}
+
+	public void setOpenForRegistration(boolean openForRegistration) {
+		this.openForRegistration = openForRegistration;
+	}
+
+
 
 	@Entity
 	@DiscriminatorValue("O-E")
@@ -96,7 +118,7 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@Entity
 	@DiscriminatorValue("V-E")
 	public static class VolunteerEvent extends AbstractEvent {
-		
+
 		@ManyToOne
 		private Volunteer volunteer;
 

@@ -1,28 +1,32 @@
 package org.sjr.babel.entity;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 import org.sjr.babel.entity.reference.FieldOfStudy;
+
 @Entity
 public class Teaching extends AbstractEntity {
 	@ManyToOne
 	private FieldOfStudy fieldOfStudy;
-	
+
 	private String contactName, contactPhone, contactMailAddress;
-	
+
+	private Date registrationStartDate;
+
+	private boolean openForRegistration;
+
 	@ManyToOne
 	private Level languageLevelRequired;
-	
+
 	@ManyToOne
 	private Organisation organisation;
 	private Boolean master;
 	private Boolean licence;
 	private String link;
 
-
-	
-	
 	public String getContactName() {
 		return contactName;
 	}
@@ -47,7 +51,6 @@ public class Teaching extends AbstractEntity {
 		this.contactMailAddress = contactMailAddress;
 	}
 
-	
 	public Boolean getMaster() {
 		return master;
 	}
@@ -62,6 +65,24 @@ public class Teaching extends AbstractEntity {
 
 	public void setLicence(Boolean licence) {
 		this.licence = licence;
+	}
+	
+	
+
+	public Date getRegistrationStartDate() {
+		return registrationStartDate;
+	}
+
+	public void setRegistrationStartDate(Date registrationStartDate) {
+		this.registrationStartDate = registrationStartDate;
+	}
+
+	public boolean isOpenForRegistration() {
+		return openForRegistration;
+	}
+
+	public void setOpenForRegistration(boolean openForRegistration) {
+		this.openForRegistration = openForRegistration;
 	}
 
 	public Organisation getOrganisation() {

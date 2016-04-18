@@ -36,6 +36,8 @@ public class Refugee extends AbstractEntity {
 	@Embedded
 	private Address address;
 	
+	@ElementCollection
+	private List<Appointment> appointments ;
 	
 	@ElementCollection
 	private List<LanguageSkill> languageSkills;

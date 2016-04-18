@@ -228,3 +228,14 @@ create table Refugee_languageSkills(
     foreign key (Refugee_id) references Refugee(id),
     foreign key (language_id) references Language(id)
 );
+
+create table Refugee_Appointments(
+	Refugee_id int not null,
+	Volunteer_id int not null,
+	startTime int not null,
+	endTime int not null,
+    subject varchar (500),
+    accepted bool null,
+    foreign key (Refugee_id) references Refugee(id),
+    foreign key (Volunteer_id) references Volunteer(id)
+);

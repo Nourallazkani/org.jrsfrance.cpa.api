@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.sql.Ref;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -13,17 +14,22 @@ import javax.transaction.Transactional;
 import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.AbstractEvent;
+import org.sjr.babel.entity.Administrator;
+import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
 import org.sjr.babel.web.endpoint.EventEndpoint.EventSummary;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController @RequestMapping(path = "/refugees")
+@RestController
+@RequestMapping(path = "/refugees")
 public class RefugeeEndpoint extends AbstractEndpoint {
 
 	class RefugeeSummary {
@@ -40,19 +46,16 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			this.lastName = r.getLastName();
 			this.birthDate = r.getBirthDate();
 			this.phoneNumber = r.getPhoneNumber();
-			this.languages = r.getLanguageSkills().stream().map(x -> x.getLanguage().getName()).collect(Collectors.toList());
+			this.languages = r.getLanguageSkills().stream().map(x -> x.getLanguage().getName())
+					.collect(Collectors.toList());
 		}
 
 	}
 
-
-
-	@RequestMapping( method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET)
 	@Transactional
-	public List<RefugeeSummary> list(
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) Integer languageId, 
-			@RequestParam(required = false) String city,
+	public List<RefugeeSummary> list(@RequestParam(required = false) String name,
+			@RequestParam(required = false) Integer languageId, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode) {
 
 		StringBuffer hql = new StringBuffer("select r from Refugee r join fetch r.languages l  where 0=0 ");
@@ -74,20 +77,18 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			hql.append(" and r.address.zipcode like :zipcode");
 		}
 
-		return objectStore.find(Refugee.class, hql.toString(),args).stream()
-				.map(RefugeeSummary::new)
+		return objectStore.find(Refugee.class, hql.toString(), args).stream().map(RefugeeSummary::new)
 				.collect(Collectors.toList());
 	}
-	
 
 	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> getFullRefugee(@PathVariable int id) {
-		
+
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (r.isPresent()) {
-		// TODO hasAccess
+			// TODO hasAccess
 			return ResponseEntity.ok(r.get());
 		} else {
 			return ResponseEntity.notFound().build();
@@ -95,7 +96,38 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 	}
 
-	
+	private boolean hasAccess(String accessKey, Refugee r) {
+		if (accessKey.startsWith("A-")) {
+			Map<String, Object> args = new HashMap<>();
+			args.put("ak", accessKey);
+			return objectStore
+					.findOne(Administrator.class, "select a from Administrator a where a.account.accessKey = :ak", args)
+					.isPresent();
+		} else {
+			return r.getAccount().getAccessKey().equals(accessKey);
+		}
+	}
+
+	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.GET)
+	@Transactional
+	@RolesAllowed({ "ADMIN" })
+	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestHeader String accsessKey) {
+		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
+		if (!r.isPresent()) {
+			return ResponseEntity.notFound().build();
+		}
+		Refugee refugee = r.get();
+		if (!hasAccess(accsessKey, refugee)) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		} else {
+			Map<String, Object> args = new HashMap<>();
+			args.put("id", id);
+			List<MeetingRequest> meetings = objectStore.find(MeetingRequest.class,
+					"select mr from MeetingRequests mr where mr.refugee_id like :id", args);
+			return ResponseEntity.ok(meetings);
+		}
+	}
+
 	@RequestMapping(path = "/{id}/summary", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> getRefugeeSummary(@PathVariable int id) {
@@ -107,9 +139,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	
-	
-	
+
 	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
@@ -124,8 +154,26 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 	}
 	
+	
+	@RequestMapping(path = "/{id}/meetingRequests/meetingRequest", method = RequestMethod.POST)
+	@Transactional
+	@RolesAllowed({ "ADMIN", "REFUGEE" })
+	public ResponseEntity<?> creatMeetingRequest(@RequestBody MeetingRequest mr, @RequestHeader String accessKey,
+			@PathVariable int id) {
+		
+			Optional<Refugee> r = objectStore.getById(Refugee.class, id);
+			if (!r.isPresent()) {
+				return ResponseEntity.badRequest().build();
+			} else if (!hasAccess(accessKey, r.get())) {
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
+			objectStore.save(mr);
+			return ResponseEntity.created(getUri("/refugees/" +r.get().getId()+"/meetingRequests/"+mr.getId())).body(mr);
+	}
+	
+	
 
-	@RequestMapping( method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> saveRefugee(@RequestBody Refugee r) {
@@ -148,6 +196,5 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 
 	}
-	
-	
+
 }

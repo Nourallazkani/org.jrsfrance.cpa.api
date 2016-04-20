@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 
 import org.sjr.babel.entity.reference.Civility;
@@ -42,9 +43,20 @@ public class Volunteer extends AbstractEntity {
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id"))
 	private List<Language> languages;
+	
+	@OneToMany
+	private List<MeetingRequest> meetingRequests ;
 
 	public Address getAddress() {
 		return address;
+	}
+
+	public List<MeetingRequest> getMeetingRequests() {
+		return meetingRequests;
+	}
+
+	public void setMeetingRequests(List<MeetingRequest> meetingRequests) {
+		this.meetingRequests = meetingRequests;
 	}
 
 	public void setAddress(Address address) {
@@ -135,6 +147,7 @@ public class Volunteer extends AbstractEntity {
 		return this.firstName + " " + this.lastName;
 	}
 
+	
 	@PrePersist
 	public void prePersist() {
 		if (this.account == null) {

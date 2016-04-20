@@ -1,18 +1,20 @@
 package org.sjr.babel.entity;
 
-import javax.persistence.Embeddable;
+import java.util.Date;
+
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
-@Embeddable
-public class Appointment extends AbstractEntity {
+@Entity
+public class MeetingRequest extends AbstractEntity {
 	
 	@ManyToOne
 	private Refugee refugee;
 	
 	@ManyToOne
 	private Volunteer volunteer;
-	
-	private int startTime, endTime;
+
+	private Date startDate, endDate;
 	private Boolean accepted;
 	
 	
@@ -29,17 +31,17 @@ public class Appointment extends AbstractEntity {
 	public void setVolunteer(Volunteer volunteer) {
 		this.volunteer = volunteer;
 	}
-	public int getStartTime() {
-		return startTime;
+	public Date getStartDate() {
+		return startDate;
 	}
-	public void setStartTime(int startTime) {
-		this.startTime = startTime;
+	public void setStartDate(Date startTime) {
+		this.startDate = startTime;
 	}
-	public int getEndTime() {
-		return endTime;
+	public Date getEndDate() {
+		return endDate;
 	}
-	public void setEndTime(int endTime) {
-		this.endTime = endTime;
+	public void setEndDate(Date endTime) {
+		this.endDate = endTime;
 	}
 	public Boolean getAccepted() {
 		return accepted;

@@ -18,6 +18,7 @@ import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
 import org.sjr.babel.web.endpoint.EventEndpoint.EventSummary;
+import org.springframework.beans.factory.config.YamlProcessor.ResolutionMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -107,6 +108,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			return r.getAccount().getAccessKey().equals(accessKey);
 		}
 	}
+	
+	
 
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.GET)
 	@Transactional
@@ -196,5 +199,31 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 
 	}
-
+	
+	
+	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}" , method = RequestMethod.DELETE)
+	@Transactional
+	@RolesAllowed({"ADMIN" , "REFUGEE"})
+	public ResponseEntity<?> deleteMeetingRequest (@PathVariable int id , 
+			@PathVariable int meetingRequestId,
+			@RequestHeader String accessKey){
+		Optional<MeetingRequest> mr = objectStore.getById(MeetingRequest.class, meetingRequestId);
+		if (!mr.isPresent()){
+			return ResponseEntity.notFound().build();
+		}else{
+			Optional<Refugee> r = objectStore.getById(Refugee.class, id);
+			if(!r.isPresent()){
+				return ResponseEntity.badRequest().build();
+			}
+			
+			Refugee refugee = r.get();
+			if(!hasAccess(accessKey, refugee)){
+				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
+			objectStore.delete(mr.get());
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	
 }

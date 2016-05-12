@@ -105,7 +105,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			Map<String, Object> args = new HashMap<>();
 			args.put("id", id);
 			List<MeetingRequest> meetings = objectStore.find(MeetingRequest.class,
-					"select mr from MeetingRequests mr where mr.Volunteer_id like :id", args);
+					"select mr from MeetingRequest mr where mr.volunteer.id = :id", args);
 			return ResponseEntity.ok(meetings);
 		}
 	}
@@ -141,11 +141,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		return ResponseEntity.notFound().build();
 
 	}
-
-	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.POST)
+	
+	public  static  class MeetingRequestAcceptationCommand{
+	public Boolean accepted ;
+	}
+  
+	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "VOLNTEER" })
-	public ResponseEntity<?> updateMeetingRequest(@RequestBody MeetingRequest mr, @RequestHeader String accessKey,
+	public ResponseEntity<?> AcceptMeetingRequest(@RequestBody MeetingRequestAcceptationCommand accepted, @RequestHeader String accessKey,
 			@PathVariable int id, @PathVariable int meetingRequestId) {
 		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, meetingRequestId);
 		if (!meeting.isPresent()) {
@@ -158,7 +162,9 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			} else if (!hasAccess(accessKey, v.get())) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
-			objectStore.save(mr);
+			MeetingRequest meetingRequest = meeting.get();
+			meetingRequest.setAccepted(accepted.accepted);		
+			objectStore.save(meetingRequest);
 			return ResponseEntity.ok().build();
 		}
 	}

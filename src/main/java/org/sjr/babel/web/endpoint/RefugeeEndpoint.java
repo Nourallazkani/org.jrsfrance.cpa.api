@@ -81,22 +81,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		return objectStore.find(Refugee.class, hql.toString(), args).stream().map(RefugeeSummary::new)
 				.collect(Collectors.toList());
 	}
-
-	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> getFullRefugee(@PathVariable int id) {
-
-		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
-		if (r.isPresent()) {
-			// TODO hasAccess
-			return ResponseEntity.ok(r.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-
-	}
-
+	
+	
 	private boolean hasAccess(String accessKey, Refugee r) {
 		if (accessKey.startsWith("A-")) {
 			Map<String, Object> args = new HashMap<>();
@@ -107,6 +93,22 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		} else {
 			return r.getAccount().getAccessKey().equals(accessKey);
 		}
+	}
+	
+
+	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
+	@Transactional
+	@RolesAllowed({ "ADMIN" })
+	public ResponseEntity<?> getFullRefugee(@PathVariable int id ,@RequestHeader String accessKey) {
+
+		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
+		if (!r.isPresent()) {
+			return ResponseEntity.notFound().build();
+		} else if (!hasAccess(accessKey, r.get())){
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		return ResponseEntity.ok(r.get());
+
 	}
 	
 	
@@ -126,7 +128,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			Map<String, Object> args = new HashMap<>();
 			args.put("id", id);
 			List<MeetingRequest> meetings = objectStore.find(MeetingRequest.class,
-					"select mr from MeetingRequests mr where mr.refugee_id like :id", args);
+					"select mr from MeetingRequest mr where mr.refugee.id = :id", args);
 			return ResponseEntity.ok(meetings);
 		}
 	}
@@ -158,20 +160,22 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	}
 	
 	
-	@RequestMapping(path = "/{id}/meetingRequests/meetingRequest", method = RequestMethod.POST)
+	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "REFUGEE" })
-	public ResponseEntity<?> creatMeetingRequest(@RequestBody MeetingRequest mr, @RequestHeader String accessKey,
+	public ResponseEntity<?> createMeetingRequest(@RequestBody MeetingRequest mr, @RequestHeader String accessKey,
 			@PathVariable int id) {
 		
 			Optional<Refugee> r = objectStore.getById(Refugee.class, id);
+			Refugee refugee = r.get();
 			if (!r.isPresent()) {
 				return ResponseEntity.badRequest().build();
-			} else if (!hasAccess(accessKey, r.get())) {
+			} else if (!hasAccess(accessKey, refugee)) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
+			mr.setRefugee(refugee);
 			objectStore.save(mr);
-			return ResponseEntity.created(getUri("/refugees/" +r.get().getId()+"/meetingRequests/"+mr.getId())).body(mr);
+			return ResponseEntity.created(getUri("/refugees/" +refugee.getId()+"/meetingRequests/"+mr.getId())).body(mr);
 	}
 	
 	

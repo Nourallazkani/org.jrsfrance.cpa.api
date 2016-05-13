@@ -102,10 +102,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (!hasAccess(accsessKey, volunteer)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} else {
-			Map<String, Object> args = new HashMap<>();
-			args.put("id", id);
-			List<MeetingRequest> meetings = objectStore.find(MeetingRequest.class,
-					"select mr from MeetingRequest mr where mr.volunteer.id = :id", args);
+			List<MeetingRequest> meetings = volunteer.getMeetingRequests();
 			return ResponseEntity.ok(meetings);
 		}
 	}
@@ -141,16 +138,16 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		return ResponseEntity.notFound().build();
 
 	}
-	
-	public  static  class MeetingRequestAcceptationCommand{
-	public Boolean accepted ;
+
+	public static class MeetingRequestAcceptationCommand {
+		public boolean accepted;
 	}
-  
-	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.PUT)
+
+	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed({ "ADMIN", "VOLNTEER" })
-	public ResponseEntity<?> AcceptMeetingRequest(@RequestBody MeetingRequestAcceptationCommand accepted, @RequestHeader String accessKey,
-			@PathVariable int id, @PathVariable int meetingRequestId) {
+	@RolesAllowed({ "ADMIN", "VOLUNTEER" })
+	public ResponseEntity<?> AcceptMeetingRequest(@RequestBody MeetingRequestAcceptationCommand accepted,
+			@RequestHeader String accessKey, @PathVariable int id, @PathVariable int meetingRequestId) {
 		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, meetingRequestId);
 		if (!meeting.isPresent()) {
 			// TODO to inform the user that there is no meeting/volunteer found.
@@ -163,15 +160,20 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 			MeetingRequest meetingRequest = meeting.get();
-			meetingRequest.setAccepted(accepted.accepted);		
+			meetingRequest.setAccepted(accepted.accepted);
+			if(accepted.accepted){
+				for( MeetingRequest m : v.get().getMeetingRequests()){
+					if (m.getAccepted() == null){
+						m.setAccepted(false);
+					}
+				}
+			}
+			
 			objectStore.save(meetingRequest);
 			return ResponseEntity.ok().build();
 		}
 	}
-	
-	
-	
-	
+
 	@RequestMapping(path = "/volunteers", method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })

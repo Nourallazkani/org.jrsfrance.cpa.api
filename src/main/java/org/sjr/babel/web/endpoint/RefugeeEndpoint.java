@@ -81,8 +81,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		return objectStore.find(Refugee.class, hql.toString(), args).stream().map(RefugeeSummary::new)
 				.collect(Collectors.toList());
 	}
-	
-	
+
 	private boolean hasAccess(String accessKey, Refugee r) {
 		if (accessKey.startsWith("A-")) {
 			Map<String, Object> args = new HashMap<>();
@@ -94,24 +93,21 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			return r.getAccount().getAccessKey().equals(accessKey);
 		}
 	}
-	
 
 	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> getFullRefugee(@PathVariable int id ,@RequestHeader String accessKey) {
+	public ResponseEntity<?> getFullRefugee(@PathVariable int id, @RequestHeader String accessKey) {
 
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
 			return ResponseEntity.notFound().build();
-		} else if (!hasAccess(accessKey, r.get())){
+		} else if (!hasAccess(accessKey, r.get())) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 		return ResponseEntity.ok(r.get());
 
 	}
-	
-	
 
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.GET)
 	@Transactional
@@ -125,10 +121,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		if (!hasAccess(accsessKey, refugee)) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		} else {
-			Map<String, Object> args = new HashMap<>();
-			args.put("id", id);
-			List<MeetingRequest> meetings = objectStore.find(MeetingRequest.class,
-					"select mr from MeetingRequest mr where mr.refugee.id = :id", args);
+			List<MeetingRequest> meetings = refugee.getMeetingRequests();
 			return ResponseEntity.ok(meetings);
 		}
 	}
@@ -158,27 +151,29 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		return ResponseEntity.notFound().build();
 
 	}
-	
-	
+
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "REFUGEE" })
 	public ResponseEntity<?> createMeetingRequest(@RequestBody MeetingRequest mr, @RequestHeader String accessKey,
 			@PathVariable int id) {
-		
-			Optional<Refugee> r = objectStore.getById(Refugee.class, id);
-			Refugee refugee = r.get();
-			if (!r.isPresent()) {
-				return ResponseEntity.badRequest().build();
-			} else if (!hasAccess(accessKey, refugee)) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-			}
-			mr.setRefugee(refugee);
-			objectStore.save(mr);
-			return ResponseEntity.created(getUri("/refugees/" +refugee.getId()+"/meetingRequests/"+mr.getId())).body(mr);
+
+		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
+		Refugee refugee = r.get();
+		if (!r.isPresent()) {
+			return ResponseEntity.badRequest().build();
+		} else if (!hasAccess(accessKey, refugee)) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		Optional<Volunteer> v = objectStore.getById(Volunteer.class, mr.getVolunteer().getId());
+		if (!v.isPresent()) {
+			return ResponseEntity.badRequest().build();
+		}
+		mr.setRefugee(refugee);
+		objectStore.save(mr);
+		return ResponseEntity.created(getUri("/refugees/" + refugee.getId() + "/meetingRequests/" + mr.getId()))
+				.body(mr);
 	}
-	
-	
 
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
@@ -203,31 +198,28 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 
 	}
-	
-	
-	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}" , method = RequestMethod.DELETE)
+
+	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed({"ADMIN" , "REFUGEE"})
-	public ResponseEntity<?> deleteMeetingRequest (@PathVariable int id , 
-			@PathVariable int meetingRequestId,
-			@RequestHeader String accessKey){
+	@RolesAllowed({ "ADMIN", "REFUGEE" })
+	public ResponseEntity<?> deleteMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId,
+			@RequestHeader String accessKey) {
 		Optional<MeetingRequest> mr = objectStore.getById(MeetingRequest.class, meetingRequestId);
-		if (!mr.isPresent()){
+		if (!mr.isPresent()) {
 			return ResponseEntity.notFound().build();
-		}else{
+		} else {
 			Optional<Refugee> r = objectStore.getById(Refugee.class, id);
-			if(!r.isPresent()){
+			if (!r.isPresent()) {
 				return ResponseEntity.badRequest().build();
 			}
-			
+
 			Refugee refugee = r.get();
-			if(!hasAccess(accessKey, refugee)){
+			if (!hasAccess(accessKey, refugee)) {
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 			}
 			objectStore.delete(mr.get());
 			return ResponseEntity.noContent().build();
 		}
 	}
-	
-	
+
 }

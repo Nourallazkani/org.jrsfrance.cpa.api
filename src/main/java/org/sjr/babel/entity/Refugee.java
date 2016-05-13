@@ -37,7 +37,7 @@ public class Refugee extends AbstractEntity {
 	@Embedded
 	private Address address;
 	
-	@OneToMany
+	@OneToMany(mappedBy = "refugee" ,fetch=FetchType.LAZY)
 	private List<MeetingRequest> meetingRequests ;
 	
 	@ElementCollection
@@ -124,6 +124,16 @@ public class Refugee extends AbstractEntity {
 
 	public void setLanguageSkills(List<LanguageSkill> languageSkills) {
 		this.languageSkills = languageSkills;
+	}
+	
+	
+
+	public List<MeetingRequest> getMeetingRequests() {
+		return meetingRequests;
+	}
+
+	public void setMeetingRequests(List<MeetingRequest> meetingRequests) {
+		this.meetingRequests = meetingRequests;
 	}
 
 	public String getFullName() {

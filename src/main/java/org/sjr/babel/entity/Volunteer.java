@@ -1,6 +1,6 @@
 package org.sjr.babel.entity;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +44,7 @@ public class Volunteer extends AbstractEntity {
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id"))
 	private List<Language> languages;
 	
-	@OneToMany
+	@OneToMany(mappedBy = "volunteer")
 	private List<MeetingRequest> meetingRequests ;
 
 	public Address getAddress() {

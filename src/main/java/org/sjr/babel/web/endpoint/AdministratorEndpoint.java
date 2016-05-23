@@ -53,6 +53,9 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> adminSummary(@PathVariable Integer id) {
 		Optional<Administrator> admin = objectStore.getById(Administrator.class, id);
+		if(!admin.isPresent()){
+			ResponseEntity.notFound().build();
+		}
 		Optional<AdministratorSummary> adminSummary = admin.map(x -> new AdministratorSummary(x));
 		return okOrNotFound(adminSummary);
 	}

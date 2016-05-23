@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,9 +40,9 @@ public class AuthzEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "authz/signUp", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> volSignUp(HttpServletRequest req) throws Exception {
+	public ResponseEntity<?> signUp(HttpServletRequest req) throws IOException {
 		InputStream is = req.getInputStream();
-
+		// ObjectMapper Jackson = new ObjectMapper ;
 		JsonNode message = jackson.readTree(is);
 		if (message.get("messageType").asText().equals("volunteer_signUp")) {
 

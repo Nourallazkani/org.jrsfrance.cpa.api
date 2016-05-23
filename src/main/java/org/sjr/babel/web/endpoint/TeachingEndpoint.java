@@ -49,7 +49,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			@RequestParam(required = false) Integer organisationId,
 			@RequestParam(required = false) Integer fieldOfStudyId, 
 			@RequestParam(required = false) String city,
-			@RequestParam(required = false) String zipcode) {
+			@RequestParam(required = false) String zipcode){
 		
 		StringBuffer hql = new StringBuffer("select t from Teaching t where 0=0 ") ;
 		Map<String, Object> args = new HashMap<>();
@@ -69,8 +69,10 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			args.put("zipcode", zipcode);
 			hql.append(" and t.organisation.address.zipcode like :zipcode");
 		}
-		return objectStore.find(Teaching.class, hql.toString() , args ).stream().map(e -> new TeachingSummary(e))
+		List<TeachingSummary> results = objectStore.find(Teaching.class, hql.toString() , args ).stream().map(e -> new TeachingSummary(e))
 				.collect(Collectors.toList());
+		
+		return results;
 	}
 
 	// the new end point

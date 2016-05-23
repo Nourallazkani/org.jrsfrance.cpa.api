@@ -1,6 +1,5 @@
 package org.sjr.babel.web.endpoint;
 
-import java.sql.Ref;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -11,14 +10,10 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
-import org.sjr.babel.entity.Refugee;
-import org.sjr.babel.entity.Volunteer;
-import org.sjr.babel.entity.AbstractEvent;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
-import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
-import org.sjr.babel.web.endpoint.EventEndpoint.EventSummary;
-import org.springframework.beans.factory.config.YamlProcessor.ResolutionMethod;
+import org.sjr.babel.entity.Refugee;
+import org.sjr.babel.entity.Volunteer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

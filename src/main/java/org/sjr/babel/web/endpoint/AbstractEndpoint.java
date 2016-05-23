@@ -81,8 +81,8 @@ public abstract class AbstractEndpoint {
 	public static class Error {
 		
 		public static final Error INVALID_DATE_RANGE = new Error("Date.Order.error","The Strating date must be befor the ending one");
-		public static final Error MAIL_ADDRESS_ALREADY_EXISTS = new Error("mailAddress.already.exsists", null) ;
-		
+		public static final Error MAIL_ADDRESS_ALREADY_EXISTS = new Error("mailAddress.already.exsists", null) ;	
+		public static final Error VOLUNTEER_BUSY = new Error("Volunteer.Busy", "Sorry the Volunteer is busy in this time, try another");
 		public String key, defaultMessage;
 
 		Error(String key, String defaultMessage) {

@@ -214,7 +214,7 @@ create table Refugee(
     firstLanguage_id int,
     civility_id int,
 	nationality_id int,
-    foreign key (firstLanguage_id) references language(id),
+    foreign key (firstLanguage_id) references Language(id),
     foreign key (country_id) references Country(id),
 	foreign key (civility_id) references Civility (id),
 	foreign key (nationality_id) references Country (id)

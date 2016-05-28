@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 
 import org.sjr.babel.entity.reference.Civility;
+import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
 
 @Entity
@@ -39,9 +40,13 @@ public class Volunteer extends AbstractEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Civility civility;
+	
+	@ManyToMany
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "FieldOfStudy_id"))
+	private List<FieldOfStudy> fieldsOfStudy;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id"))
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "Language_id"))
 	private List<Language> languages;
 	
 	@OneToMany(mappedBy = "volunteer")
@@ -113,6 +118,16 @@ public class Volunteer extends AbstractEntity {
 
 	public List<Language> getLanguages() {
 		return languages;
+	}
+
+	
+	
+	public List<FieldOfStudy> getFieldsOfStudy() {
+		return fieldsOfStudy;
+	}
+
+	public void setFieldsOfStudy(List<FieldOfStudy> fieldsOfStudy) {
+		this.fieldsOfStudy = fieldsOfStudy;
 	}
 
 	public void setLanguages(List<Language> languages) {

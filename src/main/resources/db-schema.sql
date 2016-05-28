@@ -152,11 +152,17 @@ create table Volunteer_availabilities (
 
 create table Volunteer_Language(
 	Volunteer_id int not null,
-    language_id int not null,
+    Language_id int not null,
     foreign key (Volunteer_id) references Volunteer(id),
-    foreign key (language_id) references Language(id)
+    foreign key (Language_id) references Language(id)
 );
 
+create table Volunteer_FieldOfStudy (
+	Volunteer_id int not null,
+	FieldOfStudy_id int not null,
+	foreign key (Volunteer_id) references Volunteer(id),
+	foreign key (FieldOfStudy_id) references FieldOfStudy(id)
+);
 create table Administrator (
 	id int auto_increment primary key ,
 	firstName varchar(255),
@@ -231,8 +237,8 @@ create table Refugee_languageSkills(
 
 create table MeetingRequests(
 	id int PRIMARY key auto_increment,
-	Refugee_id int not null,
-	Volunteer_id int not null,
+	refugee_id int not null,
+	volunteer_id int not null,
 	startDate date not null,
 	endDate date not null,
     subject varchar (500),
@@ -240,3 +246,4 @@ create table MeetingRequests(
     foreign key (Refugee_id) references Refugee(id),
     foreign key (Volunteer_id) references Volunteer(id)
 );
+

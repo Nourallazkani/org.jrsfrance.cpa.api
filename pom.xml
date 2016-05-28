@@ -27,6 +27,8 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<!-- permet de lancer maven avec tomcat7:run, l'application est ensuite 
+					disponible à l'adresse Http://localhost:8080/api -->
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
@@ -35,6 +37,8 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<!-- permet de lancer maven avec jetty:run, l'application est ensuite 
+					disponible à l'adresse Http://localhost:8080 -->
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
 				<version>9.3.3.v20150827</version>
@@ -103,6 +107,13 @@
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
 			<version>1.10</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>4.2.5.RELEASE</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

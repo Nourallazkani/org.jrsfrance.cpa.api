@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
@@ -26,7 +27,7 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@Embedded
 	private Address address;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	private EventType type;
 
 	@Temporal(TemporalType.DATE)

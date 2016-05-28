@@ -30,7 +30,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 
 		public int id;
 		public String civility, firstName, lastName, phoneNumber;
-		public List<String> languages;
+		public List<String> languages , fieldsOfStudy;
 		public Date birthDate;
 
 		public VolunteerSummary(Volunteer v) {
@@ -41,6 +41,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			this.birthDate = v.getBirthDate();
 			this.phoneNumber = v.getPhoneNumber();
 			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
+			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
 		}
 
 	}
@@ -63,7 +64,12 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			@RequestParam(required = false) Integer languageId, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode) {
 
-		StringBuffer hql = new StringBuffer("select v from Volunteer v join fetch v.languages l  where 0=0 ");
+		StringBuffer hql = new StringBuffer("select distinct v from Volunteer v ");
+		// fetch supplémentaire
+		if (languageId != null) {
+			hql.append("left join fetch v.languages l ");
+		}
+		hql.append("where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
 		if (languageId != null) {
 			hql.append("and l.id = :languageId ");
@@ -71,15 +77,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		}
 		if (name != null) {
 			args.put("name", name);
-			hql.append(" and v.firstName like :name or v.lastName like :name ");
+			hql.append("and v.firstName like :name or v.lastName like :name ");
 		}
 		if (city != null) {
 			args.put("city", city);
-			hql.append(" and v.address.city like :city");
+			hql.append("and v.address.city like :city ");
 		}
 		if (zipcode != null) {
 			args.put("zipcode", zipcode);
-			hql.append(" and v.address.zipcode like :zipcode");
+			hql.append("and v.address.zipcode like :zipcode");
 		}
 
 		return objectStore.find(Volunteer.class, hql.toString(), args).stream()

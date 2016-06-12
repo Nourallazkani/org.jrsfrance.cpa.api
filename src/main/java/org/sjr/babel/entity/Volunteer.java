@@ -41,6 +41,9 @@ public class Volunteer extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Civility civility;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Organisation organisation;
+	
 	@ManyToMany
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "FieldOfStudy_id"))
 	private List<FieldOfStudy> fieldsOfStudy;
@@ -140,6 +143,14 @@ public class Volunteer extends AbstractEntity {
 
 	public void setCivility(Civility civility) {
 		this.civility = civility;
+	}
+
+	public Organisation getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
 	}
 
 	public Account getAccount() {

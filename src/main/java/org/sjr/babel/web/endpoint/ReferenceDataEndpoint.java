@@ -39,7 +39,7 @@ public class ReferenceDataEndpoint extends AbstractEndpoint{
 		map.put("levels", objectStore.findAll(Level.class));
 		map.put("civilities", objectStore.findAll(Civility.class));
 		map.put("organisationCategories", objectStore.findAll(OrganisationCategory.class));
-		map.put("fieldsOfStudies", objectStore.findAll(FieldOfStudy.class));
+		map.put("fieldsOfStudy", objectStore.findAll(FieldOfStudy.class));
 		map.put("languages", objectStore.findAll(Language.class));
 	}
 	

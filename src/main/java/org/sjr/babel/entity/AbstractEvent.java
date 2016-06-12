@@ -2,6 +2,7 @@ package org.sjr.babel.entity;
 
 import java.util.Date;
 
+import javax.persistence.Convert;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -12,18 +13,22 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.sjr.babel.entity.Contact.ContactConverter;
 import org.sjr.babel.entity.reference.EventType;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class AbstractEvent extends AbstractEntity {
 
-	private String description, subject;
+	private String description, subject, link;
 
 	private Date registrationStartDate;
 
 	private boolean openForRegistration;
 
+	@Convert(converter = ContactConverter.class)
+	private Contact contact;
+	
 	@Embedded
 	private Address address;
 
@@ -47,6 +52,22 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	public void setSubject(String subject) {
 		this.subject = subject;
+	}
+
+	public String getLink() {
+		return link;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
+	}
+
+	public Contact getContact() {
+		return contact;
+	}
+
+	public void setContact(Contact contact) {
+		this.contact = contact;
 	}
 
 	public EventType getType() {

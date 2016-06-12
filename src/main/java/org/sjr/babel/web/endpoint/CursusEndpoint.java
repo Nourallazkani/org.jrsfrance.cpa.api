@@ -14,6 +14,7 @@ import org.sjr.babel.entity.Cursus;
 import org.sjr.babel.entity.AbstractEvent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,6 +33,7 @@ public class CursusEndpoint extends AbstractEndpoint {
 		public String level, organisation;
 		public AddressSummary address;
 		public Date startDate, endDate;
+		public ContactSummary contact;
 
 		public CursusSummary(Cursus c) {
 			this.id = c.getId();
@@ -40,6 +42,7 @@ public class CursusEndpoint extends AbstractEndpoint {
 			this.address = new AddressSummary(c.getAddress());
 			this.startDate = c.getStartDate();
 			this.endDate = c.getEndDate();
+			this.contact = safeTransform(c.getOrganisation().getContact(), ContactSummary::new);
 		}
 	}
 
@@ -57,9 +60,21 @@ public class CursusEndpoint extends AbstractEndpoint {
 	// http://dosjds./cursus?city=Paris
 	@RequestMapping(method = RequestMethod.GET)
 	@Transactional
-	public List<CursusSummary> list(@RequestParam(name = "city", defaultValue = "%") String city) {
-		return objectStore.find(Cursus.class, "select c from Cursus c where c.address.city like ?", city).stream()
-				.map(x -> new CursusSummary(x)).collect(Collectors.toList());
+	public List<CursusSummary> list(
+			@RequestParam(required=false, name = "city") String city, 
+			@RequestParam(required=false) Integer levelId) {
+		StringBuffer query = new StringBuffer("select c from Cursus c where 0=0 ") ;
+		Map<String, Object> args = new HashMap<>();
+		if (StringUtils.hasText(city)) {
+			args.put("city" , city);
+			query.append(" and c.address.city like :city ");
+		}
+		if (levelId!=null) {
+			args.put("levelId" , levelId);
+			query.append("and c.level.id = :levelId");
+		}
+		
+		return objectStore.find(Cursus.class, query.toString(), args).stream().map(CursusSummary::new).collect(Collectors.toList());
 	}
 
 	@RequestMapping(path = "{id}", method = RequestMethod.GET)

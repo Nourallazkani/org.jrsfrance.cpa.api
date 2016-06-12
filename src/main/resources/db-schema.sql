@@ -37,7 +37,8 @@ create table Level (
 
 create table OrganisationCategory(
 	id int auto_increment primary key ,
-	name varchar(50)
+	name varchar(50),
+	stereotype varchar(25)
 );
 
 create table FieldOfStudy (
@@ -47,7 +48,8 @@ create table FieldOfStudy (
 
 create table EventType (
 	id int not null auto_increment primary key,
-	name varchar(50)
+	name varchar(50),
+	stereotype varchar(25)
 );
 
 
@@ -75,9 +77,7 @@ create table Teaching (
 	master bit,
 	link varchar(255),
 	fieldOfStudy_id int not null,
-	contactName varchar(255),
-	contactPhone varchar(255),
-	contactMailAddress varchar(255),
+	contact varchar(512),
 	openForRegistration bool default true,
     registrationStartDate date,
 	languageLevelRequired_id int, 
@@ -136,9 +136,11 @@ create table Volunteer(
     civility_id int,
     country_id int,
 	nationality_id int,
+	organisation_id int,
     foreign key (country_id) references Country(id),
 	foreign key (civility_id) references Civility (id),
-	foreign key (nationality_id) references Country (id)
+	foreign key (nationality_id) references Country (id),
+	foreign key (organisation_id) references Organisation (id)
 );
 
 create table Volunteer_availabilities (
@@ -184,9 +186,11 @@ create table AbstractEvent (
     city varchar(255) null,
     startDate datetime default now(),
 	endDate datetime default now(),
+	contact varchar(512),
 	openForRegistration bool default true,
     registrationStartDate date,
 	subject varchar(255) null,
+	link varchar(255) null,
     description varchar(8000) null,
     country_id int not null,
     type_id int not null,

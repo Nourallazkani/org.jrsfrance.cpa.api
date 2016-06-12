@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
+import org.sjr.babel.entity.Contact;
 import org.sjr.babel.entity.Teaching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public int id;
 		public String organisation, fieldOfStudy, languageLevelRequired ,contactName,contactPhone,contactMailAddress;
 		public AddressSummary address;
+		public ContactSummary contact;
+		public Boolean master,licence;
 		// public List<Link> links;
 
 		public TeachingSummary(Teaching t) {
@@ -32,12 +35,10 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			this.fieldOfStudy = t.getFieldOfStudy().getName();
 			this.languageLevelRequired  = t.getLanguageLevelRequired().getName();
 			this.organisation = t.getOrganisation().getName();
-			this.contactName = t.getContactName();
-			this.contactPhone = t.getContactPhone();
-			this.contactMailAddress = t.getContactMailAddress();
-			if (t.getOrganisation().getAddress() != null) {
-				this.address = new AddressSummary(t.getOrganisation().getAddress());
-			}
+			this.contact = safeTransform(t.getContact(), ContactSummary::new);
+			this.address = safeTransform(t.getOrganisation().getAddress(), AddressSummary::new);
+			this.master = t.getMaster();
+			this.licence = t.getLicence();
 		}
 	}
 	

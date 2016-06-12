@@ -16,10 +16,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextHierarchy({
-	@ContextConfiguration(classes=ApplicationConfig.class),
-	@ContextConfiguration(classes=RestConfiguration.class)
-})
+@ContextHierarchy({ @ContextConfiguration(classes = ApplicationConfig.class),
+		@ContextConfiguration(classes = RestConfiguration.class) })
 public class VolunteerEndpointTest {
 
 	@Autowired
@@ -27,11 +25,11 @@ public class VolunteerEndpointTest {
 
 	@Test
 	public void testList() {
-		
-		List<VolunteerSummary> list = endpoint.list(null, null, null, null);
-		
+
+		List<VolunteerSummary> list = endpoint.list(null, null, null, null, null);
+
 		Assert.assertEquals(3, list.size());
-		VolunteerSummary v1 = list.stream().filter(x->x.id==1).findFirst().get();
+		VolunteerSummary v1 = list.stream().filter(x -> x.id == 1).findFirst().get();
 		Assert.assertEquals(2, v1.languages.size());
 		Assert.assertEquals(1, v1.fieldsOfStudy.size());
 	}

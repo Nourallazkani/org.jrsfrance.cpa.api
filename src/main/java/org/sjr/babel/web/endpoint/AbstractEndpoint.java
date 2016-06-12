@@ -2,11 +2,13 @@ package org.sjr.babel.web.endpoint;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.sjr.babel.entity.AbstractEntity;
 import org.sjr.babel.entity.Address;
+import org.sjr.babel.entity.Contact;
 import org.sjr.babel.persistence.ObjectStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +78,21 @@ public abstract class AbstractEndpoint {
 			this.lat = a.getLat();
 			this.lng = a.getLng();
 		}
+	}
+	
+	protected static class ContactSummary{ // same as contact for the time being, may differ later.
+		public String name, mailAddress, phoneNumber;
+
+		public ContactSummary(Contact contact) {
+			this.name = contact.getName();
+			this.phoneNumber = contact.getPhoneNumber();
+			this.mailAddress = contact.getMailAddress();
+		}
+	}
+	
+	// this function transform something (input) in something else based on a function provided by the caller, but only if the input is not null 
+	protected <T, U> U safeTransform(T input, Function<T, U> transformer){
+		return input!=null ? transformer.apply(input) : null;
 	}
 	
 	public static class Error {

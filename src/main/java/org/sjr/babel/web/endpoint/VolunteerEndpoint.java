@@ -15,6 +15,7 @@ import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.Volunteer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,17 +30,18 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	class VolunteerSummary {
 
 		public int id;
-		public String civility, firstName, lastName, phoneNumber;
+		public String civility, firstname, lastname, phoneNumber, city;
 		public List<String> languages , fieldsOfStudy;
 		public Date birthDate;
 
 		public VolunteerSummary(Volunteer v) {
 			this.id = v.getId();
 			this.civility = v.getCivility().getName();
-			this.firstName = v.getFirstName();
-			this.lastName = v.getLastName();
+			this.firstname = v.getFirstName();
+			this.lastname = v.getLastName();
 			this.birthDate = v.getBirthDate();
 			this.phoneNumber = v.getPhoneNumber();
+			this.city = v.getAddress().getCity();
 			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
 		}
@@ -61,13 +63,18 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "/volunteers", method = RequestMethod.GET)
 	@Transactional
 	public List<VolunteerSummary> list(@RequestParam(required = false) String name,
-			@RequestParam(required = false) Integer languageId, @RequestParam(required = false) String city,
+			@RequestParam(required = false) Integer languageId,
+			@RequestParam(required = false) Integer fieldOfStudyId,
+			@RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode) {
 
 		StringBuffer hql = new StringBuffer("select distinct v from Volunteer v ");
-		// fetch supplémentaire
+		// fetch supplémentaire mais seulement si nécessaire
 		if (languageId != null) {
-			hql.append("left join fetch v.languages l ");
+			hql.append("left join v.languages l ");
+		}
+		if (fieldOfStudyId != null) {
+			hql.append("left join v.fieldsOfStudy f ");
 		}
 		hql.append("where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
@@ -75,11 +82,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			hql.append("and l.id = :languageId ");
 			args.put("languageId", languageId);
 		}
-		if (name != null) {
+		if (fieldOfStudyId != null) {
+			hql.append("and f.id = :fieldOfStudyId ");
+			args.put("fieldOfStudyId", fieldOfStudyId);
+		}
+		if (StringUtils.hasText(name)) {
 			args.put("name", name);
 			hql.append("and v.firstName like :name or v.lastName like :name ");
 		}
-		if (city != null) {
+		if (StringUtils.hasText(city)) {
 			args.put("city", city);
 			hql.append("and v.address.city like :city ");
 		}

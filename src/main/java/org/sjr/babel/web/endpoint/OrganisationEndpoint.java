@@ -13,7 +13,9 @@ import javax.transaction.Transactional;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Organisation;
+import org.sjr.babel.entity.reference.OrganisationCategory.Stereotype;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,17 +30,14 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		public int id;
 		public String name, category;
 		public AddressSummary address;
+		public ContactSummary contact;
 
 		public OrganisationSummary(Organisation o) {
 			this.id = o.getId();
 			this.name = o.getName();
 			this.category = o.getCategory().getName();
-			/*
-			 * if (o.getAddress() != null) { this.city =
-			 * o.getAddress().getCity(); this.country =
-			 * o.getAddress().getCountry().getName(); }
-			 */
-			Optional.ofNullable(o.getAddress()).ifPresent(a -> this.address = new AddressSummary(a));
+			this.contact = safeTransform(o.getContact(), ContactSummary::new);
+			this.address = safeTransform(o.getAddress(), AddressSummary::new);
 
 		}
 
@@ -46,12 +45,28 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/organisations", method = RequestMethod.GET)
 	@Transactional
-	public List<OrganisationSummary> list(@RequestParam(name = "name", defaultValue = "%") String name) {
-		// List<Organisation> org = dao.find(name);
+	public List<OrganisationSummary> list(
+			@RequestParam(required=false) String name,
+			@RequestParam(required=false) String city,
+			@RequestParam(required=false) Stereotype stereotype
+			) 
+	{
+		StringBuffer query = new StringBuffer("select o from Organisation o join o.category c where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
-		args.put("n", name);
-		List<Organisation> results = objectStore.find(Organisation.class,
-				"select o from Organisation o where o.name like :n", args);
+		if(StringUtils.hasText(name)){
+			query.append("and o.name like :name ");
+			args.put("name", name);	
+		}
+		if(StringUtils.hasText(city)){
+			query.append("and o.address.city like :city ");
+			args.put("city", name);	
+		}
+		if(stereotype!=null){
+			query.append("and c.stereotype = :stereotype ");
+			args.put("stereotype", stereotype);
+		}
+		
+		List<Organisation> results = objectStore.find(Organisation.class, query.toString(), args);
 		// return results.stream().map(x -> new
 		// OrganisationSummary(x)).collect(Collectors.toList());
 		return results.stream().map(OrganisationSummary::new).collect(Collectors.toList());

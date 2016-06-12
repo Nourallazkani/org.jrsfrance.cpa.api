@@ -3,6 +3,7 @@ package org.sjr.babel.entity;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -13,6 +14,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.sjr.babel.entity.Contact.ContactConverter;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -25,7 +28,7 @@ public class Cursus extends AbstractEntity {
 	private Date registrationStartDate ;
 	
 	private boolean openForRegistration;
-
+	
 	@Temporal(TemporalType.DATE)
 	private Date startDate;
 
@@ -35,7 +38,8 @@ public class Cursus extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Organisation organisation;
 	
-	
+	@Convert(converter = ContactConverter.class)
+	private Contact contact;
 
 	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "cursus")
 	@ElementCollection
@@ -80,8 +84,14 @@ public class Cursus extends AbstractEntity {
 		this.organisation = organisation;
 	}
 	
-	
-	
+	public Contact getContact() {
+		return contact;
+	}
+
+	public void setContact(Contact contact) {
+		this.contact = contact;
+	}
+
 	public Date getRegistrationStartDate() {
 		return registrationStartDate;
 	}

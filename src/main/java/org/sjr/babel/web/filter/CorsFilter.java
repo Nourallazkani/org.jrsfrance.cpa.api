@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@WebFilter(urlPatterns = "/*", asyncSupported = true)
+//@WebFilter(urlPatterns = "/*", asyncSupported = true)
 public class CorsFilter extends OncePerRequestFilter {
 
 	@Override

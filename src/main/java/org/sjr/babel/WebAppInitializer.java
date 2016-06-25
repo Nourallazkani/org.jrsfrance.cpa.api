@@ -88,11 +88,12 @@ public class WebAppInitializer implements WebApplicationInitializer
 	@Import(ApplicationConfig.class)
 	@ComponentScan(basePackages="org.sjr.babel.web")
 	public static class RestConfiguration extends WebMvcConfigurerAdapter{
-		/*
+		
 		@Override
 		public void addCorsMappings(CorsRegistry registry) {
-			registry.addMapping("/**");
-		}*/
+			registry.addMapping("/**").allowedHeaders("XSRF-TOKEN");
+		}
+		
 		@Override
 		public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 			configurer.enable();

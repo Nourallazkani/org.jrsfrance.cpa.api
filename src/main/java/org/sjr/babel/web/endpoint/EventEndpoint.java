@@ -1,6 +1,7 @@
 package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -90,8 +91,14 @@ public class EventEndpoint extends AbstractEndpoint {
 	public List<EventSummary> events(
 			@RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode,
-			@RequestParam(required = false) EventType.Stereotype stereotype
-			) {
+			@RequestParam(required = false) EventType.Stereotype stereotype,
+			@RequestParam(defaultValue="false") boolean includePastEvents,
+			@RequestParam(defaultValue="false") boolean includeFutureEvents
+		) 
+	{
+		if(!includePastEvents && !includeFutureEvents){
+			return new ArrayList<>();
+		}
 		
 		StringBuffer hql = new StringBuffer("select e from AbstractEvent e join e.type t where 0=0 ");
 		HashMap<String, Object> args = new HashMap<>();
@@ -106,6 +113,15 @@ public class EventEndpoint extends AbstractEndpoint {
 		if (stereotype != null) {
 			hql.append("and t.stereotype = :stereotype ");
 			args.put("stereotype", stereotype);
+		}
+		Date now = new Date();
+		if(!includeFutureEvents){
+			hql.append("and e.startDate <= :d ");
+			args.put("d", now);
+		}
+		if(!includePastEvents){
+			hql.append("and e.startDate >= :d ");
+			args.put("d", now);
 		}
 		return objectStore.find(AbstractEvent.class, hql.toString(), args).stream().map(EventSummary::new)
 				.collect(Collectors.toList());

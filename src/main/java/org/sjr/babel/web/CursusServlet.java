@@ -20,7 +20,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class CursusServlet extends HttpServlet {
 
 	
-	private ApplicationContext ctx = new AnnotationConfigApplicationContext(WebAppInitializer.ApplicationConfig.class);
+	private ApplicationContext ctx = new AnnotationConfigApplicationContext(WebAppInitializer.RestConfiguration.class);
 	
 	protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
 			throws javax.servlet.ServletException, java.io.IOException {
@@ -44,4 +44,8 @@ public class CursusServlet extends HttpServlet {
 		req.setAttribute("results", results);
 		getServletContext().getRequestDispatcher("/WEB-INF/views/cursus.jsp").forward(req, resp);
 	};
+	
+	public static void main(String[] args) {
+		System.out.println(Double.parseDouble("123.45"));
+	}
 }

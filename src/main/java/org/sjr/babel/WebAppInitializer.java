@@ -44,7 +44,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 	public static class RestConfiguration extends WebMvcConfigurerAdapter{
 		
 		@Bean
-		public EntityManagerFactory xyz(){
+		public EntityManagerFactory emf(){
 			EntityManagerFactory emf = Persistence.createEntityManagerFactory("abcd");
 			return emf;
 		}

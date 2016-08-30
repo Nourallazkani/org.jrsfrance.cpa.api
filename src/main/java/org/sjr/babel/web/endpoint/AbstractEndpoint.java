@@ -109,5 +109,14 @@ public abstract class AbstractEndpoint {
 		}
 	}
 	
+	public static class LocalizableObjectSummary<T>{
+		public T item;
+		public long distanceFromOrigin;
+		public LocalizableObjectSummary(T item, long distanceFromOrigin) {
+			super();
+			this.item = item;
+			this.distanceFromOrigin = distanceFromOrigin;
+		}
+	}
 	
 }

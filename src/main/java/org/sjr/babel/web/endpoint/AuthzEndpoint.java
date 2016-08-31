@@ -17,6 +17,7 @@ import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -79,55 +80,74 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	}
 
 	public static class SignInCommand {
-		public String userName, password, realm;
+		public String mailAddress, password, accessKey, realm;
 	}
 
+	
+	public boolean successfulSignIn(SignInCommand command, Account userAccount){
+		if(command==null || (command.password==null && command.accessKey==null) || userAccount==null){
+			return false;
+		}
+		if(StringUtils.hasText(command.password)){
+			String encodedPassword = DigestUtils.sha256Hex(command.password);
+			return encodedPassword.equals(userAccount.getPassword());
+			
+		}
+		else if (StringUtils.hasText(command.accessKey)){
+			return userAccount.getAccessKey().equals(command.accessKey);
+		}
+		return false;
+	}
+	
 	@RequestMapping(path = "authz/signIn", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) {
-		String encodedPassword = DigestUtils.sha256Hex(input.password);
+		
+		if(input.realm==null && StringUtils.hasText(input.accessKey)){
+			input.realm = input.accessKey.substring(0, 1);
+		}
 		Map<String, Object> args = new HashMap<>();
-		args.put("userName", input.userName);
-
+		args.put("mailAddress", input.mailAddress);
+		args.put("accessKey", input.accessKey);
+		String templateQuery = "select r from %s r where (:mailAddress is null or r.mailAddress = :mailAddress) or (:accessKey is null or r.account.accessKey = :accessKey)";
+		
 		if ("A".equals(input.realm)) {
-			String hql = " select a from Administrator a where a.mailAddress = :userName";
-			Optional<Administrator> _admin = objectStore.findOne(Administrator.class, hql, args);
+			
+			Optional<Administrator> _admin = objectStore.findOne(Administrator.class, String.format(templateQuery, "Administrator"), args);
 			if (_admin.isPresent()) {
 				Administrator admin = _admin.get();
-				if (admin.getAccount().getPassword().equals(encodedPassword)) {
+				if (successfulSignIn(input, admin.getAccount())) {
 					return successSignIn(admin.getFullName(), admin.getAccount());
 				}
 			}
 
 		} else if ("O".equals(input.realm)) {
 
-			String hql = " select o from Organisation o where o.mailAddress = :userName";
-			Optional<Organisation> _org = objectStore.findOne(Organisation.class, hql, args);
+			
+			Optional<Organisation> _org = objectStore.findOne(Organisation.class, String.format(templateQuery, "Organisation"), args);
 			if (_org.isPresent()) {
-
 				Organisation org = _org.get();
-				if (org.getAccount().getPassword().equals(encodedPassword)) {
+				if (successfulSignIn(input, org.getAccount())) {
 					return successSignIn(org.getName(), org.getAccount());
 				}
 			}
 
 		} else if ("V".equals(input.realm)) {
-			String hql = "select v from Volunteer v where v.mailAddress = :mailAddress";
-			Optional<Volunteer> _vol = objectStore.findOne(Volunteer.class, hql, args);
+			
+			Optional<Volunteer> _vol = objectStore.findOne(Volunteer.class, String.format(templateQuery, "Volunteer"), args);
 			if (_vol.isPresent()) {
 				Volunteer vol = _vol.get();
-				if (vol.getAccount().getPassword().equals(encodedPassword)) {
+				if (successfulSignIn(input, vol.getAccount())) {
 					return successSignIn(vol.getFullName(), vol.getAccount());
 				}
 			}
 		}
 
 		else if ("R".equals(input.realm)) {
-			String hql = "select r from Refugee r where r.mailAddress = :mailAddress";
-			Optional<Refugee> _ref = objectStore.findOne(Refugee.class, hql, args);
+			Optional<Refugee> _ref = objectStore.findOne(Refugee.class, String.format(templateQuery, "Refugee"), args);
 			if (_ref.isPresent()) {
 				Refugee refugee = _ref.get();
-				if (refugee.getAccount().getPassword().equals(encodedPassword)) {
+				if (successfulSignIn(input, refugee.getAccount())) {
 					return successSignIn(refugee.getFullName(), refugee.getAccount());
 				}
 			}

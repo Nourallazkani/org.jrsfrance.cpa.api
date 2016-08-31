@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.Refugee;
@@ -177,6 +178,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		if (r.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
+		r.getAccount().setPassword(DigestUtils.sha256Hex(r.getAccount().getPassword()));
 		objectStore.save(r);
 		return ResponseEntity.created(getUri("/refugees/" + r.getId())).body(r);
 	}

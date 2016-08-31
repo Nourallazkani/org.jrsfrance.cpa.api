@@ -103,6 +103,8 @@ insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNum
 insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
 	values('Irinda','riquelme','irinda.r@gmail.com','xyz','ADMIN','07123456','123456789',1);
 
+insert into Refugee (firstName,lastName,birthDate,mailAddress,phoneNumber,accessKey,password)
+values ('Alaric', 'Hermant', NULL, 'az', NULL, 'xR-a871ce00-e7d2-497e-8a4e-d272b8b5b520', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
 
 insert into AbstractEvent(street1, country_id, zipcode, subject,description,organisation_id ,type_id ,DTYPE)
 values ('14 rue d''assas',1,'75006','Politique','  ',2,1,'O-E');

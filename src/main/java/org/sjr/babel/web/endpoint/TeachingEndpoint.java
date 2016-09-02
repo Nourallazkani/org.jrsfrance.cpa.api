@@ -11,9 +11,12 @@ import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Contact;
 import org.sjr.babel.entity.Teaching;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.LocalizableObjectSummary;
+import org.sjr.babel.web.endpoint.CursusEndpoint.CursusSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -46,8 +49,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping( method = RequestMethod.GET)
 	@Transactional
-	public List<TeachingSummary> list(
+	public List<LocalizableObjectSummary<TeachingSummary>> list(
 			@RequestParam(required = false) Integer organisationId,
+			@RequestParam(required = false)	String Orgine,
 			@RequestParam(required = false) Integer fieldOfStudyId, 
 			@RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode){
@@ -70,10 +74,14 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			args.put("zipcode", zipcode);
 			hql.append(" and t.organisation.address.zipcode like :zipcode");
 		}
-		List<TeachingSummary> results = objectStore.find(Teaching.class, hql.toString() , args ).stream().map(e -> new TeachingSummary(e))
+		List<TeachingSummary> results = objectStore.find(Teaching.class, hql.toString() , args )
+				.stream()
+				.map(e -> new TeachingSummary(e))
 				.collect(Collectors.toList());
 		
-		return results;
+		return results.stream()
+				.map(x -> new LocalizableObjectSummary<>(x, 0))
+				.collect(Collectors.toList());
 	}
 
 	// the new end point

@@ -67,13 +67,13 @@ public abstract class AbstractEndpoint {
 	}
 	
 	protected static class AddressSummary {
-		public String street1, street2, zipcode, city, country;
+		public String street1, street2, zipcode, locality, country;
 		public Double lat,lng; 
 		public AddressSummary(Address a ) {
 			this.street1 = a.getStreet1();
 			this.street2 = a.getStreet2();
-			this.zipcode = a.getZipcode();
-			this.city = a.getCity();
+			this.zipcode = a.getPostalCode();
+			this.locality = a.getLocality();
 			this.country = a.getCountry().getName();
 			this.lat = a.getLat();
 			this.lng = a.getLng();

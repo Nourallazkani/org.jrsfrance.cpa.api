@@ -30,7 +30,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	class VolunteerSummary {
 
 		public int id;
-		public String civility, firstname, lastname, phoneNumber, city;
+		public String civility, firstname, lastname, phoneNumber, locality;
 		public List<String> languages , fieldsOfStudy;
 		public Date birthDate;
 
@@ -41,7 +41,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			this.lastname = v.getLastName();
 			this.birthDate = v.getBirthDate();
 			this.phoneNumber = v.getPhoneNumber();
-			this.city = v.getAddress().getCity();
+			this.locality = v.getAddress().getLocality();
 			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
 		}

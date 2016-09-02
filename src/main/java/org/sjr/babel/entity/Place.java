@@ -8,7 +8,7 @@ import javax.persistence.Transient;
 import org.sjr.babel.entity.reference.Country;
 
 @Embeddable
-public class Address {
+public class Place {
 	private String street1, street2, zipcode, city;
 	
 	@ManyToOne(fetch=FetchType.EAGER)
@@ -17,7 +17,7 @@ public class Address {
 	@Transient
 	private Double lat, lng;
 
-	public Address() {
+	public Place() {
 		// TODO Auto-generated constructor stub
 	}
 

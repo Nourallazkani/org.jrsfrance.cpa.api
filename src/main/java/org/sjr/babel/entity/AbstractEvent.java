@@ -30,7 +30,7 @@ public abstract class AbstractEvent extends AbstractEntity {
 	private Contact contact;
 	
 	@Embedded
-	private Address address;
+	private Place address;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private EventType type;
@@ -78,11 +78,11 @@ public abstract class AbstractEvent extends AbstractEntity {
 		this.type = type;
 	}
 
-	public Address getAddress() {
+	public Place getAddress() {
 		return address;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(Place address) {
 		this.address = address;
 	}
 

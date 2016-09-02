@@ -30,7 +30,7 @@ public class Volunteer extends AbstractEntity {
 	private String comments;
 
 	@Embedded
-	private Address address;
+	private Place address;
 
 	@Embedded
 	private Account account;
@@ -55,7 +55,7 @@ public class Volunteer extends AbstractEntity {
 	@OneToMany(mappedBy = "volunteer")
 	private List<MeetingRequest> meetingRequests ;
 
-	public Address getAddress() {
+	public Place getAddress() {
 		return address;
 	}
 
@@ -67,7 +67,7 @@ public class Volunteer extends AbstractEntity {
 		this.meetingRequests = meetingRequests;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(Place address) {
 		this.address = address;
 	}
 

@@ -33,13 +33,13 @@ public class Course {
 
 	@Embedded
 	@Transient
-	private Address address;
+	private Place address;
 
-	public Address getAddress() {
+	public Place getAddress() {
 		return address;
 	}
 
-	public void setAddress(Address address) {
+	public void setAddress(Place address) {
 		this.address = address;
 	}
 

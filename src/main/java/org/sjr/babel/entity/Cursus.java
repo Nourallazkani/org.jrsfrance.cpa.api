@@ -48,7 +48,7 @@ public class Cursus extends AbstractEntity {
 	private List<Course> courses;
 
 	@Embedded
-	private Place address;
+	private Address address;
 	@ManyToOne
 	private Level level;
 
@@ -116,11 +116,11 @@ public class Cursus extends AbstractEntity {
 		this.courses = courses;
 	}
 
-	public Place getAddress() {
+	public Address getAddress() {
 		return address;
 	}
 
-	public void setAddress(Place address) {
+	public void setAddress(Address address) {
 		this.address = address;
 	}
 

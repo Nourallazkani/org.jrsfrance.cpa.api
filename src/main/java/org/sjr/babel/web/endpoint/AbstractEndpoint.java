@@ -7,7 +7,7 @@ import java.util.function.Function;
 import javax.servlet.http.HttpServletRequest;
 
 import org.sjr.babel.entity.AbstractEntity;
-import org.sjr.babel.entity.Place;
+import org.sjr.babel.entity.Address;
 import org.sjr.babel.entity.Contact;
 import org.sjr.babel.persistence.ObjectStore;
 import org.slf4j.Logger;
@@ -69,7 +69,7 @@ public abstract class AbstractEndpoint {
 	protected static class AddressSummary {
 		public String street1, street2, zipcode, city, country;
 		public Double lat,lng; 
-		public AddressSummary(Place a ) {
+		public AddressSummary(Address a ) {
 			this.street1 = a.getStreet1();
 			this.street2 = a.getStreet2();
 			this.zipcode = a.getZipcode();

@@ -27,7 +27,7 @@ public class Organisation extends AbstractEntity {
 	private Contact contact;
 
 	@Embedded
-	private Place address;
+	private Address address;
 
 	@Embedded
 	private Account account;
@@ -59,11 +59,11 @@ public class Organisation extends AbstractEntity {
 		this.contact = contact;
 	}
 
-	public Place getAddress() {
+	public Address getAddress() {
 		return address;
 	}
 
-	public void setAddress(Place address) {
+	public void setAddress(Address address) {
 		this.address = address;
 	}
 

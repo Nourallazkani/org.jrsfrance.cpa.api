@@ -8,8 +8,8 @@ import javax.persistence.Transient;
 import org.sjr.babel.entity.reference.Country;
 
 @Embeddable
-public class Place {
-	private String street1, street2, zipcode, city;
+public class Address {
+	private String street1, street2, postalCode, locality;
 	
 	@ManyToOne(fetch=FetchType.EAGER)
 	private Country country;
@@ -17,7 +17,7 @@ public class Place {
 	@Transient
 	private Double lat, lng;
 
-	public Place() {
+	public Address() {
 		// TODO Auto-generated constructor stub
 	}
 
@@ -37,20 +37,22 @@ public class Place {
 		this.street2 = street2;
 	}
 
-	public String getZipcode() {
-		return zipcode;
+
+
+	public String getPostalCode() {
+		return postalCode;
 	}
 
-	public void setZipcode(String zipcode) {
-		this.zipcode = zipcode;
+	public void setPostalCode(String postalCode) {
+		this.postalCode = postalCode;
 	}
 
-	public String getCity() {
-		return city;
+	public String getLocality() {
+		return locality;
 	}
 
-	public void setCity(String city) {
-		this.city = city;
+	public void setLocality(String locality) {
+		this.locality = locality;
 	}
 
 	public Country getCountry() {

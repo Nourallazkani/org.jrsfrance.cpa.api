@@ -35,7 +35,7 @@ public class Refugee extends AbstractEntity {
 	private Civility civility;
 
 	@Embedded
-	private Place address;
+	private Address address;
 	
 	@OneToMany(mappedBy = "refugee" ,fetch=FetchType.LAZY)
 	private List<MeetingRequest> meetingRequests ;
@@ -85,11 +85,11 @@ public class Refugee extends AbstractEntity {
 		this.birthDate = birthDate;
 	}
 
-	public Place getAddress() {
+	public Address getAddress() {
 		return address;
 	}
 
-	public void setAddress(Place address) {
+	public void setAddress(Address address) {
 		this.address = address;
 	}
 

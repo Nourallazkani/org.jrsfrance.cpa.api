@@ -47,8 +47,8 @@ insert into Organisation(name, street1, country_id, postalCode, locality, contac
 insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
 	values ('CPA','10 rue Damas', 1, '69123', 'Lyon', '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 1);
 
-insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 
-	values('A1', now(), DATE_ADD(now(),INTERVAL 30 DAY), 'Paris', 1,1,1);
+insert into Cursus(name, startDate, endDate, street1, postalCode, locality, googleMapId, lat, lng, country_id, organisation_id,level_id) 
+	values('A1', now(), DATE_ADD(now(),INTERVAL 30 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM' 1,1,1);
 insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 
 	values('B1',now(), DATE_ADD(now(),INTERVAL 30 DAY), 'Paris', 1,4,3);
 insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 

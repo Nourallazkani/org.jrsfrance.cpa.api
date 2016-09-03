@@ -14,12 +14,9 @@ public class Address {
 	@ManyToOne(fetch=FetchType.EAGER)
 	private Country country;
 	
-	@Transient
 	private Double lat, lng;
-
-	public Address() {
-		// TODO Auto-generated constructor stub
-	}
+	
+	private String googleMapId;
 
 	public String getStreet1() {
 		return street1;
@@ -77,5 +74,13 @@ public class Address {
 
 	public void setLng(Double lng) {
 		this.lng = lng;
+	}
+
+	public String getGoogleMapId() {
+		return googleMapId;
+	}
+
+	public void setGoogleMapId(String googleMapId) {
+		this.googleMapId = googleMapId;
 	}
 }

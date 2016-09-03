@@ -32,17 +32,26 @@ public class CursusEndpoint extends AbstractEndpoint {
 		public int id;
 		public String level, organisation;
 		public AddressSummary address;
-		public Date startDate, endDate;
+		public Date startDate, endDate, registrationStartDate;
+		public boolean openForRegistration;
 		public ContactSummary contact;
 
 		public CursusSummary(Cursus c) {
 			this.id = c.getId();
-			this.level = c.getName();
+			this.level = c.getLevel().getName();
 			this.organisation = c.getOrganisation().getName();
 			this.address = new AddressSummary(c.getAddress());
+			this.registrationStartDate = c.getRegistrationStartDate();
+			this.openForRegistration = c.isOpenForRegistration();
 			this.startDate = c.getStartDate();
 			this.endDate = c.getEndDate();
-			this.contact = safeTransform(c.getOrganisation().getContact(), ContactSummary::new);
+			if(c.getContact()!=null){
+				this.contact = new ContactSummary(c.getContact());
+			}
+			else if(c.getOrganisation().getContact()==null){
+				this.contact = new ContactSummary(c.getOrganisation().getContact());	
+			}
+			
 		}
 	}
 
@@ -60,16 +69,36 @@ public class CursusEndpoint extends AbstractEndpoint {
 	// http://dosjds./cursus?city=Paris
 	@RequestMapping(method = RequestMethod.GET)
 	@Transactional
-	public List<CursusSummary> list(@RequestParam(required=false, name = "city") String city, @RequestParam(required=false) Integer levelId) {
+	public List<CursusSummary> list(
+			@RequestParam(required=false, name = "city") String city, 
+			@RequestParam(required=false) Integer levelId,
+			@RequestParam(defaultValue="false") boolean includePastEvents,
+			@RequestParam(defaultValue="true") boolean includeFutureEvents,
+			@RequestParam(required=false) Boolean openForRegistration
+		) {
+		System.out.println(openForRegistration);
 		StringBuffer query = new StringBuffer("select c from Cursus c where 0=0 ") ;
 		Map<String, Object> args = new HashMap<>();
 		if (StringUtils.hasText(city)) {
 			args.put("city" , city);
-			query.append(" and c.address.city like :city ");
+			query.append(" and c.address.locality like :city ");
 		}
 		if (levelId!=null) {
 			args.put("levelId" , levelId);
-			query.append("and c.level.id = :levelId");
+			query.append("and c.level.id = :levelId ");
+		}
+		if(openForRegistration!=null){
+			args.put("openForRegistration" , openForRegistration.booleanValue());
+			query.append("and c.openForRegistration= :openForRegistration ");			
+		}
+		Date now = new Date();
+		if(!includeFutureEvents){
+			query.append("and c.startDate <= :d ");
+			args.put("d", now);
+		}
+		if(!includePastEvents){
+			query.append("and c.startDate >= :d ");
+			args.put("d", now);
 		}
 		
 		List<Cursus> results = objectStore.find(Cursus.class, query.toString(), args);

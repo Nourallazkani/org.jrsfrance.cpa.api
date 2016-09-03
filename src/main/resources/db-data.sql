@@ -44,21 +44,23 @@ insert into Organisation(name, street1, country_id, postalCode, locality, contac
 	values ('JRS','14 rue assas', 1, '75006', 'Paris','{"name":"Irinda","phoneNumber":"00337654321","mailAddress":"Irinda@gmail.com"}', 2);
 insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
 	values ('Singa','8 boulvard Mazzeh', 1, '31555', 'Toulouse', '{"name":"Paul","phoneNumber":"00331234765","mailAddress":"paul@gmail.com"}', 3);
+
 insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
 	values ('CPA','10 rue Damas', 1, '69123', 'Lyon', '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 1);
 
-insert into Cursus(name, startDate, endDate, street1, postalCode, locality, googleMapId, lat, lng, country_id, organisation_id,level_id) 
-	values('A1', now(), DATE_ADD(now(),INTERVAL 30 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM' 1,1,1);
-insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 
-	values('B1',now(), DATE_ADD(now(),INTERVAL 30 DAY), 'Paris', 1,4,3);
-insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 
-	values('A2', now(), DATE_ADD(now(),INTERVAL 30 DAY), 'Paris', 1,3,2);
-insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 
-	values('B2', now(), DATE_ADD(now(),INTERVAL 30 DAY), 'Paris', 1,2,4);
-insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 
-	values('C1', now(), DATE_ADD(now(),INTERVAL 30 DAY), 'Paris', 1,3,5);
-insert into Cursus(name, startDate, endDate, locality, country_id, organisation_id,level_id) 
-	values('C2', now(), DATE_ADD(now(),INTERVAL 30 DAY), 'Paris', 1,2,6);
+
+insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
+	values(DATE_ADD(now(),INTERVAL -180 DAY), DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1);
+insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
+	values(DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), now(), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3);
+insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
+	values(DATE_ADD(now(),INTERVAL -60 DAY), now(), DATE_ADD(now(),INTERVAL 60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1);
+insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
+	values(now(), DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3);
+insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
+	values(DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1);
+insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
+	values(DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3);
 
 insert into Cursus_courses(Cursus_id, level_id, translatorRequired) values(1, 1, true );
 insert into Cursus_courses(Cursus_id, level_id, translatorRequired) values(2, 1, false );

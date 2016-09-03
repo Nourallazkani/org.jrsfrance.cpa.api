@@ -106,8 +106,8 @@ create table Cursus (
     contact varchar(512),
     organisation_id int,
     level_id int,
-    startDate datetime,
-    endDate datetime,
+    startDate date,
+    endDate date,
     foreign key (country_id) references Country (id),
     foreign key (organisation_id) references Organisation(id),
     foreign key (level_id) references Level (id)

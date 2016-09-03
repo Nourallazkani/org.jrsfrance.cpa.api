@@ -44,7 +44,7 @@ public class ReferenceDataEndpoint extends AbstractEndpoint{
 	}
 	
 	@RequestMapping(method=RequestMethod.GET)
-	public Map<String, List<?>> allLists(){
+	public Map<String, List<?>> allLists() {
 		return map;
 	}
 	

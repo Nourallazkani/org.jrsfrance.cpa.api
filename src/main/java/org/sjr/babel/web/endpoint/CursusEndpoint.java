@@ -60,7 +60,7 @@ public class CursusEndpoint extends AbstractEndpoint {
 	// http://dosjds./cursus?city=Paris
 	@RequestMapping(method = RequestMethod.GET)
 	@Transactional
-	public List<LocalizableObjectSummary<CursusSummary>> list(
+	public List<CursusSummary> list(
 			@RequestParam(required=false, name = "city") String city,
 			@RequestParam(required=false, name = "origin") String origin,
 			@RequestParam(required=false) Integer levelId) {
@@ -77,7 +77,7 @@ public class CursusEndpoint extends AbstractEndpoint {
 		
 		List<Cursus> results = objectStore.find(Cursus.class, query.toString(), args);
 		return results.stream()
-				.map(x -> new LocalizableObjectSummary<>(new CursusSummary(x), 0))
+				.map(CursusSummary::new)
 				.collect(Collectors.toList());
 	}
 

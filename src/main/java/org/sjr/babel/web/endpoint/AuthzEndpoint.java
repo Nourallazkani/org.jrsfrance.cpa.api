@@ -150,7 +150,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		if(input.realm==null && StringUtils.hasText(input.accessKey)){
 			input.realm = input.accessKey.substring(0, 1);
 		}
-		
+
 		if(input.realm.equals("R")){
 			Optional<Refugee> _user = tryGetUser(input, Refugee.class);
 			if(_user.isPresent()){

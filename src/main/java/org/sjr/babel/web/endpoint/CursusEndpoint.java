@@ -48,7 +48,7 @@ public class CursusEndpoint extends AbstractEndpoint {
 			if(c.getContact()!=null){
 				this.contact = new ContactSummary(c.getContact());
 			}
-			else if(c.getOrganisation().getContact()==null){
+			else if (c.getOrganisation().getContact() != null) {
 				this.contact = new ContactSummary(c.getOrganisation().getContact());	
 			}
 			

@@ -25,16 +25,15 @@ public class ReferenceDataEndpoint extends AbstractEndpoint{
 	
 	@PostConstruct
 	public void fillMap(){
-		/*
+
 		// en 1 ligne
-		Arrays.asList(Country.class, Civility.class, OrganisationCategory.class, Civility.class, FieldOfStudy.class)
-		.forEach(x -> this.map.put(x.getName(), this.objectStore.findAll(x)));
+		// this.map = Stream.of(Country.class, Civility.class, OrganisationCategory.class, Civility.class, FieldOfStudy.class)
+		//		.collect(Collectors.toMap(x -> x.getName(), this.objectStore::findAll));
 		
 		// en deux lignes
-		List<Class<? extends AbstractEntity>> list = Arrays.asList(Country.class, Civility.class, OrganisationCategory.class, Civility.class, FieldOfStudy.class);
-		list.forEach(x -> this.map.put(x.getName(), this.objectStore.findAll(x)));
+		// List<Class<? extends AbstractEntity>> list = Arrays.asList(Country.class, Civility.class, OrganisationCategory.class, Civility.class, FieldOfStudy.class);
+		// list.forEach(x -> this.map.put(x.getName(), this.objectStore.findAll(x)));
 		
-		*/
 		map.put("countries", objectStore.findAll(Country.class));
 		map.put("levels", objectStore.findAll(Level.class));
 		map.put("civilities", objectStore.findAll(Civility.class));

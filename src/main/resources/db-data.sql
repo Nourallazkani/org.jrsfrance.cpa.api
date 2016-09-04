@@ -17,6 +17,14 @@ insert into FieldOfStudy(name) values ('Droit');
 insert into FieldOfStudy(name) values ('Mathématiques');
 insert into FieldOfStudy(name) values ('Physique et chimie');
 
+insert into ProfessionalLearningProgramDomain(name) values ('Electricité');
+insert into ProfessionalLearningProgramDomain(name) values ('Plomberie');
+insert into ProfessionalLearningProgramDomain(name) values ('Mécaniaue');
+
+insert into LanguageLearningProgramType(name) values ('Francais pour reprendre dses etudes');
+insert into LanguageLearningProgramType(name) values ('Francais pour suivre une formation');
+insert into LanguageLearningProgramType(name) values ('Francais');
+
 
 insert into OrganisationCategory(name, stereotype) values ('université', 'UNIVERSITY');
 insert into OrganisationCategory(name, stereotype) values ('bibliothéque', 'LIBRARY');
@@ -49,21 +57,21 @@ insert into Organisation(name, street1, country_id, postalCode, locality, contac
 	values ('CPA','10 rue Damas', 1, '69123', 'Lyon', '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 1);
 
 
-insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
-	values(DATE_ADD(now(),INTERVAL -180 DAY), DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1);
-insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
-	values(DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), now(), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3);
-insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
-	values(DATE_ADD(now(),INTERVAL -60 DAY), now(), DATE_ADD(now(),INTERVAL 60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1);
-insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
-	values(now(), DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3);
-insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
-	values(DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1);
-insert into Cursus(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id) 
-	values(DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3);
+insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
+	values(DATE_ADD(now(),INTERVAL -180 DAY), DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L');
+insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
+	values(DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), now(), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L');
+insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
+	values(DATE_ADD(now(),INTERVAL -60 DAY), now(), DATE_ADD(now(),INTERVAL 60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L');
+insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
+	values(now(), DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L');
+insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
+	values(DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L');
+insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
+	values(DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L');
 
-insert into Cursus_courses(Cursus_id, level_id, translatorRequired) values(1, 1, true );
-insert into Cursus_courses(Cursus_id, level_id, translatorRequired) values(2, 1, false );
+insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(1, 1, true );
+insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(2, 1, false );
 
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (1,0,1,2,1);
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (0,1,2,1,2);
@@ -88,15 +96,15 @@ insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, 
 insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
 	values ('Alaric', 'COUCOU', date(now()), 'Nour@gmail.com', '07908756', 'xyz', '123456789', 'VOLUNTEER', 'Renne', 2, 1, 'working for JRS');
 
-insert into Volunteer_Language(Volunteer_id, language_id) values(1,1);
-insert into Volunteer_Language(Volunteer_id, language_id) values(1,2);
-insert into Volunteer_FieldOfStudy(Volunteer_id, fieldOfStudy_id) values(1,2);
-insert into Volunteer_Language(Volunteer_id, language_id) values(3,1);
-insert into Volunteer_Language(Volunteer_id, language_id) values(4,2);
-insert into Volunteer_FieldOfStudy(Volunteer_id, fieldOfStudy_id) values(5,2);
-insert into Volunteer_Language(Volunteer_id, language_id) values(2,1);
-insert into Volunteer_Language(Volunteer_id, language_id) values(2,2);
-insert into Volunteer_FieldOfStudy(Volunteer_id, fieldOfStudy_id) values(1,2);
+insert into Volunteer_Language(volunteer_id, language_id) values(1,1);
+insert into Volunteer_Language(volunteer_id, language_id) values(1,2);
+insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(1,2);
+insert into Volunteer_Language(volunteer_id, language_id) values(3,1);
+insert into Volunteer_Language(volunteer_id, language_id) values(4,2);
+insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(5,2);
+insert into Volunteer_Language(volunteer_id, language_id) values(2,1);
+insert into Volunteer_Language(volunteer_id, language_id) values(2,2);
+insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(1,2);
 
 
 	

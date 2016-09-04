@@ -12,7 +12,7 @@ import javax.transaction.Transactional;
 import org.sjr.babel.entity.Contact;
 import org.sjr.babel.entity.Teaching;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.LocalizableObjectSummary;
-import org.sjr.babel.web.endpoint.CursusEndpoint.CursusSummary;
+import org.sjr.babel.web.endpoint.LearningProgramEndpoint.LearningProgramSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

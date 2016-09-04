@@ -191,17 +191,6 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		}
 	}
 
-	@RequestMapping(path = "/volunteers", method = RequestMethod.POST)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> saveVolunteer(@RequestBody Volunteer v) {
-		if (v.getId() != null) {
-			return ResponseEntity.badRequest().build();
-		}
-		objectStore.save(v);
-		return ResponseEntity.created(getUri("/volunteers/" + v.getId())).body(v);
-	}
-
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -46,7 +47,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		InputStream is = req.getInputStream();
 		// ObjectMapper Jackson = new ObjectMapper ;
 		JsonNode message = jackson.readTree(is);
-		if (message.get("messageType").asText().equals("volunteer_signUp")) {
+		if (message.get("messageType").asText().equals("volunteer_sign-up")) {
 
 			Volunteer v = jackson.treeToValue(message.get("messageBody"), Volunteer.class);
 			Map<String, Object> args = new HashMap<>();
@@ -55,11 +56,14 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if (vol.isPresent()) {
 				return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
+
 			v.getAccount().setPassword(EncryptionUtil.sha256(v.getAccount().getPassword()));
+			v.getAccount().setAccessKey("V-" + UUID.randomUUID().toString());
+
 			objectStore.save(v);
 			return successSignIn(v.getFullName(), v.getAccount());
 
-		} else if (message.get("messageType").asText().equals("refugee_signUp")) {
+		} else if (message.get("messageType").asText().equals("refugee_sign-up")) {
 			Refugee r = jackson.treeToValue(message.get("messageBody"), Refugee.class);
 			Map<String, Object> args = new HashMap<>();
 			args.put("mailAddress", r.getMailAddress());

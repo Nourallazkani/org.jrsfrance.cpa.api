@@ -4,10 +4,13 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Convert;
+import javax.persistence.DiscriminatorColumn;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
@@ -21,10 +24,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @Entity
-public class Cursus extends AbstractEntity {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	private String name;
 	
+	@Temporal(TemporalType.DATE)
 	private Date registrationStartDate ;
 	
 	private boolean openForRegistration;

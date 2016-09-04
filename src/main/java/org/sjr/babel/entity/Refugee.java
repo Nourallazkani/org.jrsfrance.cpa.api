@@ -8,6 +8,9 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
@@ -15,6 +18,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.sjr.babel.entity.reference.Civility;
+import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
 
 @Entity
@@ -40,9 +44,12 @@ public class Refugee extends AbstractEntity {
 	@OneToMany(mappedBy = "refugee" ,fetch=FetchType.LAZY)
 	private List<MeetingRequest> meetingRequests ;
 	
-	@ElementCollection
+	@ElementCollection(fetch = FetchType.LAZY)
 	private List<LanguageSkill> languageSkills;
 	
+	@ManyToMany(fetch = FetchType.LAZY) 
+	@JoinTable(inverseJoinColumns=@JoinColumn(name = "fieldOfStudy_id"))
+	private List<FieldOfStudy> fieldsOfStudy;
 
 	public String getFirstName() {
 		return firstName;
@@ -127,6 +134,14 @@ public class Refugee extends AbstractEntity {
 	}
 	
 	
+
+	public List<FieldOfStudy> getFieldsOfStudy() {
+		return fieldsOfStudy;
+	}
+
+	public void setFieldsOfStudy(List<FieldOfStudy> fieldsOfStudy) {
+		this.fieldsOfStudy = fieldsOfStudy;
+	}
 
 	public List<MeetingRequest> getMeetingRequests() {
 		return meetingRequests;

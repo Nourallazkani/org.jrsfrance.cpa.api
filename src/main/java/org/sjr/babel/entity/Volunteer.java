@@ -45,11 +45,11 @@ public class Volunteer extends AbstractEntity {
 	private Organisation organisation;
 	
 	@ManyToMany
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "FieldOfStudy_id"))
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "fieldOfStudy_id"))
 	private List<FieldOfStudy> fieldsOfStudy;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "Language_id"))
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id"))
 	private List<Language> languages;
 	
 	@OneToMany(mappedBy = "volunteer")
@@ -174,7 +174,7 @@ public class Volunteer extends AbstractEntity {
 	}
 
 	
-	@PrePersist
+	// @PrePersist see AuthEndpoint::signUp
 	public void prePersist() {
 		if (this.account == null) {
 			setAccount(new Account());

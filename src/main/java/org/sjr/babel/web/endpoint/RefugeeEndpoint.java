@@ -15,6 +15,7 @@ import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
+import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 		public int id;
 		public String civility, firstName, lastName, phoneNumber;
-		public List<String> languages;
+		public List<String> languages, fieldsOfStudy;
 		public Date birthDate;
 
 		public RefugeeSummary(Refugee r) {
@@ -43,10 +44,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			this.lastName = r.getLastName();
 			this.birthDate = r.getBirthDate();
 			this.phoneNumber = r.getPhoneNumber();
-			this.languages = r.getLanguageSkills().stream().map(x -> x.getLanguage().getName())
-					.collect(Collectors.toList());
+			this.fieldsOfStudy = r.getFieldsOfStudy().stream().map(FieldOfStudy::getName).collect(Collectors.toList());
+			this.languages = r.getLanguageSkills().stream().map(x -> x.getLanguage().getName()).collect(Collectors.toList());
 		}
-
 	}
 
 	@RequestMapping(method = RequestMethod.GET)

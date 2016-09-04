@@ -8,7 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 
 import org.sjr.babel.WebAppInitializer;
-import org.sjr.babel.entity.Cursus;
+import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.persistence.ObjectStore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -40,7 +40,7 @@ public class CursusServlet extends HttpServlet {
 			query.append(" and c.address.city like :city ");
 		}
 				
-		List<Cursus> results = os.find(Cursus.class, query.toString(), args);
+		List<AbstractLearningProgram> results = os.find(AbstractLearningProgram.class, query.toString(), args);
 		req.setAttribute("results", results);
 		getServletContext().getRequestDispatcher("/WEB-INF/views/cursus.jsp").forward(req, resp);
 	};

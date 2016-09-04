@@ -2,15 +2,15 @@ package org.sjr.babel.persistence;
 
 import java.util.List;
 
-import org.sjr.babel.entity.Cursus;
+import org.sjr.babel.entity.AbstractLearningProgram;
 
 public interface CursusDao {
 	
-	public List<Cursus> find(String city);
+	public List<AbstractLearningProgram> find(String city);
 	
-	public Cursus getById(int id);
+	public AbstractLearningProgram getById(int id);
 
-	public Cursus save (Cursus cur);
+	public AbstractLearningProgram save (AbstractLearningProgram cur);
 	
 	 void delete (int id);
 

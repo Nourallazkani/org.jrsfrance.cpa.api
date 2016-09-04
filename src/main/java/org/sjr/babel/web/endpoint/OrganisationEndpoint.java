@@ -13,7 +13,9 @@ import javax.transaction.Transactional;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Organisation;
+import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.OrganisationCategory.Stereotype;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.Error;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import util.EncryptionUtil;
 
 @RestController
 public class OrganisationEndpoint extends AbstractEndpoint {
@@ -100,14 +104,23 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		if (o.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
+		
+		Map<String, Object> args = new HashMap<>();
+		args.put("mailAddress", o.getMailAddress());
+		Optional<Organisation> org = objectStore.findOne(Organisation.class, "select v from Organisation v where v.mailAddress = :mailAddress", args);
+		if (org.isPresent()) {
+			return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+		}
+		
 		if (o.getAccount() == null) {
 			o.setAccount(new Account());
 		}
+		o.getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
 		String password = o.getAccount().getPassword();
 		if (password == null || password.equals("")) {
 			password = UUID.randomUUID().toString().substring(0, 8);
 		}
-		o.getAccount().setPassword(DigestUtils.sha256Hex(password));
+		o.getAccount().setPassword(EncryptionUtil.sha256(password));
 		objectStore.save(o);
 		return ResponseEntity.created(getUri("/organisations/" + o.getId())).body(o);
 

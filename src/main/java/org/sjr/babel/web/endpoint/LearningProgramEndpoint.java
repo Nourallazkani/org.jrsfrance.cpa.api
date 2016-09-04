@@ -1,17 +1,21 @@
 package org.sjr.babel.web.endpoint;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Administrator;
-import org.sjr.babel.entity.Cursus;
-import org.sjr.babel.entity.AbstractEvent;
+import org.sjr.babel.entity.LanguageLearningProgram;
+import org.sjr.babel.entity.AbstractLearningProgram;
+import org.sjr.babel.entity.ProfessionalLearningProgram;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -23,39 +27,53 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("cursus") // équivalent à @RequestMapping(path="cursus") et
-							// équivalent à @RequestMapping(value="cursus")
-public class CursusEndpoint extends AbstractEndpoint {
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
-	class CursusSummary {
+@RestController
+@RequestMapping(path = "learnings")
+public class LearningProgramEndpoint extends AbstractEndpoint {
+
+	class LearningProgramSummary {
 		public int id;
 		public String level, organisation;
 		public AddressSummary address;
 		public Date startDate, endDate, registrationStartDate;
 		public boolean openForRegistration;
 		public ContactSummary contact;
-
-		public CursusSummary(Cursus c) {
-			this.id = c.getId();
-			this.level = c.getLevel().getName();
-			this.organisation = c.getOrganisation().getName();
-			this.address = new AddressSummary(c.getAddress());
-			this.registrationStartDate = c.getRegistrationStartDate();
-			this.openForRegistration = c.isOpenForRegistration();
-			this.startDate = c.getStartDate();
-			this.endDate = c.getEndDate();
-			if(c.getContact()!=null){
-				this.contact = new ContactSummary(c.getContact());
+		
+		@JsonInclude(value=Include.NON_NULL)
+		public String domain, type;
+		
+		public LearningProgramSummary(AbstractLearningProgram lp) {
+			this.id = lp.getId();
+			this.level = lp.getLevel().getName();
+			this.organisation = lp.getOrganisation().getName();
+			this.address = new AddressSummary(lp.getAddress());
+			this.registrationStartDate = lp.getRegistrationStartDate();
+			this.openForRegistration = lp.isOpenForRegistration();
+			this.startDate = lp.getStartDate();
+			this.endDate = lp.getEndDate();
+			if(lp.getContact()!=null){
+				this.contact = new ContactSummary(lp.getContact());
 			}
-			else if (c.getOrganisation().getContact() != null) {
-				this.contact = new ContactSummary(c.getOrganisation().getContact());	
+			else if (lp.getOrganisation().getContact() != null) {
+				this.contact = new ContactSummary(lp.getOrganisation().getContact());	
+			}
+			
+			if (lp instanceof LanguageLearningProgram){
+				LanguageLearningProgram l = (LanguageLearningProgram) lp ;
+				this.type = l.getType().getName();
+			}else if ( lp instanceof ProfessionalLearningProgram) {
+				this.domain = ((ProfessionalLearningProgram) lp).getDomain().getName();
 			}
 			
 		}
 	}
 
-	private boolean hasAccess(String accessKey, Cursus cursus) {
+	private boolean hasAccess(String accessKey, AbstractLearningProgram cursus) {
 		if (accessKey.startsWith("A-")) {
 			Map<String, Object> args = new HashMap<>();
 			args.put("accessKey", accessKey);
@@ -65,19 +83,19 @@ public class CursusEndpoint extends AbstractEndpoint {
 			return cursus.getOrganisation().getAccount().getAccessKey().equals(accessKey);
 		}
 	}
-
-	// http://dosjds./cursus?city=Paris
-	@RequestMapping(method = RequestMethod.GET)
+	
+	@RequestMapping(path = {"language-programs", "professional-programs"} ,method = RequestMethod.GET)
 	@Transactional
-	public List<CursusSummary> list(
+	public List<LearningProgramSummary> list_(
 			@RequestParam(required=false, name = "city") String city, 
 			@RequestParam(required=false) Integer levelId,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
 			@RequestParam(required=false) Boolean openForRegistration
-		) {
-		System.out.println(openForRegistration);
-		StringBuffer query = new StringBuffer("select c from Cursus c where 0=0 ") ;
+		) { 
+		Class<? extends AbstractLearningProgram > targetClass = true ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
+
+		StringBuffer query = new StringBuffer("select c from ").append(targetClass.getSimpleName()).append(" c where 0=0 ") ;
 		Map<String, Object> args = new HashMap<>();
 		if (StringUtils.hasText(city)) {
 			args.put("city" , city);
@@ -101,39 +119,39 @@ public class CursusEndpoint extends AbstractEndpoint {
 			args.put("d", now);
 		}
 		
-		List<Cursus> results = objectStore.find(Cursus.class, query.toString(), args);
+		List<? extends AbstractLearningProgram> results = objectStore.find(targetClass, query.toString(), args);
 		return results.stream()
-				.map(CursusSummary::new)
+				.map(LearningProgramSummary::new)
 				.collect(Collectors.toList());
 	}
 
-	@RequestMapping(path = "{id}", method = RequestMethod.GET)
+	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.GET)
 	@RolesAllowed({ "ADMIN" })
 	@Transactional
 	public ResponseEntity<?> getCursus(@PathVariable Integer id,
 			@RequestParam(defaultValue = "true") boolean withDetails, @RequestHeader String accessKey) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
-		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
+		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (c.isPresent()) {
 			if (hasAccess(accessKey, c.get())) {
-				Cursus cursus = c.get();
+				AbstractLearningProgram lp = c.get();
 				if (withDetails) {
-					cursus.getCourses().size();
+					lp.getCourses().size();
 				}
-				return ResponseEntity.ok().body(cursus);
+				return ResponseEntity.ok().body(lp);
 			}
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		return ResponseEntity.notFound().build();
 	}
 
-	@RequestMapping(path = "{id}/summary", method = RequestMethod.GET)
+	@RequestMapping(path = {"language-programs/{id}/summary", "professional-programs/{id}/summary"}, method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> cursusSummary(@PathVariable Integer id) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
-		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
+		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (c.isPresent()) {
-			return ResponseEntity.ok().body(new CursusSummary(c.get()));
+			return ResponseEntity.ok().body(new LearningProgramSummary(c.get()));
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -141,9 +159,9 @@ public class CursusEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "{id}/courses", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> list(@PathVariable int id) {
-		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
+		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (c.isPresent()) {
-			Cursus cursus = c.get();
+			AbstractLearningProgram cursus = c.get();
 			cursus.getCourses().size();
 			return ResponseEntity.ok(cursus.getCourses());
 		} else {
@@ -151,10 +169,10 @@ public class CursusEndpoint extends AbstractEndpoint {
 		}
 	}
 
-	@RequestMapping(path = "{id}", method = RequestMethod.PUT)
+	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "ORGANISATION" })
-	public ResponseEntity<?> saveCur(@RequestBody Cursus cur, @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> saveCur(@RequestBody AbstractLearningProgram cur, @PathVariable int id, @RequestHeader String accessKey) {
 		if (cur.getId() == null || !cur.getId().equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
 		} else if (!hasAccess(accessKey, cur)) {
@@ -168,15 +186,15 @@ public class CursusEndpoint extends AbstractEndpoint {
 
 	}
 
-	@RequestMapping(path = "{id}", method = RequestMethod.DELETE)
+	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "ORGANISATION" })
 	public ResponseEntity<?> delete(@PathVariable int id, @RequestHeader String accessKey) {
-		Optional<Cursus> c = objectStore.getById(Cursus.class, id);
+		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (!c.isPresent()) {
 			return ResponseEntity.badRequest().build();
 		}
-		Cursus cursus = c.get();
+		AbstractLearningProgram cursus = c.get();
 		if (!hasAccess(accessKey, c.get())) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
@@ -189,19 +207,21 @@ public class CursusEndpoint extends AbstractEndpoint {
 
 	}
 
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> save(@RequestBody Cursus c, @RequestHeader String accessKey) {
-		if (c.getId() != null) {
+	public ResponseEntity<?> save(HttpServletRequest req, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
+		Class<? extends AbstractLearningProgram > targetClass = true ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
+		AbstractLearningProgram lp = this.jackson.readValue(req.getInputStream(), targetClass);
+		if (lp.getId() != null) {
 			return ResponseEntity.badRequest().build();
 		}
-		if (c.getEndDate().before(c.getStartDate())) {
+		if (lp.getEndDate().before(lp.getStartDate())) {
 			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
 		}
-		if (hasAccess(accessKey, c)) {
-			objectStore.save(c);
-			return ResponseEntity.created(getUri("/cursus/" + c.getId())).body(c);
+		if (hasAccess(accessKey, lp)) {
+			objectStore.save(lp);
+			return ResponseEntity.created(getUri("/cursus/" + lp.getId())).body(lp);
 		}
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 	}

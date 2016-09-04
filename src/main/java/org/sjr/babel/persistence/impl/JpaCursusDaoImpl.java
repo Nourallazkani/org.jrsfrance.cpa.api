@@ -2,29 +2,29 @@ package org.sjr.babel.persistence.impl;
 
 import java.util.List;
 import javax.persistence.TypedQuery;
-import org.sjr.babel.entity.Cursus;
+import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.persistence.CursusDao;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class JpaCursusDaoImpl extends AbstractJpaDao<Cursus> implements CursusDao  {
+public class JpaCursusDaoImpl extends AbstractJpaDao<AbstractLearningProgram> implements CursusDao  {
 
 
 	@Override	
-	public List<Cursus> find(String city){	
+	public List<AbstractLearningProgram> find(String city){	
 		System.out.println(em);
 		String hql = "select c from Cursus c where c.address.city like :name";
-		TypedQuery<Cursus> query = em.createQuery(hql, Cursus.class);
+		TypedQuery<AbstractLearningProgram> query = em.createQuery(hql, AbstractLearningProgram.class);
 		System.out.println(query.toString());
 		query.setParameter("name", city);
-		List<Cursus> results = query.getResultList();
+		List<AbstractLearningProgram> results = query.getResultList();
 		return results;
 		
 	}
 
 	@Override
-	Class<Cursus> getEntityClass() {
-		return Cursus.class;
+	Class<AbstractLearningProgram> getEntityClass() {
+		return AbstractLearningProgram.class;
 	}
 
 	

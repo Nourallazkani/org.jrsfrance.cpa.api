@@ -21,7 +21,7 @@ import org.sjr.babel.entity.reference.OrganisationCategory;
 public class Organisation extends AbstractEntity {
 
 	@Basic
-	private String name, userName;
+	private String name, mailAddress;
 
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
@@ -47,12 +47,12 @@ public class Organisation extends AbstractEntity {
 		return contact;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getMailAddress() {
+		return mailAddress;
 	}
 
-	public void setUserName(String mailAddress) {
-		this.userName = mailAddress;
+	public void setMailAddress(String mailAddress) {
+		this.mailAddress = mailAddress;
 	}
 
 	public void setContact(Contact contact) {
@@ -83,13 +83,12 @@ public class Organisation extends AbstractEntity {
 		this.category = category;
 	}
 
-	@PrePersist
+	//@PrePersist
 	public void prePersist() {
 		if (this.account == null) {
 			setAccount(new Account());
 		}
 		getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
-
 	}
 
 }

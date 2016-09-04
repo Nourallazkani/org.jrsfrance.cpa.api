@@ -92,7 +92,11 @@ public abstract class AbstractEndpoint {
 	
 	// this function transform something (input) in something else based on a function provided by the caller, but only if the input is not null 
 	protected <T, U> U safeTransform(T input, Function<T, U> transformer){
-		return input!=null ? transformer.apply(input) : null;
+		return safeTransform(input, transformer, null);
+	}
+	
+	protected <T, R> R safeTransform(T input, Function<T, R> transformer, R defaultValue){
+		return input!=null ? transformer.apply(input) : defaultValue;
 	}
 	
 	public static class Error {

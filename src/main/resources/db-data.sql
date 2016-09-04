@@ -1,122 +1,288 @@
+drop database if exists babel;
+
+create database babel;
+
 use babel;
+/*
+drop table if exists
+	Country_Language, Student_Language, CursusRegistration, WorkshopRegistration,Volunteer_Language,
+	Volunteer, Workshop, Course, Cursus,
+    Organisation,
+    Student,  
+    Civility,
+    Country,
+    Level, Language;
+*/
 
-insert into Level(name,next_id,previous_id,description) values ('A1',2,null,' Debutant ');
-insert into Level(name,next_id,previous_id,description) values ('A2',3,1,'moyen');
-insert into Level(name,next_id,previous_id,description) values ('B1',4,2,'moyen');
-insert into Level(name,next_id,previous_id,description) values ('B2',5,3,'expaire');
-insert into Level(name,next_id,previous_id,description) values ('C1',6,4,'expaire');
-insert into Level(name,next_id,previous_id,description) values ('C2',null,5,'expaire');
-
-
-insert into EventType (name, stereotype) values ('atelier socio linguistique', 'WORKSHOP');
-
-insert into FieldOfStudy(name) values ('IT engineering');
-insert into FieldOfStudy(name) values ('Business');
-insert into FieldOfStudy(name) values ('Economic');
-insert into FieldOfStudy(name) values ('Droit');
-insert into FieldOfStudy(name) values ('Mathématiques');
-insert into FieldOfStudy(name) values ('Physique et chimie');
-
-insert into ProfessionalLearningProgramDomain(name) values ('Electricité');
-insert into ProfessionalLearningProgramDomain(name) values ('Plomberie');
-insert into ProfessionalLearningProgramDomain(name) values ('Mécaniaue');
-
-insert into LanguageLearningProgramType(name) values ('Francais pour reprendre dses etudes');
-insert into LanguageLearningProgramType(name) values ('Francais pour suivre une formation');
-insert into LanguageLearningProgramType(name) values ('Francais');
-
-
-insert into OrganisationCategory(name, stereotype) values ('université', 'UNIVERSITY');
-insert into OrganisationCategory(name, stereotype) values ('bibliothéque', 'LIBRARY');
-insert into OrganisationCategory(name, stereotype) values ('association', 'NGO');
-
-insert into Civility(name) values ( 'Mme' );
-insert into Civility(name) values ( 'Mr' );
-
-insert into Country(name ,isoCode) values ('France', 'FR');
-insert into Country(name , isoCode) values ('Syrie' , 'SYR');
-insert into Country(name , isoCode) values ('Afganistan' , 'Afg');
-insert into Country(name , isoCode) values ('Germany' , 'Gr');
-insert into Country(name , isoCode) values ('Iraque' , 'Irq');
+create table Country (
+    id int AUTO_INCREMENT PRIMARY KEY,
+    name varchar(50),
+    isoCode varchar(3)
+);
+create table Language (
+	id int AUTO_INCREMENT PRIMARY KEY,
+    name varchar(50)
+);
+create table Civility (
+	id int auto_increment primary key,
+    name varchar (50)
+);
+create table Level (
+    id int AUTO_INCREMENT PRIMARY KEY,
+    name varchar(50),
+    next_id int,
+    previous_id int,
+    description varchar(100)
+);
 
 
-insert into Language(name) values('Français');
-insert into Language(name) values('Anglais');
-insert into Language(name) values('Arabe');
-insert into Language(name) values('Dari');
+
+create table FieldOfStudy (
+	id int auto_increment primary key,
+	name varchar(50)
+);
+
+create table OrganisationCategory(
+	id int auto_increment primary key ,
+	name varchar(50),
+	stereotype varchar(25)
+);
+
+create table Organisation(
+    id int not null auto_increment primary key,
+    name varchar(255) null,
+	password varchar(200),
+    street1 varchar(255) null,
+    street2 varchar(255) null,
+    postalCode varchar(255) null,
+    locality varchar(255) null,
+    lat decimal(10, 8) null, 
+    lng DECIMAL(11, 8) null,
+    googleMapId varchar(255) null,
+    accessKey varchar (255) null,
+    role varchar (255) null,
+    contact varchar(512),
+    mailAddress varchar(255),
+    category_id int not null,
+    country_id int null,
+    foreign key (country_id) references Country (id),
+    foreign key (category_id) references OrganisationCategory(id)
+);
+
+create table Teaching (
+	id int auto_increment primary key,
+	licence bit,
+	master bit,
+	link varchar(255),
+	contact varchar(512),
+	openForRegistration bool default true,
+    registrationStartDate date,
+    fieldOfStudy_id int not null,
+	languageLevelRequired_id int, 
+	organisation_id int null,
+	foreign key (organisation_id) references Organisation(id),
+	foreign key (languageLevelRequired_id) references Level(id),
+	foreign key (fieldOfStudy_id) references FieldOfStudy(id)
+);
+
+create table ProfessionalLearningProgramDomain(
+	id int AUTO_INCREMENT PRIMARY KEY,
+	name varchar(250) NULL
+);
+
+create table LanguageLearningProgramType(
+	id int AUTO_INCREMENT PRIMARY KEY,
+	name varchar(250) NULL
+);
+
+create table AbstractLearningProgram (
+    id int AUTO_INCREMENT PRIMARY KEY,
+    name varchar(250) NULL,
+    street1 varchar(50),
+    street2 varchar(50),
+    postalCode varchar(50),
+    locality varchar(50),
+    lat decimal(10, 8) null, 
+    lng decimal(11, 8) null,
+    googleMapId varchar(255) null,
+    country_id int,
+    openForRegistration bool default true,
+    registrationStartDate date,
+    contact varchar(512),
+    organisation_id int,
+    level_id int,
+    startDate date,
+    endDate date,
+	domain_id int,	/* only if DTYPE = P (ProfessionalLearningProgram)  */
+	type_id int,	/* only if DTYPE = L (LanguageLearningProgram) */
+	DTYPE varchar(1) not NULL,
+    foreign key (country_id) references Country (id),
+    foreign key (organisation_id) references Organisation(id),
+    foreign key (level_id) references Level (id),
+	foreign key (type_id) references ProfessionalLearningProgramDomain(id),
+	foreign key (domain_id) references LanguageLearningProgramType(id)
+);
+
+create table AbstractLearningProgram_courses (
+	LearningProgram_id int not null,
+    startDate datetime default now(),
+	endDate datetime default now(),
+    level_id  int not null,
+    translatorRequired bool default false,
+    foreign key (LearningProgram_id) references AbstractLearningProgram (id),
+    foreign key (level_id) references Level (id)
+);
+
+create table Volunteer(
+	id int auto_increment PRIMARY key,
+	firstName varchar (255),
+	lastName varchar(255),
+	birthDate date,
+	mailAddress varchar (255),
+	phoneNumber varchar (50),
+	accessKey varchar(255),
+	password varchar (255),
+	role varchar (255),
+    comments varchar(1000),
+    street1 varchar(255),
+    street2 varchar(255),
+    postalCode varchar(255),
+    locality varchar(255),
+    lat decimal(10, 8) null, 
+    lng DECIMAL(11, 8) null,
+    googleMapId varchar(255) null,
+    civility_id int,
+    country_id int,
+	nationality_id int,
+	organisation_id int,
+    foreign key (country_id) references Country(id),
+	foreign key (civility_id) references Civility (id),
+	foreign key (nationality_id) references Country (id),
+	foreign key (organisation_id) references Organisation (id)
+);
+
+create table Volunteer_availabilities (
+	Volunteer_id int not null,
+	dayOfWeek varchar(9) not null,
+	startTime int not null,
+	endTime int not null,
+	foreign key (Volunteer_id) references Volunteer(id)
+);
 
 
-insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
-	values ('science po','27 Rue Saint-Guillaume',1,'75007', 'Paris', '{"name":"Elyse","phoneNumber":"00331234567","mailAddress":"Elyse@gmail.com"}', 1);
-insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
-	values ('JRS','14 rue assas', 1, '75006', 'Paris','{"name":"Irinda","phoneNumber":"00337654321","mailAddress":"Irinda@gmail.com"}', 2);
-insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
-	values ('Singa','8 boulvard Mazzeh', 1, '31555', 'Toulouse', '{"name":"Paul","phoneNumber":"00331234765","mailAddress":"paul@gmail.com"}', 3);
+create table Volunteer_Language(
+	volunteer_id int not null,
+    language_id int not null,
+    foreign key (volunteer_id) references Volunteer(id),
+    foreign key (language_id) references Language(id)
+);
 
-insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
-	values ('CPA','10 rue Damas', 1, '69123', 'Lyon', '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 1);
+create table Volunteer_FieldOfStudy (
+	volunteer_id int not null,
+	fieldOfStudy_id int not null,
+	foreign key (volunteer_id) references Volunteer(id),
+	foreign key (fieldOfStudy_id) references FieldOfStudy(id)
+);
+create table Administrator (
+	id int auto_increment primary key ,
+	firstName varchar(255),
+	lastName varchar(255),
+	mailAddress varchar(255),
+	phoneNumber varchar(255),
+	password varchar(255),
+	accessKey varchar(255),
+	role varchar(255),
+	civility_id int ,
+	foreign key (civility_id) references Civility(id)
+);
 
+create table EventType (
+	id int not null auto_increment primary key,
+	name varchar(50),
+	stereotype varchar(25)
+);
 
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
-	values(DATE_ADD(now(),INTERVAL -180 DAY), DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L');
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
-	values(DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), now(), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L');
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
-	values(DATE_ADD(now(),INTERVAL -60 DAY), now(), DATE_ADD(now(),INTERVAL 60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L');
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
-	values(now(), DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L');
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
-	values(DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L');
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE) 
-	values(DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L');
+create table AbstractEvent (
+	id int auto_increment PRIMARY key ,
+    street1 varchar(255) null,
+    street2 varchar(255) null,
+    postalCode varchar(255) null,
+    locality varchar(255) null,
+    lat decimal(10, 8) null, 
+    lng DECIMAL(11, 8) null,
+    googleMapId varchar(255) null,
+    startDate datetime default now(),
+	endDate datetime default now(),
+	contact varchar(512),
+	openForRegistration bool default true,
+    registrationStartDate date,
+	subject varchar(255) null,
+	link varchar(255) null,
+    description varchar(8000) null,
+    country_id int not null,
+    type_id int not null,
+    organisation_id int null,
+    volunteer_id int null,
+    DTYPE varchar(4),
+    foreign key (type_id) References EventType(id),
+    foreign key (volunteer_id) References Volunteer(id),
+    foreign key (organisation_id) References Organisation(id),
+    foreign key (country_id) References Country(id)
+);
 
-insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(1, 1, true );
-insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(2, 1, false );
+create table Refugee(
+	id int auto_increment primary key,
+    firstName varchar (255),
+	lastName varchar(255),
+	birthDate date,
+	mailAddress varchar (255),
+	phoneNumber varchar (50),
+    
+	accessKey varchar(255),
+	password varchar (255),
+	role varchar (255),
+    
+    street1 varchar(255),
+    street2 varchar(255),
+    postalCode varchar(255),
+    locality varchar(255),
+    lat decimal(10, 8) null, 
+    lng DECIMAL(11, 8) null,
+    googleMapId varchar(255) null,
+    country_id int,
+    
+    firstLanguage_id int,
+    civility_id int,
+	nationality_id int,
+    foreign key (firstLanguage_id) references Language(id),
+    foreign key (country_id) references Country(id),
+	foreign key (civility_id) references Civility (id),
+	foreign key (nationality_id) references Country (id)
+);
 
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (1,0,1,2,1);
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (0,1,2,1,2);
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (1,0,3,3,3);
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (0,1,4,2,4);
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (0,1,5,2,2);
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id) values (1,1,6,2,1);
+create table Refugee_FieldOfStudy(
+	refugee_id int not null,
+    fieldOfStudy_id int not null,
+    foreign key (refugee_id) references Refugee(id),
+    foreign key (fieldOfStudy_id) references FieldOfStudy(id)
+);
+create table Refugee_languageSkills(
+	Refugee_id int not null,
+    language_id int not null,
+    level_id int not null,
+    foreign key (level_id) references Level(id),
+    foreign key (Refugee_id) references Refugee(id),
+    foreign key (language_id) references Language(id)
+);
 
-update Teaching t, Organisation o set t.contact=o.contact where t.organisation_id=o.id;
-
-
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
-	values ('Abiir','ZATAR', date(now()), 'Alaric@gmail.com', '07908756','xyz','123456789','VOLUNTEER', 'bordeaux', 1, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
-	values ('lucile','BALOU', date(now()), 'lucile@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Toulouse', 1, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
-	values ('Nour', 'BADAN', date(now()), 'Nour@gmail.com', '07652436', 'xyz', '123456789', 'VOLUNTEER', 'Lyon', 2, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
-	values ('jawad', 'DODO', date(now()), 'jawad@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Paris', 2, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
-	values ('ABD', 'BADAN', date(now()), 'Nour@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'bordeaux ', 2, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
-	values ('Alaric', 'COUCOU', date(now()), 'Nour@gmail.com', '07908756', 'xyz', '123456789', 'VOLUNTEER', 'Renne', 2, 1, 'working for JRS');
-
-insert into Volunteer_Language(volunteer_id, language_id) values(1,1);
-insert into Volunteer_Language(volunteer_id, language_id) values(1,2);
-insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(1,2);
-insert into Volunteer_Language(volunteer_id, language_id) values(3,1);
-insert into Volunteer_Language(volunteer_id, language_id) values(4,2);
-insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(5,2);
-insert into Volunteer_Language(volunteer_id, language_id) values(2,1);
-insert into Volunteer_Language(volunteer_id, language_id) values(2,2);
-insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(1,2);
-
-
-	
-insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
-	values('Alaric','Hermant','alaric_hermant@yahoo.fr','xyz','ADMIN','07123456','123456789',2);
-insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
-	values('Irinda','riquelme','irinda.r@gmail.com','xyz','ADMIN','07123456','123456789',1);
-
-insert into Refugee (firstName,lastName,birthDate,mailAddress,phoneNumber,accessKey,password)
-values ('Alaric', 'Hermant', NULL, 'az', NULL, 'R-a871ce00-e7d2-497e-8a4e-d272b8b5b520', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
-
-insert into AbstractEvent(street1, country_id, postalCode, subject,description,organisation_id ,type_id ,DTYPE)
-values ('14 rue d''assas',1,'75006','Politique','  ',2,1,'O-E');
-
-update AbstractEvent a, Organisation o set a.contact=o.contact where a.organisation_id=o.id;
+create table MeetingRequests(
+	id int PRIMARY key auto_increment,
+	refugee_id int not null,
+	volunteer_id int not null,
+	startDate date not null,
+	endDate date not null,
+    subject varchar (500),
+    accepted bool null,
+    foreign key (Refugee_id) references Refugee(id),
+    foreign key (Volunteer_id) references Volunteer(id)
+);

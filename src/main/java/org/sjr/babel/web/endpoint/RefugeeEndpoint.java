@@ -39,7 +39,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 		public RefugeeSummary(Refugee r) {
 			this.id = r.getId();
-			this.civility = r.getCivility().getName();
+			this.civility = safeTransform(r.getCivility(), x -> x.getName());
 			this.firstName = r.getFirstName();
 			this.lastName = r.getLastName();
 			this.birthDate = r.getBirthDate();
@@ -55,7 +55,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			@RequestParam(required = false) Integer languageId, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode) {
 
-		StringBuffer hql = new StringBuffer("select r from Refugee r join fetch r.languages l  where 0=0 ");
+		StringBuffer hql = new StringBuffer("select r from Refugee r join fetch r.languageSkills l  where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
 		if (languageId != null) {
 			hql.append("and l.id = :languageId ");

@@ -12,9 +12,9 @@ import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.LanguageLearningProgram;
-import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.entity.ProfessionalLearningProgram;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.HandlerMapping;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -65,9 +66,11 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			
 			if (lp instanceof LanguageLearningProgram){
 				LanguageLearningProgram l = (LanguageLearningProgram) lp ;
-				this.type = l.getType().getName();
+				this.type = safeTransform(l.getType(), x -> x.getName(), "");
+				
 			}else if ( lp instanceof ProfessionalLearningProgram) {
-				this.domain = ((ProfessionalLearningProgram) lp).getDomain().getName();
+				ProfessionalLearningProgram p = (ProfessionalLearningProgram) lp;
+				this.domain = safeTransform(p.getDomain(), x -> x.getName(), "");
 			}
 			
 		}
@@ -86,14 +89,17 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"language-programs", "professional-programs"} ,method = RequestMethod.GET)
 	@Transactional
-	public List<LearningProgramSummary> list_(
+	public List<LearningProgramSummary> learningPrograms(
 			@RequestParam(required=false, name = "city") String city, 
 			@RequestParam(required=false) Integer levelId,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
-			@RequestParam(required=false) Boolean openForRegistration
+			@RequestParam(required=false) Boolean openForRegistration,
+			HttpServletRequest req
 		) { 
-		Class<? extends AbstractLearningProgram > targetClass = true ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
+		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		
+		Class<? extends AbstractLearningProgram > targetClass = path.endsWith("language-programs") ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
 
 		StringBuffer query = new StringBuffer("select c from ").append(targetClass.getSimpleName()).append(" c where 0=0 ") ;
 		Map<String, Object> args = new HashMap<>();
@@ -128,8 +134,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.GET)
 	@RolesAllowed({ "ADMIN" })
 	@Transactional
-	public ResponseEntity<?> getCursus(@PathVariable Integer id,
-			@RequestParam(defaultValue = "true") boolean withDetails, @RequestHeader String accessKey) {
+	public ResponseEntity<?> learningProgram(@PathVariable Integer id, @RequestParam(defaultValue = "true") boolean withDetails, @RequestHeader String accessKey) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
 		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (c.isPresent()) {
@@ -147,7 +152,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"language-programs/{id}/summary", "professional-programs/{id}/summary"}, method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> cursusSummary(@PathVariable Integer id) {
+	public ResponseEntity<?> learningProgram(@PathVariable Integer id) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
 		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (c.isPresent()) {
@@ -172,7 +177,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "ORGANISATION" })
-	public ResponseEntity<?> saveCur(@RequestBody AbstractLearningProgram cur, @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> learningProgram(@RequestBody AbstractLearningProgram cur, @PathVariable int id, @RequestHeader String accessKey) {
 		if (cur.getId() == null || !cur.getId().equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
 		} else if (!hasAccess(accessKey, cur)) {
@@ -189,7 +194,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "ORGANISATION" })
-	public ResponseEntity<?> delete(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> learningProgram(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (!c.isPresent()) {
 			return ResponseEntity.badRequest().build();
@@ -210,8 +215,12 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> save(HttpServletRequest req, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
-		Class<? extends AbstractLearningProgram > targetClass = true ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
+	public ResponseEntity<?> learningProgram(HttpServletRequest req, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
+		
+		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		
+		Class<? extends AbstractLearningProgram > targetClass = path.endsWith("language-programs")  ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
+		
 		AbstractLearningProgram lp = this.jackson.readValue(req.getInputStream(), targetClass);
 		if (lp.getId() != null) {
 			return ResponseEntity.badRequest().build();

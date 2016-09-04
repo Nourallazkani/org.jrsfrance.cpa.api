@@ -260,7 +260,7 @@ create table Refugee(
 	foreign key (nationality_id) references Country (id)
 );
 
-create table Refugee_fieldsOfStudy(
+create table Refugee_FieldOfStudy(
 	refugee_id int not null,
     fieldOfStudy_id int not null,
     foreign key (refugee_id) references Refugee(id),
@@ -286,5 +286,3 @@ create table MeetingRequests(
     foreign key (Refugee_id) references Refugee(id),
     foreign key (Volunteer_id) references Volunteer(id)
 );
-
-

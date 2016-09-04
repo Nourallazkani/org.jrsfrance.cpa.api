@@ -16,6 +16,7 @@ import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.LanguageLearningProgram;
 import org.sjr.babel.entity.ProfessionalLearningProgram;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -52,7 +53,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			this.id = lp.getId();
 			this.level = lp.getLevel().getName();
 			this.organisation = lp.getOrganisation().getName();
-			this.address = new AddressSummary(lp.getAddress());
+			this.address = safeTransform(lp.getAddress(), x -> new AddressSummary(x, true));
 			this.registrationStartDate = lp.getRegistrationStartDate();
 			this.openForRegistration = lp.isOpenForRegistration();
 			this.startDate = lp.getStartDate();

@@ -39,7 +39,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			this.languageLevelRequired  = t.getLanguageLevelRequired().getName();
 			this.organisation = t.getOrganisation().getName();
 			this.contact = safeTransform(t.getContact(), ContactSummary::new);
-			this.address = safeTransform(t.getOrganisation().getAddress(), AddressSummary::new);
+			this.address = safeTransform(t.getOrganisation().getAddress(), x -> new AddressSummary(x, true));
 			this.master = t.getMaster();
 			this.licence = t.getLicence();
 		}

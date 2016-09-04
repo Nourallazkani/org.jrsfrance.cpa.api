@@ -45,7 +45,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			this.id = event.getId();
 			this.subject = event.getSubject();
 			this.description = event.getDescription();
-			this.address = safeTransform(event.getAddress(), AddressSummary::new);
+			this.address = safeTransform(event.getAddress(), x->new AddressSummary(x, true));
 			this.startDate = event.getStartDate();
 			this.endDate = event.getEndDate();
 			this.type = event.getType().getName();

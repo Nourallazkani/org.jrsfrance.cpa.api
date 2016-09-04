@@ -66,21 +66,25 @@ public abstract class AbstractEndpoint {
 		return UriComponentsBuilder.fromHttpRequest(httpRequest).path(path).build().toUri();
 	}
 	
-	protected static class AddressSummary {
-		public String street1, street2, zipcode, locality, country;
+	protected class AddressSummary {
+		public String street1, street2, postalCode, locality, country;
 		public Double lat,lng; 
-		public AddressSummary(Address a ) {
-			this.street1 = a.getStreet1();
-			this.street2 = a.getStreet2();
-			this.zipcode = a.getPostalCode();
+		public AddressSummary(Address a, boolean withDetails ) {
+			
+			if(withDetails){
+				this.street1 = a.getStreet1();
+				this.street2 = a.getStreet2();
+				this.postalCode = a.getPostalCode();
+				this.lat = a.getLat();
+				this.lng = a.getLng();
+			}
+			
 			this.locality = a.getLocality();
-			this.country = a.getCountry().getName();
-			this.lat = a.getLat();
-			this.lng = a.getLng();
+			this.country = safeTransform(a.getCountry(), x->x.getName());
 		}
 	}
 	
-	protected static class ContactSummary{ // same as contact for the time being, may differ later.
+	protected class ContactSummary{ // same as contact for the time being, may differ later.
 		public String name, mailAddress, phoneNumber;
 
 		public ContactSummary(Contact contact) {

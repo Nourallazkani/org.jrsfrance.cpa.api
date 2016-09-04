@@ -13,7 +13,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 
 import org.sjr.babel.entity.reference.Civility;
 import org.sjr.babel.entity.reference.FieldOfStudy;

@@ -15,6 +15,7 @@ import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.OrganisationCategory.Stereotype;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.Error;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -41,7 +42,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			this.name = o.getName();
 			this.category = o.getCategory().getName();
 			this.contact = safeTransform(o.getContact(), ContactSummary::new);
-			this.address = safeTransform(o.getAddress(), AddressSummary::new);
+			this.address = safeTransform(o.getAddress(), x -> new AddressSummary(x, true));
 
 		}
 

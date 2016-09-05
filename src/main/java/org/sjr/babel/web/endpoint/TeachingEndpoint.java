@@ -49,7 +49,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping( method = RequestMethod.GET)
 	@Transactional
-	public List<LocalizableObjectSummary<TeachingSummary>> list(
+	public List<TeachingSummary> list(
 			@RequestParam(required = false) Integer organisationId,
 			@RequestParam(required = false)	String Orgine,
 			@RequestParam(required = false) Integer fieldOfStudyId, 
@@ -79,9 +79,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 				.map(e -> new TeachingSummary(e))
 				.collect(Collectors.toList());
 		
-		return results.stream()
-				.map(x -> new LocalizableObjectSummary<>(x, 0))
-				.collect(Collectors.toList());
+		return results.stream().collect(Collectors.toList());
 	}
 
 	// the new end point

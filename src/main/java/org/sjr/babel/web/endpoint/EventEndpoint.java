@@ -36,7 +36,7 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	class EventSummary {
 		public int id;
-		public String subject, description, organizedBy,type;
+		public String subject, description, organizedBy,type,link;
 		public AddressSummary address;
 		public Date startDate, endDate;
 		public ContactSummary contact;
@@ -49,6 +49,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			this.startDate = event.getStartDate();
 			this.endDate = event.getEndDate();
 			this.type = event.getType().getName();
+			this.link = event.getLink();
 			this.contact = safeTransform(event.getContact(), ContactSummary::new);
 			if (event instanceof VolunteerEvent) {
 				VolunteerEvent e = (VolunteerEvent) event;
@@ -91,6 +92,7 @@ public class EventEndpoint extends AbstractEndpoint {
 	public List<EventSummary> events(
 			@RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode,
+			@RequestParam(required = false) String sujet,
 			@RequestParam(required = false) EventType.Stereotype stereotype,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="false") boolean includeFutureEvents
@@ -105,6 +107,10 @@ public class EventEndpoint extends AbstractEndpoint {
 		if (city != null && !(city.trim().equals(""))) {
 			hql.append("and e.address.city like :city ");
 			args.put("city", city);
+		}
+		if (sujet != null && !(sujet.trim().equals(""))) {
+			hql.append("and e.sujet like :sujet ");
+			args.put("sujet", sujet);
 		}
 		if (zipcode != null && !(zipcode.trim().equals(""))) {
 			hql.append("and e.address.zipcode like :zipcode ");

@@ -47,14 +47,15 @@ insert into Language(name) values('Dari');
 
 
 insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
-	values ('science po','27 Rue Saint-Guillaume',1,'75007', 'Paris', '{"name":"Elyse","phoneNumber":"00331234567","mailAddress":"Elyse@gmail.com"}', 1);
+	values ('SCIENCE PO','27 Rue Saint-Guillaume',1,'75007', 'Paris', '{"name":"Elyse","phoneNumber":"00331234567","mailAddress":"Elyse@gmail.com"}', 1);
 insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
-	values ('JRS','14 rue assas', 1, '75006', 'Paris','{"name":"Irinda","phoneNumber":"00337654321","mailAddress":"Irinda@gmail.com"}', 2);
-insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
-	values ('Singa','8 boulvard Mazzeh', 1, '31555', 'Toulouse', '{"name":"Paul","phoneNumber":"00331234765","mailAddress":"paul@gmail.com"}', 3);
-
+	values ('SINGA','8 boulvard Mazzeh', 1, '31555', 'Toulouse', '{"name":"Paul","phoneNumber":"00331234765","mailAddress":"paul@gmail.com"}', 3);
 insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
 	values ('CPA','10 rue Damas', 1, '69123', 'Lyon', '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 1);
+insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
+	values ('CENTRE POMPIDOU','Place Georges-Pompidou', 1, '75004', 'Paris', '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 2);
+insert into Organisation(name, street1, country_id, postalCode, locality, contact, category_id) 
+	values ('BNF','Quai François Mauriac', 1, '75706', 'Paris', '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 2);
 
 
 insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
@@ -120,7 +121,11 @@ values ('Alaric', 'Hermant', NULL, 'az', NULL, 'R-a871ce00-e7d2-497e-8a4e-d272b8
 insert into Refugee_languageSkills(Refugee_id, language_id,level_id) values(1,1,1);
 insert into Refugee_FieldOfStudy(refugee_id, fieldOfStudy_id) values(1,1);
 
-insert into AbstractEvent(street1, country_id, postalCode, subject,description,organisation_id ,type_id ,DTYPE)
-values ('14 rue d''assas',1,'75006','Politique','  ',2,1,'O-E');
+insert into AbstractEvent(street1, country_id, postalCode, subject,description,startDate,endDate,organisation_id ,type_id ,DTYPE)
+values ('14 rue d''assas',1,'75006','Politique','  ',DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY),2,1,'O-E');
+insert into AbstractEvent(street1, country_id, postalCode, subject,description,startDate,endDate,organisation_id ,type_id ,DTYPE)
+values ('19 rue Raspail',1,'94200','Economic','  ',DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY),4,1,'O-E');
+insert into AbstractEvent(street1, country_id, postalCode, subject,description,startDate,endDate,organisation_id ,type_id ,DTYPE)
+values ('44 rue du bac',1,'75007','La vie de tout les jours','  ',DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY),5,1,'V-E');
 
 update AbstractEvent a, Organisation o set a.contact=o.contact where a.organisation_id=o.id;

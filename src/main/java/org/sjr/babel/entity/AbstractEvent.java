@@ -6,6 +6,8 @@ import javax.persistence.Convert;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -20,9 +22,12 @@ import org.sjr.babel.entity.reference.EventType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class AbstractEvent extends AbstractEntity {
 
+	public enum Audience {REFUGEE, VOLUNTEER}
+	
+	@Enumerated(EnumType.STRING)
+	private Audience audience;
+	
 	private String description, subject, link;
-
-	private Date registrationStartDate;
 
 	private boolean openForRegistration;
 
@@ -36,7 +41,15 @@ public abstract class AbstractEvent extends AbstractEntity {
 	private EventType type;
 
 	@Temporal(TemporalType.DATE)
-	private Date startDate, endDate;
+	private Date registrationStartDate, startDate, endDate;
+
+	public Audience getAudience() {
+		return audience;
+	}
+
+	public void setAudience(Audience audience) {
+		this.audience = audience;
+	}
 
 	public String getDescription() {
 		return description;
@@ -124,7 +137,8 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@Entity
 	@DiscriminatorValue("O-E")
 	public static class OrganisationEvent extends AbstractEvent {
-		@ManyToOne
+		
+		@ManyToOne(optional = false)
 		private Organisation organisation;
 
 		public Organisation getOrganisation() {
@@ -141,7 +155,7 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@DiscriminatorValue("V-E")
 	public static class VolunteerEvent extends AbstractEvent {
 
-		@ManyToOne
+		@ManyToOne(optional = false)
 		private Volunteer volunteer;
 
 		public Volunteer getVolunteer() {

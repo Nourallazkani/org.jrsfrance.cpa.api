@@ -204,6 +204,7 @@ create table EventType (
 
 create table AbstractEvent (
 	id int auto_increment PRIMARY key ,
+	audience varchar(15) not null,
     street1 varchar(255) null,
     street2 varchar(255) null,
     postalCode varchar(255) null,

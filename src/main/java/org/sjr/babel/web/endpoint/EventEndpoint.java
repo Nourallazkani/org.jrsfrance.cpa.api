@@ -36,9 +36,9 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	class EventSummary {
 		public int id;
-		public String subject, description, organizedBy,type,link;
+		public String subject, description, organisedBy,type,link;
 		public AddressSummary address;
-		public Date startDate, endDate;
+		public Date startDate, endDate,registrationStartDate;
 		public ContactSummary contact;
 
 		public EventSummary(AbstractEvent event) {
@@ -48,15 +48,16 @@ public class EventEndpoint extends AbstractEndpoint {
 			this.address = safeTransform(event.getAddress(), x->new AddressSummary(x, true));
 			this.startDate = event.getStartDate();
 			this.endDate = event.getEndDate();
+			this.registrationStartDate = event.getRegistrationStartDate();
 			this.type = event.getType().getName();
 			this.link = event.getLink();
 			this.contact = safeTransform(event.getContact(), ContactSummary::new);
 			if (event instanceof VolunteerEvent) {
 				VolunteerEvent e = (VolunteerEvent) event;
-				this.organizedBy = e.getVolunteer().getFullName();
+				this.organisedBy = e.getVolunteer().getFullName();
 			} else if (event instanceof OrganisationEvent) {
 				OrganisationEvent e = (OrganisationEvent) event;
-				this.organizedBy = e.getOrganisation().getName();
+				this.organisedBy = e.getOrganisation().getName();
 			}
 
 		}
@@ -92,8 +93,10 @@ public class EventEndpoint extends AbstractEndpoint {
 	public List<EventSummary> events(
 			@RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode,
-			@RequestParam(required = false) String sujet,
+			@RequestParam(required = false) String subject,
 			@RequestParam(required = false) EventType.Stereotype stereotype,
+			@RequestParam(required = false) AbstractEvent.Audience audience,
+			@RequestParam(required = false) Boolean openForRegistration,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="false") boolean includeFutureEvents
 		) 
@@ -105,12 +108,12 @@ public class EventEndpoint extends AbstractEndpoint {
 		StringBuffer hql = new StringBuffer("select e from AbstractEvent e join e.type t where 0=0 ");
 		HashMap<String, Object> args = new HashMap<>();
 		if (city != null && !(city.trim().equals(""))) {
-			hql.append("and e.address.city like :city ");
-			args.put("city", city);
+			hql.append("and e.address.locality like :locality ");
+			args.put("locality", city);
 		}
-		if (sujet != null && !(sujet.trim().equals(""))) {
-			hql.append("and e.sujet like :sujet ");
-			args.put("sujet", sujet);
+		if (subject != null && !(subject.trim().equals(""))) {
+			hql.append("and e.subject like :subject ");
+			args.put("sujet", subject);
 		}
 		if (zipcode != null && !(zipcode.trim().equals(""))) {
 			hql.append("and e.address.zipcode like :zipcode ");
@@ -119,6 +122,14 @@ public class EventEndpoint extends AbstractEndpoint {
 		if (stereotype != null) {
 			hql.append("and t.stereotype = :stereotype ");
 			args.put("stereotype", stereotype);
+		}
+		if(audience!=null){
+			hql.append("and e.audience = :audience ");
+			args.put("audience", audience);
+		}
+		if(openForRegistration!=null){
+			hql.append("and e.openForRegistration = :openForRegistration ");
+			args.put("openForRegistration", openForRegistration.booleanValue());
 		}
 		Date now = new Date();
 		if(!includeFutureEvents){
@@ -129,6 +140,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			hql.append("and e.startDate >= :d ");
 			args.put("d", now);
 		}
+		hql.append("order by e.startDate");
 		return objectStore.find(AbstractEvent.class, hql.toString(), args).stream().map(EventSummary::new)
 				.collect(Collectors.toList());
 	}

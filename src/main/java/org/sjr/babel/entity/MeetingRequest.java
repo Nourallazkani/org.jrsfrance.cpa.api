@@ -3,22 +3,33 @@ package org.sjr.babel.entity;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 
 @Entity
 public class MeetingRequest extends AbstractEntity {
+	
+	enum Reason{}
+
+	private Date startDate, endDate;
+	private Boolean accepted;
+	
+	@Enumerated(EnumType.STRING)
+	private Reason reason;
 	
 	@ManyToOne
 	private Refugee refugee;
 	
 	@ManyToOne
 	private Volunteer volunteer;
-
-	private Date startDate, endDate;
-	private Boolean accepted;
 	
-	
-	
+	public Reason getReason() {
+		return reason;
+	}
+	public void setReason(Reason reason) {
+		this.reason = reason;
+	}
 	public Refugee getRefugee() {
 		return refugee;
 	}

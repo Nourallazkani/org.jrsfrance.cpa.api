@@ -59,9 +59,7 @@ public class EventEndpoint extends AbstractEndpoint {
 				OrganisationEvent e = (OrganisationEvent) event;
 				this.organisedBy = e.getOrganisation().getName();
 			}
-
 		}
-
 	}
 
 	private boolean hasAccess(String accessKey, int eventId) {

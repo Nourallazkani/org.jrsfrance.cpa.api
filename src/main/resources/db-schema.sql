@@ -282,7 +282,8 @@ create table MeetingRequests(
 	volunteer_id int not null,
 	startDate date not null,
 	endDate date not null,
-    subject varchar (500),
+    reason varchar(20),
+	subject varchar (500),
     accepted bool null,
     foreign key (Refugee_id) references Refugee(id),
     foreign key (Volunteer_id) references Volunteer(id)

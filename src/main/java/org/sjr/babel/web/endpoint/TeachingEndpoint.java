@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,14 +10,10 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
-import org.sjr.babel.entity.Contact;
 import org.sjr.babel.entity.Teaching;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.LocalizableObjectSummary;
-import org.sjr.babel.web.endpoint.LearningProgramEndpoint.LearningProgramSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,6 +28,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public AddressSummary address;
 		public ContactSummary contact;
 		public Boolean master,licence;
+		public Date registrationStartDate;
+		public boolean openForRegistration;
 		// public List<Link> links;
 
 		public TeachingSummary(Teaching t) {
@@ -42,6 +41,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			this.address = safeTransform(t.getOrganisation().getAddress(), x -> new AddressSummary(x, true));
 			this.master = t.getMaster();
 			this.licence = t.getLicence();
+			this.registrationStartDate = t.getRegistrationStartDate();
+			this.openForRegistration = t.isOpenForRegistration();
 		}
 	}
 	
@@ -51,10 +52,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@Transactional
 	public List<TeachingSummary> list(
 			@RequestParam(required = false) Integer organisationId,
-			@RequestParam(required = false)	String Orgine,
 			@RequestParam(required = false) Integer fieldOfStudyId, 
 			@RequestParam(required = false) String city,
-			@RequestParam(required = false) String zipcode){
+			@RequestParam(required=false) Boolean openForRegistration){
 		
 		StringBuffer hql = new StringBuffer("select t from Teaching t where 0=0 ") ;
 		Map<String, Object> args = new HashMap<>();
@@ -70,9 +70,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			args.put("name" , city);
 			hql.append(" and  t.organisation.address.city like :name");
 		}
-		if (zipcode !=null){
-			args.put("zipcode", zipcode);
-			hql.append(" and t.organisation.address.zipcode like :zipcode");
+		if (openForRegistration !=null){
+			args.put("openForRegistration", openForRegistration.booleanValue());
+			hql.append(" and t.openForRegistration = :openForRegistration");
 		}
 		List<TeachingSummary> results = objectStore.find(Teaching.class, hql.toString() , args )
 				.stream()

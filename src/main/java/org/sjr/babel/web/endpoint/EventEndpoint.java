@@ -131,6 +131,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			hql.append("and e.openForRegistration = :openForRegistration ");
 			args.put("openForRegistration", openForRegistration.booleanValue());
 		}
+
 		Date now = new Date();
 		if(!includeFutureEvents){
 			hql.append("and e.startDate <= :d ");

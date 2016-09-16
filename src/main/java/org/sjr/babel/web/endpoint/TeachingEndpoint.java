@@ -68,7 +68,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 		if (city != null && !city.trim().equals("")) {
 			args.put("name" , city);
-			hql.append(" and  t.organisation.address.city like :name");
+			hql.append(" and  t.organisation.address.locality like :name");
 		}
 		if (openForRegistration !=null){
 			args.put("openForRegistration", openForRegistration.booleanValue());

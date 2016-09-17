@@ -1,4 +1,4 @@
-use babel;
+use cpa;
 
 insert into Level(name,next_id,previous_id,description) values ('A1',2,null,' Debutant ');
 insert into Level(name,next_id,previous_id,description) values ('A2',3,1,'moyen');

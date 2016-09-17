@@ -7,8 +7,17 @@
 	<packaging>war</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<db.username>root</db.username>
+		<db.password>root</db.password>
+		<db.server>localhost</db.server>
 	</properties>
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -73,14 +82,14 @@
 			<artifactId>hibernate-ehcache</artifactId>
 			<version>5.2.2.Final</version>
 		</dependency>
-		
+
 		<!-- jta -->
 		<dependency>
 			<groupId>javax.transaction</groupId>
 			<artifactId>javax.transaction-api</artifactId>
 			<version>1.2</version>
 		</dependency>
-		
+
 		<!-- spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -109,7 +118,7 @@
 			<artifactId>standard</artifactId>
 			<version>1.1.2</version>
 		</dependency>
-		
+
 		<!-- aspectj, for interceptions -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -134,27 +143,27 @@
 			<artifactId>jackson-datatype-hibernate5</artifactId>
 			<version>2.8.2</version>
 		</dependency>
-		
+
 		<!-- logging -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.13</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.13</version>
 		</dependency>
-		
+
 		<!-- jsr 250 api -->
 		<dependency>
 			<groupId>javax.annotation</groupId>
 			<artifactId>jsr250-api</artifactId>
 			<version>1.0</version>
 		</dependency>
-		
+
 		<!-- utils -->
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -180,7 +189,17 @@
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 		</dependency>
-		
 	</dependencies>
 
+
+	<profiles>
+		<profile>
+			<id>aws</id>
+			<properties>
+				<db.username>cpa</db.username>
+				<db.password>montaigoual</db.password>
+				<db.server>cpa.c0patx0njnp3.eu-west-1.rds.amazonaws.com:3306</db.server>
+			</properties>
+		</profile>
+	</profiles>
 </project>

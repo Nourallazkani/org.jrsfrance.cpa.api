@@ -1,8 +1,8 @@
-drop database if exists babel;
+drop database if exists cpa;
 
-create database babel;
+create database cpa;
 
-use babel;
+use cpa;
 /*
 drop table if exists
 	Country_Language, Student_Language, CursusRegistration, WorkshopRegistration,Volunteer_Language,

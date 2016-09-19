@@ -16,7 +16,6 @@ import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.LanguageLearningProgram;
 import org.sjr.babel.entity.ProfessionalLearningProgram;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -42,7 +41,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		public int id;
 		public String level, organisation;
 		public AddressSummary address;
-		public Date startDate, endDate, registrationStartDate;
+		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
 		public boolean openForRegistration;
 		public ContactSummary contact;
 		
@@ -54,8 +53,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			this.level = lp.getLevel().getName();
 			this.organisation = lp.getOrganisation().getName();
 			this.address = safeTransform(lp.getAddress(), x -> new AddressSummary(x, true));
-			this.registrationStartDate = lp.getRegistrationStartDate();
-			this.openForRegistration = lp.isOpenForRegistration();
+			this.registrationOpeningDate = lp.getRegistrationOpeningDate();
+			this.registrationClosingDate = lp.getRegistrationClosingDate();
 			this.startDate = lp.getStartDate();
 			this.endDate = lp.getEndDate();
 			if(lp.getContact()!=null){
@@ -112,11 +111,13 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			args.put("levelId" , levelId);
 			query.append("and c.level.id = :levelId ");
 		}
-		if(openForRegistration!=null){
-			args.put("openForRegistration" , openForRegistration.booleanValue());
-			query.append("and c.openForRegistration= :openForRegistration ");			
+		Date now = new Date();	
+		
+		if(openForRegistration != null){
+			query.append("and c.registrationClosingDate ").append(openForRegistration ? ">=" : "<=" ).append(" :d ");
+			args.put("d", now);
 		}
-		Date now = new Date();
+		
 		if(!includeFutureEvents){
 			query.append("and c.startDate <= :d ");
 			args.put("d", now);

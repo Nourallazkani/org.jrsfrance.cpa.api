@@ -59,19 +59,24 @@ insert into Organisation(name, street1, postalCode, locality, lat, lng, googleMa
 	values ('BNF', '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 2);
 
 
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
-	values(DATE_ADD(now(),INTERVAL -180 DAY), DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L', 1);
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
-	values(DATE_ADD(now(),INTERVAL -120 DAY), DATE_ADD(now(),INTERVAL -60 DAY), now(), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L', 3);
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id)
-	values(DATE_ADD(now(),INTERVAL -60 DAY), now(), DATE_ADD(now(),INTERVAL 60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L', 2);
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
-	values(now(), DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L', 1);
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, domain_id) 
-	values(DATE_ADD(now(),INTERVAL 60 DAY), DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'P', 1);
-insert into AbstractLearningProgram(registrationStartDate, startDate, endDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, domain_id) 
-	values(DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'P', 2);
+insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
+	values(DATE_ADD(now(),INTERVAL -60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L', 1);
+insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
+	values(DATE_ADD(now(),INTERVAL -30 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L', 3);
+insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
+	values(now(), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'L', 2);
+insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
+	values(DATE_ADD(now(),INTERVAL 30 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L', 1);
+insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, domain_id) 
+	values(DATE_ADD(now(),INTERVAL 60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'P', 1);
+insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
+	values(DATE_ADD(now(),INTERVAL 90 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'P', 2);
 
+update AbstractLearningProgram set 
+	registrationOpeningDate=DATE_ADD(startDate,INTERVAL -120 DAY),
+    registrationClosingDate=DATE_ADD(startDate,INTERVAL -30 DAY),
+    endDate=DATE_ADD(startDate,INTERVAL 90 DAY);
+    
 	
 insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(1, 1, true );
 insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(2, 1, false );
@@ -131,5 +136,9 @@ values ('REFUGEE', '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.3442343
 insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,endDate,organisation_id ,type_id ,DTYPE)
 values ('VOLUNTEER', '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,'Initiation FLE','  ',DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY),5,2,'O-E');
 
-update AbstractEvent a, Organisation o set a.contact=o.contact where a.organisation_id=o.id;
-update AbstractEvent set registrationStartDate=date_add(startDate, interval -30 day), description='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+update AbstractEvent a, Organisation o set
+	a.contact=o.contact,
+	registrationStartDate=date_add(startDate, interval -30 day), 
+    registrationStartDate=date_add(startDate, interval -30 day), 
+    description='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
+where a.organisation_id=o.id;

@@ -30,15 +30,11 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	private String name;
 	
 	@Temporal(TemporalType.DATE)
-	private Date registrationStartDate ;
+	private Date registrationOpeningDate,registrationClosingDate;	
 	
-	private boolean openForRegistration;
 	
 	@Temporal(TemporalType.DATE)
-	private Date startDate;
-
-	@Temporal(TemporalType.DATE)
-	private Date endDate;
+	private Date startDate, endDate;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Organisation organisation;
@@ -81,6 +77,22 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 		this.endDate = endDate;
 	}
 
+	public Date getRegistrationOpeningDate() {
+		return registrationOpeningDate;
+	}
+
+	public void setRegistrationOpeningDate(Date registrationOpeningDate) {
+		this.registrationOpeningDate = registrationOpeningDate;
+	}
+
+	public Date getRegistrationClosingDate() {
+		return registrationClosingDate;
+	}
+
+	public void setRegistrationClosingDate(Date registrationClosingDate) {
+		this.registrationClosingDate = registrationClosingDate;
+	}
+
 	public Organisation getOrganisation() {
 		return organisation;
 	}
@@ -97,21 +109,7 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 		this.contact = contact;
 	}
 
-	public Date getRegistrationStartDate() {
-		return registrationStartDate;
-	}
 
-	public void setRegistrationStartDate(Date registrationStartDate) {
-		this.registrationStartDate = registrationStartDate;
-	}
-
-	public boolean isOpenForRegistration() {
-		return openForRegistration;
-	}
-
-	public void setOpenForRegistration(boolean openForRegistration) {
-		this.openForRegistration = openForRegistration;
-	}
 
 	public List<Course> getCourses() {
 		return courses;

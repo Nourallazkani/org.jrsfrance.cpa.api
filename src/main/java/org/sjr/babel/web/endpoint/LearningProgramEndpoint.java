@@ -114,7 +114,12 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		Date now = new Date();	
 		
 		if(openForRegistration != null){
-			query.append("and c.registrationClosingDate ").append(openForRegistration ? ">=" : "<=" ).append(" :d ");
+			if(openForRegistration){
+				query.append("and (c.registrationClosingDate >= :d and c.registrationOpeningDate <= :d) ");	
+			}
+			else{
+				query.append("and (c.registrationClosingDate < :d || c.registrationOpeningDate > :d) ");
+			}
 			args.put("d", now);
 		}
 		

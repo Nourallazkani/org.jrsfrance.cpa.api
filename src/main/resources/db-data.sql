@@ -127,18 +127,19 @@ values ('Alaric', 'Hermant', NULL, 'az', NULL, 'R-a871ce00-e7d2-497e-8a4e-d272b8
 insert into Refugee_languageSkills(Refugee_id, language_id,level_id) values(1,1,1);
 insert into Refugee_FieldOfStudy(refugee_id, fieldOfStudy_id) values(1,1);
 
-insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,endDate,organisation_id ,type_id ,DTYPE)
-values ('REFUGEE', '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, 'Comprendre les éléctions présidentielles','  ',DATE_ADD(now(),INTERVAL 120 DAY), DATE_ADD(now(),INTERVAL 180 DAY),2,1,'O-E');
-insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,endDate,organisation_id ,type_id ,DTYPE)
-values ('REFUGEE', '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, 'Chercher un emploi','  ',DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY),4,1,'O-E');
-insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,endDate,volunteer_id ,type_id ,DTYPE)
-values ('REFUGEE', '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,'Visite du musée du Louvre','  ',DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY),5,2,'V-E');
-insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,endDate,organisation_id ,type_id ,DTYPE)
-values ('VOLUNTEER', '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,'Initiation FLE','  ',DATE_ADD(now(),INTERVAL 180 DAY), DATE_ADD(now(),INTERVAL 240 DAY),5,2,'O-E');
+insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,organisation_id ,type_id ,DTYPE)
+values ('REFUGEE', '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, 'Comprendre les éléctions présidentielles','  ',DATE_ADD(now(),INTERVAL 15 DAY),2,1,'O-E');
+insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,organisation_id ,type_id ,DTYPE)
+values ('REFUGEE', '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, 'Chercher un emploi','  ',DATE_ADD(now(),INTERVAL 30 DAY),4,1,'O-E');
+insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,volunteer_id ,type_id ,DTYPE)
+values ('REFUGEE', '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,'Visite du musée du Louvre','  ',DATE_ADD(now(),INTERVAL 45 DAY),5,2,'V-E');
+insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, googleMapId, country_id, subject,description,startDate,organisation_id ,type_id ,DTYPE)
+values ('VOLUNTEER', '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,'Initiation FLE','  ',DATE_ADD(now(),INTERVAL 60 DAY),5,2,'O-E');
 
-update AbstractEvent a, Organisation o set
-	a.contact=o.contact,
-	registrationStartDate=date_add(startDate, interval -30 day), 
-    registrationStartDate=date_add(startDate, interval -30 day), 
-    description='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
-where a.organisation_id=o.id;
+update AbstractEvent set
+    endDate = date_add(endDate, interval 2 hour),
+	registrationOpeningDate=date_add(startDate, interval -40 day), 
+    registrationClosingDate=date_add(startDate, interval -5 day), 
+    description='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
+update AbstractEvent a, Organisation o set a.contact=o.contact where a.organisation_id=o.id;

@@ -17,6 +17,7 @@ import org.sjr.babel.entity.AbstractEvent;
 import org.sjr.babel.entity.AbstractEvent.OrganisationEvent;
 import org.sjr.babel.entity.AbstractEvent.VolunteerEvent;
 import org.sjr.babel.entity.Administrator;
+import org.sjr.babel.entity.Contact;
 import org.sjr.babel.entity.reference.EventType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		public int id;
 		public String subject, description, organisedBy,type,link;
 		public AddressSummary address;
-		public Date startDate, endDate,registrationStartDate;
+		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
 		public ContactSummary contact;
 
 		public EventSummary(AbstractEvent event) {
@@ -48,16 +49,27 @@ public class EventEndpoint extends AbstractEndpoint {
 			this.address = safeTransform(event.getAddress(), x->new AddressSummary(x, true));
 			this.startDate = event.getStartDate();
 			this.endDate = event.getEndDate();
-			this.registrationStartDate = event.getRegistrationStartDate();
+			this.registrationOpeningDate = event.getRegistrationOpeningDate();
+			this.registrationClosingDate = event.getRegistrationClosingDate();
 			this.type = event.getType().getName();
 			this.link = event.getLink();
 			this.contact = safeTransform(event.getContact(), ContactSummary::new);
 			if (event instanceof VolunteerEvent) {
 				VolunteerEvent e = (VolunteerEvent) event;
 				this.organisedBy = e.getVolunteer().getFullName();
+				if(this.contact == null){
+					Contact c = new Contact();
+					c.setMailAddress(e.getVolunteer().getMailAddress());
+					c.setName(e.getVolunteer().getFullName());
+					c.setPhoneNumber(e.getVolunteer().getPhoneNumber());
+					this.contact = new ContactSummary(c);
+				}
 			} else if (event instanceof OrganisationEvent) {
 				OrganisationEvent e = (OrganisationEvent) event;
 				this.organisedBy = e.getOrganisation().getName();
+				if(this.contact == null){
+					this.contact = new ContactSummary(e.getOrganisation().getContact());
+				}
 			}
 		}
 	}
@@ -96,7 +108,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			@RequestParam(required = false) AbstractEvent.Audience audience,
 			@RequestParam(required = false) Boolean openForRegistration,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
-			@RequestParam(defaultValue="false") boolean includeFutureEvents
+			@RequestParam(defaultValue="true") boolean includeFutureEvents
 		) 
 	{
 		if(!includePastEvents && !includeFutureEvents){
@@ -121,16 +133,24 @@ public class EventEndpoint extends AbstractEndpoint {
 			hql.append("and t.stereotype = :stereotype ");
 			args.put("stereotype", stereotype);
 		}
+		else{
+			hql.append("and t.stereotype is null ");
+		}
 		if(audience!=null){
 			hql.append("and e.audience = :audience ");
 			args.put("audience", audience);
 		}
-		if(openForRegistration!=null){
-			hql.append("and e.openForRegistration = :openForRegistration ");
-			args.put("openForRegistration", openForRegistration.booleanValue());
-		}
 
 		Date now = new Date();
+		if(openForRegistration != null){
+			if(openForRegistration){
+				hql.append("and (e.registrationClosingDate >= :d and e.registrationOpeningDate <= :d) ");	
+			}
+			else{
+				hql.append("and (e.registrationClosingDate < :d || e.registrationOpeningDate > :d) ");
+			}
+			args.put("d", now);
+		}
 		if(!includeFutureEvents){
 			hql.append("and e.startDate <= :d ");
 			args.put("d", now);

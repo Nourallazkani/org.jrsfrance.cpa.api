@@ -22,26 +22,29 @@ import org.sjr.babel.entity.reference.EventType;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class AbstractEvent extends AbstractEntity {
 
-	public enum Audience {REFUGEE, VOLUNTEER}
-	
+	public enum Audience {
+		REFUGEE, VOLUNTEER
+	}
+
 	@Enumerated(EnumType.STRING)
 	private Audience audience;
-	
+
 	private String description, subject, link;
 
-	private boolean openForRegistration;
+	@Temporal(TemporalType.DATE)
+	private Date registrationOpeningDate, registrationClosingDate;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date startDate, endDate;
 
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
-	
+
 	@Embedded
 	private Address address;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private EventType type;
-
-	@Temporal(TemporalType.DATE)
-	private Date registrationStartDate, startDate, endDate;
 
 	public Audience getAudience() {
 		return audience;
@@ -114,30 +117,27 @@ public abstract class AbstractEvent extends AbstractEntity {
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
 	}
-	
 
-	public Date getRegistrationStartDate() {
-		return registrationStartDate;
+	public Date getRegistrationOpeningDate() {
+		return registrationOpeningDate;
 	}
 
-	public void setRegistrationStartDate(Date registrationStartDate) {
-		this.registrationStartDate = registrationStartDate;
+	public void setRegistrationOpeningDate(Date registrationOpeningDate) {
+		this.registrationOpeningDate = registrationOpeningDate;
 	}
 
-	public boolean isOpenForRegistration() {
-		return openForRegistration;
+	public Date getRegistrationClosingDate() {
+		return registrationClosingDate;
 	}
 
-	public void setOpenForRegistration(boolean openForRegistration) {
-		this.openForRegistration = openForRegistration;
+	public void setRegistrationClosingDate(Date registrationClosingDate) {
+		this.registrationClosingDate = registrationClosingDate;
 	}
-
-
 
 	@Entity
 	@DiscriminatorValue("O-E")
 	public static class OrganisationEvent extends AbstractEvent {
-		
+
 		@ManyToOne(optional = false)
 		private Organisation organisation;
 

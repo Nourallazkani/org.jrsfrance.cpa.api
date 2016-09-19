@@ -32,7 +32,6 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	@Temporal(TemporalType.DATE)
 	private Date registrationOpeningDate,registrationClosingDate;	
 	
-	
 	@Temporal(TemporalType.DATE)
 	private Date startDate, endDate;
 

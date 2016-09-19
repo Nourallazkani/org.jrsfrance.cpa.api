@@ -69,7 +69,7 @@ insert into AbstractLearningProgram(startDate, street1, postalCode, locality, la
 	values(DATE_ADD(now(),INTERVAL 30 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'L', 1);
 insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, domain_id) 
 	values(DATE_ADD(now(),INTERVAL 60 DAY), '16 rue Saint Guillaume', '75006', 'Paris', 48.85537310000001, 2.329008599999952, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1,1,1,'P', 1);
-insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, type_id) 
+insert into AbstractLearningProgram(startDate, street1, postalCode, locality, lat, lng, googleMapId, country_id, organisation_id,level_id, DTYPE, domain_id) 
 	values(DATE_ADD(now(),INTERVAL 90 DAY), '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,4,3,'P', 2);
 
 update AbstractLearningProgram set 
@@ -137,7 +137,7 @@ insert into AbstractEvent(audience, street1, postalCode, locality, lat, lng, goo
 values ('VOLUNTEER', '43 rue des écoles', '75005', 'Paris', 48.8497584, 2.344234300000039, 'Eic0NyBSdWUgZGVzIMOJY29sZXMsIDc1MDA1IFBhcmlzLCBGcmFuY2U', 1,'Initiation FLE','  ',DATE_ADD(now(),INTERVAL 60 DAY),5,2,'O-E');
 
 update AbstractEvent set
-    endDate = date_add(endDate, interval 2 hour),
+    endDate = date_add(startDate, interval 2 hour),
 	registrationOpeningDate=date_add(startDate, interval -40 day), 
     registrationClosingDate=date_add(startDate, interval -5 day), 
     description='Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';

@@ -17,7 +17,7 @@ public interface ObjectStore {
 
 	<T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id, Function<T, ?>... fetchs);
 	
-	<T extends AbstractEntity> Optional<T>	findOne(Class<T> clazz, String hql	, Map<String, Object> args);
+	<T> Optional<T>	findOne(Class<T> clazz, String hql	, Map<String, Object> args);
 
 	/**
 	 * abcd
@@ -29,7 +29,7 @@ public interface ObjectStore {
 	 * @return
 	 */
 
-	<T extends AbstractEntity> List<T> find(Class<T> clazz, String hql);
+	<T> List<T> find(Class<T> clazz, String hql);
 
 	/**
 	 * 
@@ -38,10 +38,10 @@ public interface ObjectStore {
 	 * @param paramValue
 	 * @return
 	 */
-	<T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Object paramValue);
+	<T> List<T> find(Class<T> clazz, String hql, Object paramValue);
 
-	<T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Map<String, Object> args);
+	<T> List<T> find(Class<T> clazz, String hql, Map<String, Object> args);
 	
-	<T extends AbstractEntity> List<T> findAll (Class <T> clazz);
+	<T> List<T> findAll (Class <T> clazz);
 
 }

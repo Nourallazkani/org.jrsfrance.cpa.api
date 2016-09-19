@@ -86,7 +86,7 @@ class JpaObjectStoreImpl implements ObjectStore {
 	 * 
 	 */
 	@Override
-	public <T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Map<String, Object> args) {
+	public <T> List<T> find(Class<T> clazz, String hql, Map<String, Object> args) {
 		TypedQuery<T> query = em.createQuery(hql, clazz);
 		if (args != null) {
 			for (String argKey : args.keySet()) {
@@ -100,24 +100,24 @@ class JpaObjectStoreImpl implements ObjectStore {
 	}
 
 	@Override
-	public <T extends AbstractEntity> List<T> find(Class<T> clazz, String hql) {
+	public <T> List<T> find(Class<T> clazz, String hql) {
 		return find(clazz, hql, null);
 	}
 
 	@Override
-	public <T extends AbstractEntity> List<T> find(Class<T> clazz, String hql, Object paramValue) {
+	public <T> List<T> find(Class<T> clazz, String hql, Object paramValue) {
 		TypedQuery<T> query = em.createQuery(hql, clazz);
 		query.setParameter(1, paramValue);
 		return query.getResultList();
 	}
 
 	@Override
-	public <T extends AbstractEntity> List<T> findAll(Class<T> clazz) {
+	public <T> List<T> findAll(Class<T> clazz) {
 		return find(clazz, "select c from "+clazz.getName()+" c ");
 	}
 
 	@Override
-	public <T extends AbstractEntity> Optional<T> findOne(Class<T> clazz, String hql, Map<String, Object> args) {
+	public <T> Optional<T> findOne(Class<T> clazz, String hql, Map<String, Object> args) {
 		List<T> items = find(clazz, hql, args);
 		if( items.isEmpty()){
 			return Optional.empty(); 

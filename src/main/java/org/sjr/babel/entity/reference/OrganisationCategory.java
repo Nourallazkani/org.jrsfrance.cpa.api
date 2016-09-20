@@ -6,7 +6,6 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
-import org.sjr.babel.entity.reference.EventType.Stereotype;
 import org.sjr.babel.entity.AbstractReferenceEntity;
 
 @Entity @Cacheable @CacheOnStartup(order = 0)

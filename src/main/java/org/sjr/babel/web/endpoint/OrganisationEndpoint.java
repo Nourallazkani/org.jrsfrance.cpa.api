@@ -10,13 +10,9 @@ import java.util.stream.Collectors;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Organisation;
-import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.OrganisationCategory.Stereotype;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.Error;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +38,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			this.name = o.getName();
 			this.category = o.getCategory().getName();
 			this.contact = safeTransform(o.getContact(), ContactSummary::new);
-			this.address = safeTransform(o.getAddress(), x -> new AddressSummary(x, true));
+			this.address = safeTransform(o.getAddress(), x -> new AddressSummary(x));
 
 		}
 
@@ -144,7 +140,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	/// @ResponseStatus(code=HttpStatus.NO_CONTENT)
 	public ResponseEntity<Void> delete(@PathVariable int id) {
 		// dao.delete( id);
-		Optional<Organisation> o = objectStore.getById(Organisation.class, id);
+		Optional<Organisation> o = this.objectStore.getById(Organisation.class, id);
 		if (o.isPresent()) {
 			objectStore.delete(o.get());
 			return ResponseEntity.noContent().build();

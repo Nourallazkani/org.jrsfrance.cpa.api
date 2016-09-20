@@ -32,11 +32,12 @@ import util.EncryptionUtil;
 @RestController
 public class AuthzEndpoint extends AbstractEndpoint {
 
-	private ResponseEntity<Map<String, String>> successSignIn(String name, Account account) {
-		Map<String, String> responseEntity = new HashMap<>();
+	private ResponseEntity<Map<String, Object>> successSignIn(int id, String name, Account account) {
+		Map<String, Object> responseEntity = new HashMap<>();
 		responseEntity.put("name", name);
 		responseEntity.put("role", account.getRole());
 		responseEntity.put("accessKey", account.getAccessKey());
+		responseEntity.put("id", id);
 		return ResponseEntity.ok(responseEntity);
 	}
 	
@@ -61,7 +62,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			v.getAccount().setAccessKey("V-" + UUID.randomUUID().toString());
 
 			objectStore.save(v);
-			return successSignIn(v.getFullName(), v.getAccount());
+			return successSignIn(v.getId(), v.getFullName(), v.getAccount());
 
 		} else if (message.get("messageType").asText().equals("refugee_sign-up")) {
 			Refugee r = jackson.treeToValue(message.get("messageBody"), Refugee.class);
@@ -73,7 +74,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			}
 			r.getAccount().setPassword(EncryptionUtil.sha256(r.getAccount().getPassword()));
 			objectStore.save(r);
-			return successSignIn(r.getFullName(), r.getAccount());
+			return successSignIn(r.getId(), r.getFullName(), r.getAccount());
 			// jackson.treeToValue(message.get("messageBody"), Refugee.class);
 
 		}
@@ -130,18 +131,21 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Organisation> _user = tryGetUser(input, Organisation.class);
 			if(_user.isPresent()){
 				Organisation organisation = _user.get();
+				System.out.println(organisation.getAccount().getAccessKey());
 			}
 		}
 		else if(input.realm.equals("V")){
 			Optional<Volunteer> _user = tryGetUser(input, Volunteer.class);
 			if(_user.isPresent()){
 				Volunteer volunteer = _user.get();
+				System.out.println(volunteer.getAccount().getAccessKey());
 			}
 		}
 		else if(input.realm.equals("A")){
 			Optional<Administrator> _user = tryGetUser(input, Administrator.class);
 			if(_user.isPresent()){
 				Administrator admin = _user.get();
+				System.out.println(admin.getAccount().getAccessKey());
 			}
 		}
 		return ResponseEntity.accepted().build();
@@ -160,7 +164,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if(_user.isPresent()){
 				Refugee refugee = _user.get();
 				if (successfulSignIn(input, refugee.getAccount())) {
-					return successSignIn(refugee.getFullName(), refugee.getAccount());
+					return successSignIn(refugee.getId(), refugee.getFullName(), refugee.getAccount());
 				}
 			}
 		}
@@ -169,7 +173,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if(_user.isPresent()){
 				Organisation organisation = _user.get();
 				if (successfulSignIn(input, organisation.getAccount())) {
-					return successSignIn(organisation.getName(), organisation.getAccount());
+					return successSignIn(organisation.getId(), organisation.getName(), organisation.getAccount());
 				}
 			}
 		}
@@ -178,7 +182,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if(_user.isPresent()){
 				Volunteer volunteer = _user.get();
 				if (successfulSignIn(input, volunteer.getAccount())) {
-					return successSignIn(volunteer.getFullName(), volunteer.getAccount());
+					return successSignIn(volunteer.getId(),  volunteer.getFullName(), volunteer.getAccount());
 				}
 			}
 		}
@@ -187,7 +191,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if(_user.isPresent()){
 				Administrator admin = _user.get();
 				if (successfulSignIn(input, admin.getAccount())) {
-					return successSignIn(admin.getFullName(), admin.getAccount());
+					return successSignIn(admin.getId(), admin.getFullName(), admin.getAccount());
 				}
 			}
 		}		
@@ -195,4 +199,9 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 
+	
+	public static void main(String[] args) {
+		System.out.println("O-"+UUID.randomUUID().toString());
+		System.out.println(UUID.randomUUID().toString());
+	}
 }

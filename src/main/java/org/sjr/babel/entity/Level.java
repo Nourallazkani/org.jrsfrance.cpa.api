@@ -6,20 +6,11 @@ import javax.persistence.Entity;
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 
 @Entity @Cacheable @CacheOnStartup(order = 0)
-public class Level extends AbstractEntity {
+public class Level extends AbstractReferenceEntity {
 
-	private String name, description;
+	private String description;
 	
 	//private Level next, previous;
-
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public String getDescription() {
 		return description;

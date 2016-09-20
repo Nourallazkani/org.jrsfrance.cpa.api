@@ -3,7 +3,6 @@ package org.sjr.babel.persistence;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.sjr.babel.entity.AbstractEntity;
 
@@ -15,7 +14,7 @@ public interface ObjectStore {
 
 	<T extends AbstractEntity> void delete(Class<T> clazz, int id);
 
-	<T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id, Function<T, ?>... fetchs);
+	<T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id);
 	
 	<T> Optional<T>	findOne(Class<T> clazz, String hql	, Map<String, Object> args);
 

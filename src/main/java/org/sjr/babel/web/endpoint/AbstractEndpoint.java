@@ -1,6 +1,8 @@
 package org.sjr.babel.web.endpoint;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -9,7 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.sjr.babel.entity.AbstractEntity;
 import org.sjr.babel.entity.Address;
 import org.sjr.babel.entity.Contact;
+import org.sjr.babel.entity.Organisation;
+import org.sjr.babel.entity.Volunteer;
+import org.sjr.babel.entity.reference.Country;
 import org.sjr.babel.persistence.ObjectStore;
+import org.sjr.babel.web.helper.ReferenceDataHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractEndpoint {
@@ -27,6 +34,9 @@ public abstract class AbstractEndpoint {
 	
 	@Autowired
 	protected ObjectMapper jackson;
+
+	@Autowired
+	protected ReferenceDataHelper refDataProvider;
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -66,40 +76,78 @@ public abstract class AbstractEndpoint {
 		return UriComponentsBuilder.fromHttpRequest(httpRequest).path(path).build().toUri();
 	}
 	
-	protected class AddressSummary {
-		public String street1, street2, postalCode, locality, country;
+	protected Optional<Organisation> getOrganisationByAccessKey(String accessKey){
+		Map<String, Object> args= new HashMap<>();
+		args.put("accessKey", accessKey);
+		return this.objectStore.findOne(Organisation.class, "select o from Organisation o where o.account.accessKey=:accessKey", args);
+	}
+	
+	protected Optional<Volunteer> getVolunteerByAccessKey(String accessKey){
+		Map<String, Object> args= new HashMap<>();
+		args.put("accessKey", accessKey);
+		return this.objectStore.findOne(Volunteer.class, "select v from Volunteer v where v.account.accessKey=:accessKey", args);
+	}
+	
+	@JsonIgnoreProperties(ignoreUnknown=true)
+	protected static class AddressSummary {
+		public String street1, street2, postalCode, locality;
+		public String country="France";
 		public Double lat,lng; 
-		public AddressSummary(Address a, boolean withDetails ) {
+		
+		public AddressSummary(){}
+		
+		public AddressSummary(Address a) {
 			
-			if(withDetails){
-				this.street1 = a.getStreet1();
-				this.street2 = a.getStreet2();
-				this.postalCode = a.getPostalCode();
-				this.lat = a.getLat();
-				this.lng = a.getLng();
-			}
+			this.street1 = a.getStreet1();
+			this.street2 = a.getStreet2();
+			this.postalCode = a.getPostalCode();
+			this.lat = a.getLat();
+			this.lng = a.getLng();
 			
 			this.locality = a.getLocality();
-			this.country = safeTransform(a.getCountry(), x->x.getName());
+			this.country = safeTransform(a.getCountry(), x -> x.getName());
+		}
+		
+		public Address toAddress(ReferenceDataHelper referenceDataProvider){
+			Address address = new Address();
+			address.setStreet1(this.street1);
+			address.setStreet2(this.street2);
+			address.setPostalCode(this.postalCode);
+			address.setLocality(this.locality);
+			address.setLat(this.lat);
+			address.setLng(this.lng);
+			
+			address.setCountry(referenceDataProvider.resolve(Country.class, this.country));
+			return address;
 		}
 	}
 	
-	protected class ContactSummary{ // same as contact for the time being, may differ later.
+	protected static class ContactSummary{ // same as contact for the time being, may differ later.
 		public String name, mailAddress, phoneNumber;
 
+		public ContactSummary(){}
+		
 		public ContactSummary(Contact contact) {
 			this.name = contact.getName();
 			this.phoneNumber = contact.getPhoneNumber();
 			this.mailAddress = contact.getMailAddress();
 		}
+		
+		public Contact toContact(){
+			Contact c = new Contact();
+			c.setMailAddress(this.mailAddress);
+			c.setName(this.name);
+			c.setPhoneNumber(this.phoneNumber);
+			return c;
+		}
 	}
 	
 	// this function transform something (input) in something else based on a function provided by the caller, but only if the input is not null 
-	protected <T, U> U safeTransform(T input, Function<T, U> transformer){
+	protected static <T, U> U safeTransform(T input, Function<T, U> transformer){
 		return safeTransform(input, transformer, null);
 	}
 	
-	protected <T, R> R safeTransform(T input, Function<T, R> transformer, R defaultValue){
+	protected static <T, R> R  safeTransform(T input, Function<T, R> transformer, R defaultValue){
 		return input!=null ? transformer.apply(input) : defaultValue;
 	}
 	
@@ -116,6 +164,7 @@ public abstract class AbstractEndpoint {
 			this.defaultMessage = defaultMessage;
 		}
 	}
+	
 	
 	public static class LocalizableObjectSummary<T>{
 		public T item;

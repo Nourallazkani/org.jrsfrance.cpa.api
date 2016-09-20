@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Contact implements Serializable {
 
+	private static final long serialVersionUID = 3271702525941084890L;
+
 	@Converter
 	public static class ContactConverter implements javax.persistence.AttributeConverter<Contact, String>{
 

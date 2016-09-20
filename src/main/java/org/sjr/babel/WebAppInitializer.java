@@ -61,7 +61,12 @@ public class WebAppInitializer implements WebApplicationInitializer
 		
 		@Override
 		public void addCorsMappings(CorsRegistry registry) {
-			registry.addMapping("/**");//.allowedHeaders("XSRF-TOKEN");
+			registry
+				.addMapping("/**")
+				.allowedHeaders("accessKey", "content-type")
+				.allowedMethods("PUT", "POST", "GET", "DELETE")
+				.allowedOrigins("*");
+			//allowedMethods("POST, PUT, DELETE, GET");//.allowedHeaders("XSRF-TOKEN");
 		}
 		
 		@Override

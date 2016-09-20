@@ -1,6 +1,5 @@
 package org.sjr.babel.web.endpoint;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,48 +9,51 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.AbstractEvent;
+import org.sjr.babel.entity.AbstractEvent.Audience;
 import org.sjr.babel.entity.AbstractEvent.OrganisationEvent;
 import org.sjr.babel.entity.AbstractEvent.VolunteerEvent;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Contact;
+import org.sjr.babel.entity.Organisation;
+import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.EventType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-
 @RestController
 @RequestMapping("/events")
 public class EventEndpoint extends AbstractEndpoint {
 
-	class EventSummary {
+	public static class EventSummary {
 		public int id;
-		public String subject, description, organisedBy,type,link;
+		public String subject, description, organisedBy,type, audience,link;
 		public AddressSummary address;
 		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
 		public ContactSummary contact;
 
+		public EventSummary() {	} // for jackson deserialisation
+		
 		public EventSummary(AbstractEvent event) {
 			this.id = event.getId();
 			this.subject = event.getSubject();
 			this.description = event.getDescription();
-			this.address = safeTransform(event.getAddress(), x->new AddressSummary(x, true));
+			this.audience = event.getAudience().name();
+			this.address = safeTransform(event.getAddress(), x -> new AddressSummary(x));
 			this.startDate = event.getStartDate();
 			this.endDate = event.getEndDate();
 			this.registrationOpeningDate = event.getRegistrationOpeningDate();
 			this.registrationClosingDate = event.getRegistrationClosingDate();
-			this.type = event.getType().getName();
+			this.type = safeTransform(event.getType(), x -> x.getName());
 			this.link = event.getLink();
 			this.contact = safeTransform(event.getContact(), ContactSummary::new);
 			if (event instanceof VolunteerEvent) {
@@ -73,14 +75,8 @@ public class EventEndpoint extends AbstractEndpoint {
 			}
 		}
 	}
-
-	private boolean hasAccess(String accessKey, int eventId) {
-		Optional<AbstractEvent> _event= this.objectStore.getById(AbstractEvent.class, eventId);
-		return _event.isPresent() ? false: hasAccess(accessKey, _event.get());
-	}
 		
 	private boolean hasAccess(String accessKey, AbstractEvent event) {
-
 		if (accessKey.startsWith("A-")) {
 			Map<String, Object> args = new HashMap<>();
 			args.put("accessKey", accessKey);
@@ -102,9 +98,9 @@ public class EventEndpoint extends AbstractEndpoint {
 	@Transactional
 	public List<EventSummary> events(
 			@RequestParam(required = false) String city,
-			@RequestParam(required = false) String zipcode,
-			@RequestParam(required = false) String subject,
 			@RequestParam(required = false) EventType.Stereotype stereotype,
+			@RequestParam(required = false) Integer organisationId,
+			@RequestParam(required = false) Integer volunteerId,
 			@RequestParam(required = false) AbstractEvent.Audience audience,
 			@RequestParam(required = false) Boolean openForRegistration,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
@@ -115,19 +111,26 @@ public class EventEndpoint extends AbstractEndpoint {
 			return new ArrayList<>();
 		}
 		
-		StringBuffer hql = new StringBuffer("select e from AbstractEvent e join e.type t where 0=0 ");
+		Class<?> targetClass;
+		if(organisationId != null){
+			targetClass = OrganisationEvent.class;
+		}
+		else if(volunteerId != null){
+			targetClass = VolunteerEvent.class;
+		}
+		else{
+			targetClass = AbstractEvent.class;
+		}
+		
+		StringBuffer hql = new StringBuffer("select e from ").append(targetClass.getName()).append(" e left join e.type t where 0=0 ");
 		HashMap<String, Object> args = new HashMap<>();
 		if (city != null && !(city.trim().equals(""))) {
 			hql.append("and e.address.locality like :locality ");
 			args.put("locality", city);
 		}
-		if (subject != null && !(subject.trim().equals(""))) {
-			hql.append("and e.subject like :subject ");
-			args.put("sujet", subject);
-		}
-		if (zipcode != null && !(zipcode.trim().equals(""))) {
-			hql.append("and e.address.zipcode like :zipcode ");
-			args.put("zipcode", zipcode);
+		if (organisationId != null) {
+			hql.append("and e.organisation.id = :organisationId");
+			args.put("organisationId", organisationId);
 		}
 		if (stereotype != null) {
 			hql.append("and t.stereotype = :stereotype ");
@@ -136,7 +139,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		else{
 			hql.append("and t.stereotype is null ");
 		}
-		if(audience!=null){
+		if (audience != null) {
 			hql.append("and e.audience = :audience ");
 			args.put("audience", audience);
 		}
@@ -173,7 +176,6 @@ public class EventEndpoint extends AbstractEndpoint {
 			return hasAccess(accessKey, w.get()) ? ResponseEntity.ok(w.get()) : ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		} else
 			return ResponseEntity.notFound().build();
-
 	}
 
 	@RequestMapping(path = "/{id}/summary", method = RequestMethod.GET)
@@ -207,39 +209,84 @@ public class EventEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed("ADMIN")
-	public ResponseEntity<?> updateWorkshop(@RequestParam AbstractEvent w, @PathVariable int id,
-			@RequestHeader String accessKey) {
-		if (w.getId() == null || !(w.getId() == id)) {
+	public ResponseEntity<?> update(@RequestBody EventSummary input,  @PathVariable int id, @RequestHeader String accessKey) {
+		if(input.id!=id){
 			return ResponseEntity.badRequest().build();
-		} else if (hasAccess(accessKey, id)) {
-			objectStore.save(w);
-			return ResponseEntity.noContent().build();
 		}
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
+		if(!_event.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		
+		AbstractEvent event = _event.get();
+		if(!hasAccess(accessKey, event))
+		{
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		event.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+		event.setContact(safeTransform(input.contact, x -> x.toContact()));
+		event.setType(this.refDataProvider.resolve(EventType.class, input.type));
+		
+		event.setAudience(Audience.valueOf(input.audience));
+		event.setDescription(input.description);
+		event.setEndDate(event.getEndDate());
+		event.setLink(input.link);
+		event.setRegistrationClosingDate(input.registrationClosingDate);
+		event.setRegistrationOpeningDate(input.registrationOpeningDate);
+		event.setStartDate(input.startDate);
+		event.setSubject(input.subject);
+		
+		return ResponseEntity.noContent().build();
 
 	}
 
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> saveWorkshop(HttpServletRequest req, @RequestHeader String accessKey)
-			throws JsonProcessingException, IOException {
-		AbstractEvent event = null;
-		JsonNode json = jackson.readTree(req.getInputStream());
-		if (json.has("organisation")) {
-			event = jackson.treeToValue(json, OrganisationEvent.class);
-		} else if (json.has("volunteer")) {
-			event = jackson.treeToValue(json, VolunteerEvent.class);
-		}
-
-		if (event == null) {
-			return ResponseEntity.badRequest().build();
-		}
-		if (event.getId() != null) {
+	public ResponseEntity<?> save(@RequestBody EventSummary input, @RequestHeader String accessKey){
+		if (input.id > 0) {
 			return ResponseEntity.badRequest().build();
 		}
 		
-		objectStore.save(event);
+		AbstractEvent event;
+		if(accessKey.startsWith("O-")){
+			OrganisationEvent _event = new OrganisationEvent();
+			Optional<Organisation> _o = getOrganisationByAccessKey(accessKey);
+			if(!_o.isPresent()){
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			_event.setOrganisation(_o.get());
+			event = _event;
+		}
+		else if(accessKey.startsWith("V-")){
+			VolunteerEvent _event = new VolunteerEvent();
+			Optional<Volunteer> _v = getVolunteerByAccessKey(accessKey);
+			if(!_v.isPresent()){
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			_event.setVolunteer(_v.get());
+			event = _event;
+		}
+		else{
+			return ResponseEntity.badRequest().build();
+		}
+		
+		event.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+		event.setContact(safeTransform(input.contact, x -> x.toContact()));
+		event.setType(this.refDataProvider.resolve(EventType.class, input.type));
+		
+		event.setAudience(Audience.valueOf(input.audience));
+		event.setDescription(input.description);
+		event.setEndDate(event.getEndDate());
+		event.setLink(input.link);
+		event.setRegistrationClosingDate(input.registrationClosingDate);
+		event.setRegistrationOpeningDate(input.registrationOpeningDate);
+		event.setStartDate(input.startDate);
+		event.setSubject(input.subject);
+		
+		
+		this.objectStore.save(event);
 		return ResponseEntity.created(getUri("/events/" + event.getId())).body(event);
 	}
 

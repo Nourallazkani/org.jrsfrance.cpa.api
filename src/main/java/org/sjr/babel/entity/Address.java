@@ -3,7 +3,6 @@ package org.sjr.babel.entity;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
 
 import org.sjr.babel.entity.reference.Country;
 

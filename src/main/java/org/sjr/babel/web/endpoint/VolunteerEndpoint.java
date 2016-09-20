@@ -42,7 +42,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			this.lastname = v.getLastName();
 			this.birthDate = v.getBirthDate();
 			this.phoneNumber = v.getPhoneNumber();
-			this.address = new AddressSummary(v.getAddress(), false);
+			this.address = new AddressSummary(v.getAddress());
 			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
 		}

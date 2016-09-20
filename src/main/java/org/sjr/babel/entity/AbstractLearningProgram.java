@@ -4,46 +4,43 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Convert;
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.sjr.babel.entity.Contact.ContactConverter;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class AbstractLearningProgram extends AbstractEntity {
 
-	private String name;
-	
+	private String name, link;
+
 	@Temporal(TemporalType.DATE)
-	private Date registrationOpeningDate,registrationClosingDate;	
-	
+	private Date registrationOpeningDate, registrationClosingDate;
+
 	@Temporal(TemporalType.DATE)
 	private Date startDate, endDate;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Organisation organisation;
-	
+
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
 
-	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "cursus")
-	@ElementCollection
-	@OrderBy("startDate")
-	@JsonInclude(Include.NON_EMPTY)
+	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "cursus")
+	@Transient
+	//@ElementCollection
+	//@OrderBy("startDate")
+	//@JsonInclude(Include.NON_EMPTY)
 	private List<Course> courses;
 
 	@Embedded
@@ -57,6 +54,14 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getLink() {
+		return link;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 	public Date getStartDate() {
@@ -98,7 +103,7 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	public void setOrganisation(Organisation organisation) {
 		this.organisation = organisation;
 	}
-	
+
 	public Contact getContact() {
 		return contact;
 	}
@@ -106,8 +111,6 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	public void setContact(Contact contact) {
 		this.contact = contact;
 	}
-
-
 
 	public List<Course> getCourses() {
 		return courses;

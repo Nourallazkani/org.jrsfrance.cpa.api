@@ -13,8 +13,6 @@ import org.sjr.babel.persistence.ObjectStore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @WebServlet(urlPatterns = "/cursus_")
 public class CursusServlet extends HttpServlet {

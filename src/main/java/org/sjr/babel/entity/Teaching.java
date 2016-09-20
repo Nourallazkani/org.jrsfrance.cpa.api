@@ -5,6 +5,8 @@ import java.util.Date;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.sjr.babel.entity.Contact.ContactConverter;
 import org.sjr.babel.entity.reference.FieldOfStudy;
@@ -12,13 +14,12 @@ import org.sjr.babel.entity.reference.FieldOfStudy;
 @Entity
 public class Teaching extends AbstractEntity {
 	
-	private Date registrationStartDate;
-
-	private boolean openForRegistration;
-	
 	private Boolean master, licence;
 	
 	private String link;
+	
+	@Temporal(TemporalType.DATE)
+	private Date registrationOpeningDate, registrationClosingDate;
 	
 	@ManyToOne
 	private FieldOfStudy fieldOfStudy;
@@ -32,20 +33,21 @@ public class Teaching extends AbstractEntity {
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
 
-	public Date getRegistrationStartDate() {
-		return registrationStartDate;
+
+	public Date getRegistrationOpeningDate() {
+		return registrationOpeningDate;
 	}
 
-	public void setRegistrationStartDate(Date registrationStartDate) {
-		this.registrationStartDate = registrationStartDate;
+	public void setRegistrationOpeningDate(Date registrationOpeningDate) {
+		this.registrationOpeningDate = registrationOpeningDate;
 	}
 
-	public boolean isOpenForRegistration() {
-		return openForRegistration;
+	public Date getRegistrationClosingDate() {
+		return registrationClosingDate;
 	}
 
-	public void setOpenForRegistration(boolean openForRegistration) {
-		this.openForRegistration = openForRegistration;
+	public void setRegistrationClosingDate(Date registrationClosingDate) {
+		this.registrationClosingDate = registrationClosingDate;
 	}
 
 	public Boolean getMaster() {

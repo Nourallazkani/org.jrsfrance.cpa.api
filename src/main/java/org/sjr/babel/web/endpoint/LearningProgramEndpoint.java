@@ -15,10 +15,15 @@ import javax.transaction.Transactional;
 import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.LanguageLearningProgram;
+import org.sjr.babel.entity.Level;
+import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.ProfessionalLearningProgram;
+import org.sjr.babel.entity.reference.LanguageLearningProgramType;
+import org.sjr.babel.entity.reference.ProfessionalLearningProgramDomain;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -33,13 +38,13 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
-@RestController
-@RequestMapping(path = "learnings")
+@RestController @RequestMapping(path = "learnings")
 public class LearningProgramEndpoint extends AbstractEndpoint {
 
-	class LearningProgramSummary {
+	public static class LearningProgramSummary {
 		public int id;
 		public String level, organisation;
+		public String link;
 		public AddressSummary address;
 		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
 		public boolean openForRegistration;
@@ -48,11 +53,14 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		@JsonInclude(value=Include.NON_NULL)
 		public String domain, type;
 		
+		public LearningProgramSummary() {} // for jackson deserialisation
+		
 		public LearningProgramSummary(AbstractLearningProgram lp) {
 			this.id = lp.getId();
 			this.level = lp.getLevel().getName();
 			this.organisation = lp.getOrganisation().getName();
-			this.address = safeTransform(lp.getAddress(), x -> new AddressSummary(x, true));
+			this.link = lp.getLink();
+			this.address = safeTransform(lp.getAddress(), x -> new AddressSummary(x));
 			this.registrationOpeningDate = lp.getRegistrationOpeningDate();
 			this.registrationClosingDate = lp.getRegistrationClosingDate();
 			this.startDate = lp.getStartDate();
@@ -92,6 +100,9 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	public List<LearningProgramSummary> learningPrograms(
 			@RequestParam(required=false, name = "city") String city, 
 			@RequestParam(required=false) Integer levelId,
+			@RequestParam(required=false) Integer domainId,
+			@RequestParam(required=false) Integer typeId,
+			@RequestParam(required=false) Integer organisationId,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
 			@RequestParam(required=false) Boolean openForRegistration,
@@ -111,6 +122,18 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			args.put("levelId" , levelId);
 			query.append("and c.level.id = :levelId ");
 		}
+		if (organisationId != null) {
+			args.put("organisationId", organisationId);
+			query.append("and c.organisation.id = :organisationId ");
+		}
+		if (typeId != null && targetClass.equals(LanguageLearningProgram.class)) {
+			args.put("typeId", typeId);
+			query.append("and c.type.id = :typeId ");
+		}
+		if (domainId != null && targetClass.equals(ProfessionalLearningProgram.class)) {
+			args.put("domainId", domainId);
+			query.append("and c.domain.id = :domainId ");
+		}		
 		Date now = new Date();	
 		
 		if(openForRegistration != null){
@@ -181,65 +204,116 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		}
 	}
 
-	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.PUT)
-	@Transactional
-	@RolesAllowed({ "ADMIN", "ORGANISATION" })
-	public ResponseEntity<?> learningProgram(@RequestBody AbstractLearningProgram cur, @PathVariable int id, @RequestHeader String accessKey) {
-		if (cur.getId() == null || !cur.getId().equals(id)) {
-			return ResponseEntity.badRequest().body("Id is not correct!");
-		} else if (!hasAccess(accessKey, cur)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-		if (cur.getEndDate().before(cur.getStartDate())) {
-			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
-		}
-		objectStore.save(cur);
-		return ResponseEntity.noContent().build();
-
-	}
-
+	@CrossOrigin
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "ORGANISATION" })
 	public ResponseEntity<?> learningProgram(@PathVariable int id, @RequestHeader String accessKey) {
-		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
-		if (!c.isPresent()) {
-			return ResponseEntity.badRequest().build();
+		Optional<AbstractLearningProgram> _lp = objectStore.getById(AbstractLearningProgram.class, id);
+		if (!_lp.isPresent()) {
+			return ResponseEntity.notFound().build();
 		}
-		AbstractLearningProgram cursus = c.get();
-		if (!hasAccess(accessKey, c.get())) {
+		AbstractLearningProgram lp = _lp.get();
+		if (!hasAccess(accessKey, lp)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		if (!cursus.getCourses().isEmpty()) {
-			int n = cursus.getCourses().size();
-			return ResponseEntity.badRequest().body("This cursus has " + n + " dependant courses");
-		}
-		objectStore.delete(cursus);
+
+		objectStore.delete(lp);
 		return ResponseEntity.noContent().build();
 
 	}
 
+	
+	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.PUT)
+	@Transactional
+	@RolesAllowed({ "ADMIN", "ORGANISATION" })
+	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, @PathVariable int id, @RequestHeader String accessKey) {
+
+		if (input.id == 0 || input.id != id) {
+			return ResponseEntity.badRequest().body("Id is not correct!");
+		}
+		if (input.endDate.before(input.startDate)) {
+			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
+		}
+		
+		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);
+		if(!_learningProgram.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		
+		AbstractLearningProgram learningProgram = _learningProgram.get();
+		if (!hasAccess(accessKey, learningProgram)) {
+			System.out.println(learningProgram.getOrganisation().getAccount().getAccessKey());
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		if(learningProgram instanceof LanguageLearningProgram){
+			((LanguageLearningProgram)learningProgram).setType(this.refDataProvider.resolve(LanguageLearningProgramType.class, input.type));
+		}
+		else{
+			((ProfessionalLearningProgram)learningProgram).setDomain(this.refDataProvider.resolve(ProfessionalLearningProgramDomain.class, input.domain));
+		}
+		
+		learningProgram.setStartDate(input.startDate);
+		learningProgram.setEndDate(input.endDate);
+		learningProgram.setRegistrationOpeningDate(input.registrationOpeningDate);
+		learningProgram.setRegistrationClosingDate(input.registrationClosingDate);
+		learningProgram.setLink(input.link);
+		
+		learningProgram.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+		learningProgram.setContact(safeTransform(input.contact, x -> x.toContact()));
+		
+		learningProgram.setLevel(this.refDataProvider.resolve(Level.class, input.level));
+		
+		objectStore.save(learningProgram);
+		return ResponseEntity.noContent().build();
+
+	}
+	
+	@CrossOrigin
 	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> learningProgram(HttpServletRequest req, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
+	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, HttpServletRequest req, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
+
+		if (input.endDate.before(input.startDate)) {
+			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
+		}
+		
+		Optional<Organisation> o = getOrganisationByAccessKey(accessKey);
+		if(!o.isPresent()){
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
 		
 		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 		
-		Class<? extends AbstractLearningProgram > targetClass = path.endsWith("language-programs")  ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
+		AbstractLearningProgram lp;
+		if(path.endsWith("language-programs")){
+			LanguageLearningProgram _lp = new LanguageLearningProgram();
+			_lp.setType(this.refDataProvider.resolve(LanguageLearningProgramType.class, input.type));
+			lp = _lp;
+		}
+		else{
+			ProfessionalLearningProgram _lp = new ProfessionalLearningProgram();
+			_lp.setDomain(this.refDataProvider.resolve(ProfessionalLearningProgramDomain.class, input.domain));
+			lp = _lp;
+		}
 		
-		AbstractLearningProgram lp = this.jackson.readValue(req.getInputStream(), targetClass);
-		if (lp.getId() != null) {
-			return ResponseEntity.badRequest().build();
-		}
-		if (lp.getEndDate().before(lp.getStartDate())) {
-			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
-		}
-		if (hasAccess(accessKey, lp)) {
-			objectStore.save(lp);
-			return ResponseEntity.created(getUri("/cursus/" + lp.getId())).body(lp);
-		}
-		return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		lp.setOrganisation(o.get());
+		lp.setStartDate(input.startDate);
+		lp.setEndDate(input.endDate);
+		lp.setRegistrationOpeningDate(input.registrationOpeningDate);
+		lp.setRegistrationClosingDate(input.registrationClosingDate);
+		lp.setLink(input.link);
+		lp.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+		lp.setContact(safeTransform(input.contact, x -> x.toContact()));
+		
+		lp.setLevel(this.refDataProvider.resolve(Level.class, input.level));
+		
+		
+		objectStore.save(lp);
+		input.id = lp.getId();
+		
+		return ResponseEntity.created(getUri("/language-programs/" + lp.getId())).body(input);
 	}
-
 }

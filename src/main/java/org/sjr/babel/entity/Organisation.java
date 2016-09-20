@@ -9,7 +9,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
 
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 import org.sjr.babel.entity.Contact.ContactConverter;

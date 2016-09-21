@@ -17,6 +17,7 @@ import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import util.EncryptionUtil;
 
@@ -42,6 +44,9 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	}
 	
 
+	@Autowired
+	private ObjectMapper jackson;
+	
 	@RequestMapping(path = "authz/signUp", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signUp(HttpServletRequest req) throws IOException {

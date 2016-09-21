@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.FieldOfStudy;
+import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -90,21 +92,44 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 	}
 
-	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
+	@RequestMapping(path = "{id}", method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> getFullRefugee(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> getRefugeeSummary(@PathVariable int id, @RequestHeader String accessKey) {
 
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
-			return ResponseEntity.notFound().build();
-		} else if (!hasAccess(accessKey, r.get())) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+		else if (!hasAccess(accessKey, r.get())) {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
-		return ResponseEntity.ok(r.get());
-
+		else{
+			return ResponseEntity.ok(new RefugeeSummary(r.get()));
+		}
 	}
-
+	
+	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+	@Transactional
+	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody RefugeeSummary input, @RequestHeader String accessKey) {
+		if (input.id != id) {
+			return ResponseEntity.badRequest().build();
+		} else {
+			// TODO update refugee
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<Void> deleteRefugee(@PathVariable int id) {
+		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
+		if (r.isPresent()) {
+			objectStore.delete(r.get());
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+	
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.GET)
 	@Transactional
 	@RolesAllowed({ "ADMIN" })
@@ -121,33 +146,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			return ResponseEntity.ok(meetings);
 		}
 	}
-
-	@RequestMapping(path = "/{id}/summary", method = RequestMethod.GET)
-	@Transactional
-	public ResponseEntity<?> getRefugeeSummary(@PathVariable int id) {
-
-		Optional<RefugeeSummary> r = objectStore.getById(Refugee.class, id).map(rf -> new RefugeeSummary(rf));
-		if (r.isPresent()) {
-			return ResponseEntity.ok(r.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
-
-	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<Void> deleteRefugee(@PathVariable int id) {
-		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
-		if (r.isPresent()) {
-			// TODO hasAccess
-			objectStore.delete(r.get());
-			return ResponseEntity.noContent().build();
-		}
-		return ResponseEntity.notFound().build();
-
-	}
-
+	
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "REFUGEE" })
@@ -167,35 +166,11 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 		mr.setRefugee(refugee);
 		objectStore.save(mr);
-		return ResponseEntity.created(getUri("/refugees/" + refugee.getId() + "/meetingRequests/" + mr.getId()))
-				.body(mr);
+		
+		URI uri = getUri("/refugees/" + refugee.getId() + "/meetingRequests/" + mr.getId());
+		return ResponseEntity.created(uri).body(mr);
 	}
-
-	@RequestMapping(method = RequestMethod.POST)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> saveRefugee(@RequestBody Refugee r) {
-		if (r.getId() != null) {
-			return ResponseEntity.badRequest().build();
-		}
-		r.getAccount().setPassword(DigestUtils.sha256Hex(r.getAccount().getPassword()));
-		objectStore.save(r);
-		return ResponseEntity.created(getUri("/refugees/" + r.getId())).body(r);
-	}
-
-	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> updateRefugee(@PathVariable int id, @RequestBody Refugee r) {
-		if (r.getId() == null || !(r.getId() == id)) {
-			return ResponseEntity.badRequest().build();
-		} else {
-			objectStore.save(r);
-			return ResponseEntity.noContent().build();
-		}
-
-	}
-
+	
 	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "REFUGEE" })

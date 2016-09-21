@@ -37,6 +37,11 @@ public class ReferenceDataHelper {
 	public Map<String, Map<String, List<?>>> getReferenceData() {
 		return referenceData;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public <T> List<T> getAll(Class<T> region) {
+		return (List<T>) referenceData.get(getRegion(region)).get("all");
+	}
 
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractReferenceEntity> T resolve(Class<T> clazz, String name){
@@ -45,20 +50,8 @@ public class ReferenceDataHelper {
 		}
 		List<?> allElements = this.referenceData.get(getRegion(clazz)).get("all");
 		
-		// special resolver for country, 'name' may be the 2 letters code (exemple : FR for France, IT for Italia, etc...).
-		if(clazz.equals(Country.class)){
-			return (T) allElements.stream().filter(x -> {
-				Country c = (Country) x;
-				if (name.length() == 2) {
-					return name.equals(c.getIsoCode());
-				} else {
-					return name.equals(c.getName());
-				}
-			}).findFirst().get();
-		}
-		else{
-			return (T) allElements.stream().filter(x -> ((AbstractReferenceEntity)x).getName().equals(name)).findFirst().get();
-		}
+		return (T) allElements.stream().filter(x -> ((AbstractReferenceEntity)x).getName().equals(name)).findFirst().get();
+		
 	}
 	
 	private String getRegion(Class<?> clazz){

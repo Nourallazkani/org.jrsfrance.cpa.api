@@ -29,7 +29,13 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private Audience audience;
 
-	private String description, subject, link;
+	/*@Embedded
+	private MultiLanguageText description;
+	
+	@Embedded
+	public MultiLanguageText subject;*/
+	
+	private String subject, description, link;
 
 	@Temporal(TemporalType.DATE)
 	private Date registrationOpeningDate, registrationClosingDate;

@@ -108,22 +108,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		return results.stream().collect(Collectors.toList());
 	}
 
-	// the new end point
-
-	@RequestMapping(path = "/{id}", method = RequestMethod.GET)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> get(@PathVariable int id) {
-
-		Optional<Teaching> t = objectStore.getById(Teaching.class, id);
-		if (t.isPresent()) {
-			return ResponseEntity.ok(t.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
-
-	@RequestMapping(path = "/{id}/summary", method = RequestMethod.GET)
+	@RequestMapping(path = "{id}", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> getSummary(@PathVariable int id) {
 

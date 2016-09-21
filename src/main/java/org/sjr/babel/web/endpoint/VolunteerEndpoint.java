@@ -108,9 +108,49 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 				.collect(Collectors.toList());
 	}
 
+	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<?> getFullVolunteer(@PathVariable int id) {
+		/*
+		 * //Other way to create this method
+		 * if(objectStore.getById(Volunteer.class, id) == null){ return
+		 * ResponseEntity.badRequest().build(); } return
+		 * ResponseEntity.ok(objectStore.getById(Volunteer.class, id));
+		 */
+		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
+		if (v.isPresent()) {
+			return ResponseEntity.ok(new VolunteerSummary(v.get()));
+		} else {
+			return ResponseEntity.notFound().build();
+		}
+
+	}
+
+	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
+	@Transactional
+	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody VolunteerSummary input, @RequestHeader String accessKey) {
+		if (input.id!=id) {
+			return ResponseEntity.badRequest().build();
+		} else {
+			// TODO update volunteer
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+
+	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<Void> deleteVolunteer(@PathVariable int id) {
+		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
+		if (v.isPresent()) {
+			objectStore.delete(v.get());
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.notFound().build();
+	}
+
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestHeader String accsessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
@@ -124,43 +164,11 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.ok(meetings);
 		}
 	}
-
-	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.GET)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> getFullVolunteer(@PathVariable int id) {
-		/*
-		 * //Other way to create this method
-		 * if(objectStore.getById(Volunteer.class, id) == null){ return
-		 * ResponseEntity.badRequest().build(); } return
-		 * ResponseEntity.ok(objectStore.getById(Volunteer.class, id));
-		 */
-		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
-		if (v.isPresent()) {
-			return ResponseEntity.ok(v.get());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-
-	}
-
-	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.DELETE)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<Void> deleteVolunteer(@PathVariable int id) {
-		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
-		if (v.isPresent()) {
-			objectStore.delete(v.get());
-			return ResponseEntity.noContent().build();
-		}
-		return ResponseEntity.notFound().build();
-
-	}
-
+	
 	public static class MeetingRequestAcceptationCommand {
 		public boolean accepted;
 	}
-
+	
 	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.POST)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "VOLUNTEER" })
@@ -190,18 +198,5 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			objectStore.save(meetingRequest);
 			return ResponseEntity.ok().build();
 		}
-	}
-
-	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
-	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody Volunteer v) {
-		if (v.getId() == null || !(v.getId() == id)) {
-			return ResponseEntity.badRequest().build();
-		} else {
-			objectStore.save(v);
-			return ResponseEntity.noContent().build();
-		}
-
 	}
 }

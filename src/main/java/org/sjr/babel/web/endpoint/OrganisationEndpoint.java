@@ -76,54 +76,15 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> org(@PathVariable Integer id) {
-		logger.info("entering org ");
-		return okOrNotFound(objectStore.getById(Organisation.class, id));
-		// return okOrNotFound(dao.getById(id));
-		// return org ==null ? ResponseEntity.notFound().build() :
-		// ResponseEntity.ok(org);
-	}
-
-	@RequestMapping(path = "/organisations/{id}/summary", method = RequestMethod.GET)
-	@Transactional
 	public ResponseEntity<?> orgSummary(@PathVariable Integer id) {
 		logger.info("entering org ");
 		Optional<Organisation> org = objectStore.getById(Organisation.class, id);
+		
 		Optional<OrganisationSummary> orgSummary = org.map(x -> new OrganisationSummary(x));
 		return okOrNotFound(orgSummary);
 	}
-
-	@RequestMapping(path = "/organisations", method = RequestMethod.POST)
-	@Transactional
-	@RolesAllowed("ADMIN")
-	public ResponseEntity<?> org(@RequestBody Organisation o) {
-		if (o.getId() != null) {
-			return ResponseEntity.badRequest().build();
-		}
-		
-		Map<String, Object> args = new HashMap<>();
-		args.put("mailAddress", o.getMailAddress());
-		Optional<Organisation> org = objectStore.findOne(Organisation.class, "select v from Organisation v where v.mailAddress = :mailAddress", args);
-		if (org.isPresent()) {
-			return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
-		}
-		
-		if (o.getAccount() == null) {
-			o.setAccount(new Account());
-		}
-		o.getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
-		String password = o.getAccount().getPassword();
-		if (password == null || password.equals("")) {
-			password = UUID.randomUUID().toString().substring(0, 8);
-		}
-		o.getAccount().setPassword(EncryptionUtil.sha256(password));
-		objectStore.save(o);
-		return ResponseEntity.created(getUri("/organisations/" + o.getId())).body(o);
-
-	}
-
-	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.PUT)
+	
+	@RequestMapping(path = "organisations/{id}", method = RequestMethod.PUT)
 	@Transactional
 	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> updateOrg(@RequestBody Organisation o, @PathVariable int id) {
@@ -133,20 +94,4 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		objectStore.save(o);
 		return ResponseEntity.noContent().build();
 	}
-
-	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.DELETE)
-	@Transactional
-	@RolesAllowed("ADMIN")
-	/// @ResponseStatus(code=HttpStatus.NO_CONTENT)
-	public ResponseEntity<Void> delete(@PathVariable int id) {
-		// dao.delete( id);
-		Optional<Organisation> o = this.objectStore.getById(Organisation.class, id);
-		if (o.isPresent()) {
-			objectStore.delete(o.get());
-			return ResponseEntity.noContent().build();
-		}
-		return ResponseEntity.notFound().build();
-		// return ResponseEntity.noContent().build();
-	}
-
 }

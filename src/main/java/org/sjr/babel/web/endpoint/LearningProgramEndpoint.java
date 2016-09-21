@@ -151,10 +151,11 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			args.put("d", now);
 		}
 		if(!includePastEvents){
-			query.append("and c.startDate >= :d ");
+			query.append("and c.endDate >= :d ");
 			args.put("d", now);
 		}
 		
+		query.append("order by c.startDate");
 		List<? extends AbstractLearningProgram> results = objectStore.find(targetClass, query.toString(), args);
 		return results.stream()
 				.map(LearningProgramSummary::new)
@@ -162,25 +163,6 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	}
 
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.GET)
-	@RolesAllowed({ "ADMIN" })
-	@Transactional
-	public ResponseEntity<?> learningProgram(@PathVariable Integer id, @RequestParam(defaultValue = "true") boolean withDetails, @RequestHeader String accessKey) {
-		// return okOrNotFound(objectStore.getById(Cursus.class, id));
-		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
-		if (c.isPresent()) {
-			if (hasAccess(accessKey, c.get())) {
-				AbstractLearningProgram lp = c.get();
-				if (withDetails) {
-					lp.getCourses().size();
-				}
-				return ResponseEntity.ok().body(lp);
-			}
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-		return ResponseEntity.notFound().build();
-	}
-
-	@RequestMapping(path = {"language-programs/{id}/summary", "professional-programs/{id}/summary"}, method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> learningProgram(@PathVariable Integer id) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
@@ -191,20 +173,6 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		return ResponseEntity.notFound().build();
 	}
 
-	@RequestMapping(path = "{id}/courses", method = RequestMethod.GET)
-	@Transactional
-	public ResponseEntity<?> list(@PathVariable int id) {
-		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
-		if (c.isPresent()) {
-			AbstractLearningProgram cursus = c.get();
-			cursus.getCourses().size();
-			return ResponseEntity.ok(cursus.getCourses());
-		} else {
-			return ResponseEntity.notFound().build();
-		}
-	}
-
-	@CrossOrigin
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "ORGANISATION" })

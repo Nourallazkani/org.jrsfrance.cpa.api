@@ -1,4 +1,4 @@
-package org.sjr.babel.web.endpoint;
+package org.sjr.babel.web.endpoint.admin;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.sjr.babel.entity.Administrator;
+import org.sjr.babel.web.endpoint.AbstractEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -100,7 +101,4 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 		}
 		return ResponseEntity.notFound().build();
 	}
-
-	
-
 }

@@ -25,16 +25,12 @@ import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class AbstractEndpoint {
 
 	@Autowired
 	protected ObjectStore objectStore;
 	
-	@Autowired
-	protected ObjectMapper jackson;
-
 	@Autowired
 	protected ReferenceDataHelper refDataProvider;
 	

@@ -13,6 +13,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.sjr.babel.entity.reference.Civility;
 import org.sjr.babel.entity.reference.FieldOfStudy;
@@ -28,6 +30,9 @@ public class Volunteer extends AbstractEntity {
 	private String phoneNumber;
 	private String comments;
 
+	@Temporal(TemporalType.DATE)
+	private Date registrationDate;
+
 	@Embedded
 	private Address address;
 
@@ -39,10 +44,10 @@ public class Volunteer extends AbstractEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Civility civility;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Organisation organisation;
-	
+
 	@ManyToMany
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "fieldOfStudy_id"))
 	private List<FieldOfStudy> fieldsOfStudy;
@@ -50,25 +55,9 @@ public class Volunteer extends AbstractEntity {
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id"))
 	private List<Language> languages;
-	
+
 	@OneToMany(mappedBy = "volunteer")
-	private List<MeetingRequest> meetingRequests ;
-
-	public Address getAddress() {
-		return address;
-	}
-
-	public List<MeetingRequest> getMeetingRequests() {
-		return meetingRequests;
-	}
-
-	public void setMeetingRequests(List<MeetingRequest> meetingRequests) {
-		this.meetingRequests = meetingRequests;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
+	private List<MeetingRequest> meetingRequests;
 
 	public String getFirstName() {
 		return firstName;
@@ -98,8 +87,8 @@ public class Volunteer extends AbstractEntity {
 		return mailAddress;
 	}
 
-	public void setMailAddress(String email) {
-		this.mailAddress = email;
+	public void setMailAddress(String mailAddress) {
+		this.mailAddress = mailAddress;
 	}
 
 	public String getPhoneNumber() {
@@ -118,38 +107,20 @@ public class Volunteer extends AbstractEntity {
 		this.comments = comments;
 	}
 
-	public List<Language> getLanguages() {
-		return languages;
+	public Date getRegistrationDate() {
+		return registrationDate;
 	}
 
-	
-	
-	public List<FieldOfStudy> getFieldsOfStudy() {
-		return fieldsOfStudy;
+	public void setRegistrationDate(Date registrationDate) {
+		this.registrationDate = registrationDate;
 	}
 
-	public void setFieldsOfStudy(List<FieldOfStudy> fieldsOfStudy) {
-		this.fieldsOfStudy = fieldsOfStudy;
+	public Address getAddress() {
+		return address;
 	}
 
-	public void setLanguages(List<Language> languages) {
-		this.languages = languages;
-	}
-
-	public Civility getCivility() {
-		return civility;
-	}
-
-	public void setCivility(Civility civility) {
-		this.civility = civility;
-	}
-
-	public Organisation getOrganisation() {
-		return organisation;
-	}
-
-	public void setOrganisation(Organisation organisation) {
-		this.organisation = organisation;
+	public void setAddress(Address address) {
+		this.address = address;
 	}
 
 	public Account getAccount() {
@@ -168,11 +139,50 @@ public class Volunteer extends AbstractEntity {
 		this.availabilities = availabilities;
 	}
 
+	public Civility getCivility() {
+		return civility;
+	}
+
+	public void setCivility(Civility civility) {
+		this.civility = civility;
+	}
+
+	public Organisation getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(Organisation organisation) {
+		this.organisation = organisation;
+	}
+
+	public List<FieldOfStudy> getFieldsOfStudy() {
+		return fieldsOfStudy;
+	}
+
+	public void setFieldsOfStudy(List<FieldOfStudy> fieldsOfStudy) {
+		this.fieldsOfStudy = fieldsOfStudy;
+	}
+
+	public List<Language> getLanguages() {
+		return languages;
+	}
+
+	public void setLanguages(List<Language> languages) {
+		this.languages = languages;
+	}
+
+	public List<MeetingRequest> getMeetingRequests() {
+		return meetingRequests;
+	}
+
+	public void setMeetingRequests(List<MeetingRequest> meetingRequests) {
+		this.meetingRequests = meetingRequests;
+	}
+
 	public String getFullName() {
 		return this.firstName + " " + this.lastName;
 	}
 
-	
 	// @PrePersist see AuthEndpoint::signUp
 	public void prePersist() {
 		if (this.account == null) {

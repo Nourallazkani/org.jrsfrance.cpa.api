@@ -1,6 +1,5 @@
 package org.sjr.babel;
 
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -18,8 +17,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.event.ApplicationContextEvent;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -27,12 +24,10 @@ import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 
 public class WebAppInitializer implements WebApplicationInitializer
 {
@@ -69,18 +64,14 @@ public class WebAppInitializer implements WebApplicationInitializer
 			//allowedMethods("POST, PUT, DELETE, GET");//.allowedHeaders("XSRF-TOKEN");
 		}
 		
-		@Override
-		public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
-			configurer.enable();
-		}
-		
+		/*
 		@Override
 		public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 			ObjectMapper jackson = jackson();
 			jackson.registerModule(new Hibernate5Module());
 			MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(jackson);
 			converters.add(converter);
-		}
+		}*/
 
 	}
 	

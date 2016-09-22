@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 public class LearningProgramEndpoint extends AbstractEndpoint {
 
 	public static class LearningProgramSummary {
-		public int id;
+		public Integer id;
 		public String level, organisation;
 		public String link;
 		public AddressSummary address;
@@ -194,10 +194,9 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.PUT)
 	@Transactional
-	@RolesAllowed({ "ADMIN", "ORGANISATION" })
 	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, @PathVariable int id, @RequestHeader String accessKey) {
 
-		if (input.id == 0 || input.id != id) {
+		if (input.id == null || !input.id.equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
 		}
 		if (input.endDate.before(input.startDate)) {
@@ -211,7 +210,6 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		AbstractLearningProgram learningProgram = _learningProgram.get();
 		if (!hasAccess(accessKey, learningProgram)) {
-			System.out.println(learningProgram.getOrganisation().getAccount().getAccessKey());
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		
@@ -241,9 +239,10 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@CrossOrigin
 	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, HttpServletRequest req, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
-
+		if(input.id!=null){
+			return ResponseEntity.badRequest().build();
+		}
 		if (input.endDate.before(input.startDate)) {
 			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
 		}

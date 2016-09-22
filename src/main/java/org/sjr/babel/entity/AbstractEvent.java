@@ -2,6 +2,9 @@ package org.sjr.babel.entity;
 
 import java.util.Date;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
@@ -29,13 +32,25 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private Audience audience;
 
-	/*@Embedded
+	@Embedded()
+	@AttributeOverrides({
+		@AttributeOverride(name="defaultText", column=@Column(name="subject_defaultText")),
+		@AttributeOverride(name="textAr", column=@Column(name="subject_textAr")),
+		@AttributeOverride(name="textEn", column=@Column(name="subject_textEn")),
+		@AttributeOverride(name="textPrs", column=@Column(name="subject_textPrs"))
+	})
+	private MultiLanguageText subject;
+	
+	@Embedded()
+	@AttributeOverrides({
+		@AttributeOverride(name="defaultText", column=@Column(name="description_defaultText")),
+		@AttributeOverride(name="textAr", column=@Column(name="description_textAr")),
+		@AttributeOverride(name="textEn", column=@Column(name="description_textEn")),
+		@AttributeOverride(name="textPrs", column=@Column(name="description_textPrs"))
+	})
 	private MultiLanguageText description;
 	
-	@Embedded
-	public MultiLanguageText subject;*/
-	
-	private String subject, description, link;
+	private String link;
 
 	@Temporal(TemporalType.DATE)
 	private Date registrationOpeningDate, registrationClosingDate;
@@ -60,19 +75,19 @@ public abstract class AbstractEvent extends AbstractEntity {
 		this.audience = audience;
 	}
 
-	public String getDescription() {
+	public MultiLanguageText getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(MultiLanguageText description) {
 		this.description = description;
 	}
 
-	public String getSubject() {
+	public MultiLanguageText getSubject() {
 		return subject;
 	}
 
-	public void setSubject(String subject) {
+	public void setSubject(MultiLanguageText subject) {
 		this.subject = subject;
 	}
 

@@ -1,6 +1,8 @@
 drop database if exists cpa;
 
-create database cpa;
+create database cpa 
+	DEFAULT CHARACTER SET utf8
+	DEFAULT COLLATE utf8_general_ci;
 
 use cpa;
 /*
@@ -63,6 +65,7 @@ create table Organisation(
     role varchar (255) null,
     contact varchar(512),
     mailAddress varchar(255),
+    registrationDate date null,
     category_id int not null,
     country_id int null,
     foreign key (country_id) references Country (id),
@@ -139,6 +142,7 @@ create table Volunteer(
 	firstName varchar (255),
 	lastName varchar(255),
 	birthDate date,
+    registrationDate date null,
 	mailAddress varchar (255),
 	phoneNumber varchar (50),
 	accessKey varchar(255),
@@ -219,9 +223,15 @@ create table AbstractEvent (
     registrationOpeningDate date,
     registrationClosingDate date,
     registrationStartDate date,
-	subject varchar(255) null,
+	subject_defaultText varchar(255) null,
+	subject_textEn varchar(255) null,
+	subject_textAr varchar(255) null,
+	subject_textPrs varchar(255) null,
 	link varchar(255) null,
-    description varchar(8000) null,
+	description_defaultText varchar(255) null,
+	description_textEn varchar(255) null,
+	description_textAr varchar(255) null,
+	description_textPrs varchar(255) null,
     country_id int /*not*/ null,
     type_id int null,
     organisation_id int null,
@@ -232,12 +242,17 @@ create table AbstractEvent (
     foreign key (organisation_id) References Organisation(id),
     foreign key (country_id) References Country(id)
 );
+alter table AbstractEvent modify column description_defaultText varchar(8000);
+alter table AbstractEvent modify column description_defaultText varchar(8000);
+alter table AbstractEvent modify column description_defaultText varchar(8000);
+alter table AbstractEvent modify column description_defaultText varchar(8000);
 
 create table Refugee(
 	id int auto_increment primary key,
     firstName varchar (255),
 	lastName varchar(255),
 	birthDate date,
+    registrationDate date null,
 	mailAddress varchar (255),
 	phoneNumber varchar (50),
     

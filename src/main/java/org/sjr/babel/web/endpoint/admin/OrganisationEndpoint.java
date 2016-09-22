@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint.admin;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -56,15 +57,18 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 		}
 		
-		if (o.getAccount() == null) {
-			o.setAccount(new Account());
-		}
-		o.getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
+		o.setRegistrationDate(new Date());
+		
+		Account account = new Account();
+		
 		String password = o.getAccount().getPassword();
 		if (password == null || password.equals("")) {
 			password = UUID.randomUUID().toString().substring(0, 8);
 		}
-		o.getAccount().setPassword(EncryptionUtil.sha256(password));
+		account.setPassword(EncryptionUtil.sha256(password));
+		account.setAccessKey("O-" + UUID.randomUUID().toString());
+		
+		o.setAccount(account);
 		objectStore.save(o);
 		return ResponseEntity.created(getUri("/organisations/" + o.getId())).body(o);
 

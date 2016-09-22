@@ -5,14 +5,14 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class MultiLanguageText {
 
-	private String textFr, textEn, textPrs, textAr;
+	private String defaultText, textEn, textPrs, textAr;
 
-	public String getTextFr() {
-		return textFr;
+	public String getDefaultText() {
+		return defaultText;
 	}
 
-	public void setTextFr(String textFr) {
-		this.textFr = textFr;
+	public void setDefaultText(String defaultText) {
+		this.defaultText = defaultText;
 	}
 
 	public String getTextEn() {
@@ -37,5 +37,21 @@ public class MultiLanguageText {
 
 	public void setTextAr(String textAr) {
 		this.textAr = textAr;
+	}
+
+	public String getText(String language) {
+		if("fr".equals(language)){
+			return this.defaultText;
+		}
+		else if("en".equals(language)){
+			return this.textEn;
+		}
+		else if("ar".equals(language)){
+			return this.textAr;
+		}
+		else if("prs".equals(language)){
+			return this.textPrs;
+		}
+		return this.defaultText;
 	}
 }

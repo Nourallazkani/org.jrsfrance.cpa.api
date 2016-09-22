@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
@@ -19,6 +18,7 @@ import org.sjr.babel.entity.AbstractEvent.OrganisationEvent;
 import org.sjr.babel.entity.AbstractEvent.VolunteerEvent;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Contact;
+import org.sjr.babel.entity.MultiLanguageText;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.EventType;
@@ -37,7 +37,7 @@ import org.springframework.web.servlet.HandlerMapping;
 public class EventEndpoint extends AbstractEndpoint {
 
 	public static class EventSummary {
-		public int id;
+		public Integer id;
 		public String subject, description, organisedBy,type, audience,link;
 		public AddressSummary address;
 		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
@@ -45,10 +45,10 @@ public class EventEndpoint extends AbstractEndpoint {
 
 		public EventSummary() {	} // for jackson deserialisation
 		
-		public EventSummary(AbstractEvent event) {
+		public EventSummary(AbstractEvent event, String language) {
 			this.id = event.getId();
-			this.subject = event.getSubject();
-			this.description = event.getDescription();
+			this.subject = event.getSubject().getText(language);
+			this.description = event.getDescription().getText(language);
 			this.audience = event.getAudience().name();
 			this.address = safeTransform(event.getAddress(), x -> new AddressSummary(x));
 			this.startDate = event.getStartDate();
@@ -107,6 +107,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			@RequestParam(required = false) Boolean openForRegistration,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
+			@RequestHeader("Accept-language") String language,
 			HttpServletRequest req
 		) 
 	{
@@ -168,15 +169,15 @@ public class EventEndpoint extends AbstractEndpoint {
 			args.put("d", now);
 		}
 		hql.append("order by e.startDate");
-		return objectStore.find(AbstractEvent.class, hql.toString(), args).stream().map(EventSummary::new)
+		return objectStore.find(AbstractEvent.class, hql.toString(), args).stream().map(x->new EventSummary(x, language))
 				.collect(Collectors.toList());
 	}
 
 	@RequestMapping(path = {"events/{id}", "workshops/{id}"}, method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getWorkshopSummary(@PathVariable int id) {
+	public ResponseEntity<?> getWorkshopSummary(@PathVariable int id, @RequestHeader("Accept-language") String language) {
 
-		Optional<EventSummary> w = objectStore.getById(AbstractEvent.class, id).map(ws -> new EventSummary(ws));
+		Optional<EventSummary> w = objectStore.getById(AbstractEvent.class, id).map(ws -> new EventSummary(ws, language));
 		if (w.isPresent()) {
 			return ResponseEntity.ok(w.get());
 		} else {
@@ -186,7 +187,6 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"events/{id}", "workshops/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<Void> deleteWorkshop(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<AbstractEvent> w = objectStore.getById(AbstractEvent.class, id);
 		if (w.isPresent()) {
@@ -202,9 +202,8 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"events/{id}", "workshops/{id}"}, method = RequestMethod.PUT)
 	@Transactional
-	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> update(@RequestBody EventSummary input,  @PathVariable int id, @RequestHeader String accessKey) {
-		if (input.id != id) {
+		if (input.id == null || !input.id.equals(id)) {
 			return ResponseEntity.badRequest().build();
 		}
 		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
@@ -223,13 +222,29 @@ public class EventEndpoint extends AbstractEndpoint {
 		event.setType(this.refDataProvider.resolve(EventType.class, input.type));
 		
 		event.setAudience(Audience.valueOf(input.audience));
-		event.setDescription(input.description);
+		
+		if(!input.subject.equals(event.getSubject().getDefaultText())){
+			MultiLanguageText newSubject = new MultiLanguageText();
+			newSubject.setDefaultText(input.subject);
+			newSubject.setTextAr(null);
+			newSubject.setTextPrs(null);
+			newSubject.setTextEn(null);
+			event.setSubject(newSubject);	
+		}
+		if(!input.description.equals(event.getDescription().getDefaultText())){
+			MultiLanguageText newDescription = new MultiLanguageText();
+			newDescription.setDefaultText(input.description);
+			newDescription.setTextAr(null);
+			newDescription.setTextPrs(null);
+			newDescription.setTextEn(null);
+			event.setDescription(newDescription);
+		}
+
+		event.setStartDate(input.startDate);
 		event.setEndDate(event.getEndDate());
 		event.setLink(input.link);
 		event.setRegistrationClosingDate(input.registrationClosingDate);
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
-		event.setStartDate(input.startDate);
-		event.setSubject(input.subject);
 		
 		return ResponseEntity.noContent().build();
 
@@ -237,9 +252,8 @@ public class EventEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"events", "workshops"}, method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<?> save(@RequestBody EventSummary input, @RequestHeader String accessKey, HttpServletRequest req){
-		if (input.id > 0) {
+		if (input.id != null) {
 			return ResponseEntity.badRequest().build();
 		}
 		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
@@ -285,13 +299,21 @@ public class EventEndpoint extends AbstractEndpoint {
 		
 		
 		event.setAudience(Audience.valueOf(input.audience));
-		event.setDescription(input.description);
+		
+		MultiLanguageText description = new MultiLanguageText();
+		description.setDefaultText(input.description);
+		event.setDescription(description);
+		
+		MultiLanguageText subject = new MultiLanguageText();
+		description.setDefaultText(input.subject);
+		event.setSubject(subject);
+		
 		event.setLink(input.link);
 		event.setRegistrationClosingDate(input.registrationClosingDate);
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
 		event.setStartDate(input.startDate);
 		event.setEndDate(event.getEndDate());
-		event.setSubject(input.subject);
+		
 		
 		this.objectStore.save(event);
 		input.id = event.getId();

@@ -8,18 +8,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.Refugee;
-import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.FieldOfStudy;
-import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -28,22 +25,32 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
+import util.EncryptionUtil;
+
 @RestController
 @RequestMapping(path = "/refugees")
 public class RefugeeEndpoint extends AbstractEndpoint {
 
-	class RefugeeSummary {
+	public static class RefugeeSummary {
 
 		public int id;
+		public String mailAddress;
+		public @JsonProperty(access = Access.WRITE_ONLY) String password;
 		public String civility, firstName, lastName, phoneNumber;
 		public List<String> languages, fieldsOfStudy;
 		public Date birthDate;
-
+		
+		public RefugeeSummary() {}
+		
 		public RefugeeSummary(Refugee r) {
 			this.id = r.getId();
 			this.civility = safeTransform(r.getCivility(), x -> x.getName());
 			this.firstName = r.getFirstName();
 			this.lastName = r.getLastName();
+			this.mailAddress = r.getMailAddress();
 			this.birthDate = r.getBirthDate();
 			this.phoneNumber = r.getPhoneNumber();
 			this.fieldsOfStudy = r.getFieldsOfStudy().stream().map(FieldOfStudy::getName).collect(Collectors.toList());
@@ -101,7 +108,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 		else if (!hasAccess(accessKey, r.get())) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		else{
 			return ResponseEntity.ok(new RefugeeSummary(r.get()));
@@ -110,37 +117,59 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody RefugeeSummary input, @RequestHeader String accessKey) {
-		if (input.id != id) {
+	public ResponseEntity<?> update(@PathVariable int id, @RequestBody RefugeeSummary input, @RequestHeader String accessKey) {
+		if (input.id!=id) {
 			return ResponseEntity.badRequest().build();
 		} else {
-			// TODO update refugee
+			Optional<Refugee> _r = this.objectStore.getById(Refugee.class, id);
+			if (!_r.isPresent()) {
+				return ResponseEntity.notFound().build();
+			} 
+			Refugee r = _r.get();
+			if (!hasAccess(accessKey, r)) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			
+			r.setFirstName(input.firstName);
+			r.setLastName(input.lastName);
+			r.setMailAddress(input.mailAddress);
+			r.setPhoneNumber(input.phoneNumber);
+			if(StringUtils.hasText(input.password)){
+				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
+			}
+			
+			this.objectStore.save(r);
+			
 			return ResponseEntity.noContent().build();
 		}
 	}
 	
 	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<Void> deleteRefugee(@PathVariable int id) {
-		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
-		if (r.isPresent()) {
-			objectStore.delete(r.get());
-			return ResponseEntity.noContent().build();
+	public ResponseEntity<Void> deleteRefugee(@PathVariable int id, @RequestHeader String accessKey) {
+		Optional<Refugee> _r = objectStore.getById(Refugee.class, id);
+		if(!_r.isPresent()){
+			return ResponseEntity.notFound().build();
 		}
-		return ResponseEntity.notFound().build();
+		Refugee r = _r.get();
+		if(!hasAccess(accessKey, r)){
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		objectStore.delete(r);
+		return ResponseEntity.noContent().build();
 	}
 	
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
-	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestHeader String accsessKey) {
+	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		Refugee refugee = r.get();
-		if (!hasAccess(accsessKey, refugee)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		if (!hasAccess(accessKey, refugee)) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		} else {
 			List<MeetingRequest> meetings = refugee.getMeetingRequests();
 			return ResponseEntity.ok(meetings);
@@ -149,21 +178,16 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed({ "ADMIN", "REFUGEE" })
-	public ResponseEntity<?> createMeetingRequest(@RequestBody MeetingRequest mr, @RequestHeader String accessKey,
-			@PathVariable int id) {
+	public ResponseEntity<?> createMeetingRequest(@PathVariable int id, @RequestBody MeetingRequest mr, @RequestHeader String accessKey) {
 
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		Refugee refugee = r.get();
 		if (!r.isPresent()) {
 			return ResponseEntity.badRequest().build();
 		} else if (!hasAccess(accessKey, refugee)) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		Optional<Volunteer> v = objectStore.getById(Volunteer.class, mr.getVolunteer().getId());
-		if (!v.isPresent()) {
-			return ResponseEntity.badRequest().build();
-		}
+		
 		mr.setRefugee(refugee);
 		objectStore.save(mr);
 		
@@ -173,25 +197,18 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed({ "ADMIN", "REFUGEE" })
-	public ResponseEntity<?> deleteMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId,
-			@RequestHeader String accessKey) {
-		Optional<MeetingRequest> mr = objectStore.getById(MeetingRequest.class, meetingRequestId);
-		if (!mr.isPresent()) {
+	public ResponseEntity<?> deleteMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId, @RequestHeader String accessKey) {
+		Optional<MeetingRequest> _mr = objectStore.getById(MeetingRequest.class, meetingRequestId);
+		if (!_mr.isPresent()) {
 			return ResponseEntity.notFound().build();
 		} else {
-			Optional<Refugee> r = objectStore.getById(Refugee.class, id);
-			if (!r.isPresent()) {
-				return ResponseEntity.badRequest().build();
-			}
-
-			Refugee refugee = r.get();
+			MeetingRequest mr = _mr.get();
+			Refugee refugee = mr.getRefugee();
 			if (!hasAccess(accessKey, refugee)) {
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
-			objectStore.delete(mr.get());
+			objectStore.delete(mr);
 			return ResponseEntity.noContent().build();
 		}
 	}
-
 }

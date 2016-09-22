@@ -17,27 +17,10 @@ public interface ObjectStore {
 	<T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id);
 	
 	<T> Optional<T>	findOne(Class<T> clazz, String hql	, Map<String, Object> args);
-
-	/**
-	 * abcd
-	 * 
-	 * @param hql
-	 * 			xya
-	 * @param args
-	 * @param clazz
-	 * @return
-	 */
+	
+	<T extends AbstractEntity> Long count(Class<T> clazz, String hql, Map<String, Object> args);
 
 	<T> List<T> find(Class<T> clazz, String hql);
-
-	/**
-	 * 
-	 * @param clazz
-	 * @param hql
-	 * @param paramValue
-	 * @return
-	 */
-	<T> List<T> find(Class<T> clazz, String hql, Object paramValue);
 
 	<T> List<T> find(Class<T> clazz, String hql, Map<String, Object> args);
 	

@@ -1,12 +1,8 @@
 package org.sjr.babel.web.endpoint;
 
-import java.util.List;
-
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sjr.babel.WebAppInitializer.RestConfiguration;
-import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
@@ -23,7 +19,7 @@ public class VolunteerEndpointTest {
 
 	@Test
 	public void testList() {
-		List<VolunteerSummary> list = endpoint.list(null, null, null, null, null);
+		
 	}
 
 }

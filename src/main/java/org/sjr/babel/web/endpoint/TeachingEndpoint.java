@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Administrator;
@@ -30,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TeachingEndpoint extends AbstractEndpoint {
 
 	public static class TeachingSummary {
-		public int id;
+		public Integer id;
 		public String organisation, fieldOfStudy, languageLevelRequired, link;
 		public AddressSummary address;
 		public ContactSummary contact;
@@ -122,7 +121,6 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed({ "ADMIN" })
 	public ResponseEntity<Void> delete(@PathVariable int id) {
 		// return deleteIfExists(Education.class, id);
 
@@ -139,7 +137,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
 	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody TeachingSummary input, @RequestHeader("accessKey") String accessKey) {
-		if (input.id != id) {
+		if (input.id ==null || !input.id.equals((id))) {
 			return ResponseEntity.badRequest().build();
 		} else {
 			Optional<Teaching> _teaching = this.objectStore.getById(Teaching.class, id);
@@ -173,7 +171,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping( method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody TeachingSummary input, @RequestHeader("accessKey") String accessKey) {
-		if (input.id > 0) {
+		if (input.id != null) {
 			return ResponseEntity.badRequest().build();
 		}
 

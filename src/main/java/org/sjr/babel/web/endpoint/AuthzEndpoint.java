@@ -1,23 +1,20 @@
 package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.sjr.babel.entity.AbstractEntity;
 import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -26,66 +23,66 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import util.EncryptionUtil;
 
 @RestController
 public class AuthzEndpoint extends AbstractEndpoint {
 
 	private ResponseEntity<Map<String, Object>> successSignIn(int id, String name, Account account) {
-		Map<String, Object> responseEntity = new HashMap<>();
-		responseEntity.put("name", name);
-		responseEntity.put("role", account.getRole());
-		responseEntity.put("accessKey", account.getAccessKey());
-		responseEntity.put("id", id);
-		return ResponseEntity.ok(responseEntity);
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("name", name);
+		responseBody.put("role", account.getRole());
+		responseBody.put("accessKey", account.getAccessKey());
+		responseBody.put("id", id);
+		return ResponseEntity.ok(responseBody);
 	}
 	
-
-	@Autowired
-	private ObjectMapper jackson;
+	public static class SignUpCommand{
+		public String firstName, lastName;
+		public String profile;
+		public String mailAddress;
+		public String password;
+	}
 	
 	@RequestMapping(path = "authz/signUp", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> signUp(HttpServletRequest req) throws IOException {
-		InputStream is = req.getInputStream();
-		// ObjectMapper Jackson = new ObjectMapper ;
-		JsonNode message = jackson.readTree(is);
-		if (message.get("messageType").asText().equals("volunteer_sign-up")) {
-
-			Volunteer v = jackson.treeToValue(message.get("messageBody"), Volunteer.class);
-			Map<String, Object> args = new HashMap<>();
-			args.put("mailAddress", v.getMailAddress());
-			Optional<Volunteer> vol = objectStore.findOne(Volunteer.class, "select v from Volunteer v where v.mailAddress = :mailAddress", args);
-			if (vol.isPresent()) {
-				return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
-			}
-
-			v.getAccount().setPassword(EncryptionUtil.sha256(v.getAccount().getPassword()));
-			v.getAccount().setAccessKey("V-" + UUID.randomUUID().toString());
-
-			objectStore.save(v);
-			return successSignIn(v.getId(), v.getFullName(), v.getAccount());
-
-		} else if (message.get("messageType").asText().equals("refugee_sign-up")) {
-			Refugee r = jackson.treeToValue(message.get("messageBody"), Refugee.class);
-			Map<String, Object> args = new HashMap<>();
-			args.put("mailAddress", r.getMailAddress());
-			Optional<Refugee> duplicate = objectStore.findOne(Refugee.class, "select r from Refugee r where r.mailAddress = :mailAddress", args);
-			if (duplicate.isPresent()) {
-				return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
-			}
-			r.getAccount().setPassword(EncryptionUtil.sha256(r.getAccount().getPassword()));
-			objectStore.save(r);
-			return successSignIn(r.getId(), r.getFullName(), r.getAccount());
-			// jackson.treeToValue(message.get("messageBody"), Refugee.class);
-
+	public ResponseEntity<?> signUp(SignUpCommand input) throws IOException {
+		if(!"V".equals(input.profile) || "R".equals(input.profile)){
+			return ResponseEntity.badRequest().build();
 		}
-
-		return ResponseEntity.badRequest().build();
-
+		Class<? extends AbstractEntity> targetClass = input.profile=="V" ? Volunteer.class : Refugee.class;
+		Map<String, Object> args = new HashMap<>();
+		args.put("mailAddress", input.mailAddress);
+		long n = objectStore.count(Volunteer.class, "select count(x) from "+targetClass.getName()+" x where x.mailAddress = :mailAddress", args);
+		if (n > 0) {
+			return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+		}
+		
+		
+		Account account = new Account();
+		account.setPassword(EncryptionUtil.sha256(input.password));
+		account.setAccessKey(input.profile + "-" + UUID.randomUUID().toString());
+		
+		if(input.profile.equals("V")){
+			Volunteer volunteer = new Volunteer();
+			volunteer.setFirstName(input.firstName);
+			volunteer.setLastName(input.lastName);
+			volunteer.setMailAddress(input.mailAddress);
+			volunteer.setAccount(account);
+			volunteer.setRegistrationDate(new Date());
+			this.objectStore.save(volunteer);
+			return successSignIn(volunteer.getId(), volunteer.getFullName(), volunteer.getAccount());
+		}
+		else{
+			Refugee refugee = new Refugee();
+			refugee.setFirstName(input.firstName);
+			refugee.setLastName(input.lastName);
+			refugee.setMailAddress(input.mailAddress);
+			refugee.setAccount(account);
+			refugee.setRegistrationDate(new Date());
+			this.objectStore.save(refugee);
+			return successSignIn(refugee.getId(), refugee.getFullName(), refugee.getAccount());
+		}
 	}
 
 	public static class SignInCommand {
@@ -98,7 +95,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			return false;
 		}
 		else if(StringUtils.hasText(command.password)){
-			String encodedPassword = DigestUtils.sha256Hex(command.password);
+			String encodedPassword = EncryptionUtil.sha256(command.password);
 			return encodedPassword.equals(userAccount.getPassword());
 			
 		}
@@ -108,14 +105,14 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		return false;
 	}
 	
-	private <T extends AbstractEntity> Optional<T> tryGetUser(@RequestBody SignInCommand input, Class<T> clazz){
+	private <T extends AbstractEntity> Optional<T> tryGetUser(SignInCommand input, Class<T> clazz){
 		if(input.realm==null && StringUtils.hasText(input.accessKey)){
 			input.realm = input.accessKey.substring(0, 1);
 		}
 		Map<String, Object> args = new HashMap<>();
 		args.put("mailAddress", input.mailAddress);
 		args.put("accessKey", input.accessKey);
-		String templateQuery = "select x from %s x where (:mailAddress is null or x.mailAddress = :mailAddress) or (:accessKey is null or x.account.accessKey = :accessKey)";
+		String templateQuery = "select x from %s x where (:mailAddress is not null and x.mailAddress = :mailAddress) or (:accessKey is not null and x.account.accessKey = :accessKey)";
 		return objectStore.findOne(clazz, String.format(templateQuery, clazz.getSimpleName()), args);
 		
 	}
@@ -202,11 +199,5 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		}		
 		
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-	}
-
-	
-	public static void main(String[] args) {
-		System.out.println("O-"+UUID.randomUUID().toString());
-		System.out.println(UUID.randomUUID().toString());
 	}
 }

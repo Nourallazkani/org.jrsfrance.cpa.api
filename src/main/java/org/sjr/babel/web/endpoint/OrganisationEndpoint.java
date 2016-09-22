@@ -4,13 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
-import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.reference.OrganisationCategory.Stereotype;
 import org.springframework.http.ResponseEntity;
@@ -21,8 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import util.EncryptionUtil;
 
 @RestController
 public class OrganisationEndpoint extends AbstractEndpoint {
@@ -86,7 +81,6 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "organisations/{id}", method = RequestMethod.PUT)
 	@Transactional
-	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> updateOrg(@RequestBody Organisation o, @PathVariable int id) {
 		if (o.getId() == null || !o.getId().equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");

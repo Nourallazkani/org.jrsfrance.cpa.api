@@ -25,9 +25,9 @@ import org.sjr.babel.entity.reference.Language;
 public class Refugee extends AbstractEntity {
 
 	private String firstName, lastName, mailAddress, phoneNumber;
-	
+
 	@Temporal(TemporalType.DATE)
-	private Date birthDate;
+	private Date birthDate, registrationDate;
 
 	@Embedded
 	private Account account;
@@ -40,15 +40,15 @@ public class Refugee extends AbstractEntity {
 
 	@Embedded
 	private Address address;
-	
-	@OneToMany(mappedBy = "refugee" ,fetch=FetchType.LAZY)
-	private List<MeetingRequest> meetingRequests ;
-	
+
+	@OneToMany(mappedBy = "refugee", fetch = FetchType.LAZY)
+	private List<MeetingRequest> meetingRequests;
+
 	@ElementCollection(fetch = FetchType.LAZY)
 	private List<LanguageSkill> languageSkills;
-	
-	@ManyToMany(fetch = FetchType.LAZY) 
-	@JoinTable(inverseJoinColumns=@JoinColumn(name = "fieldOfStudy_id"))
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(inverseJoinColumns = @JoinColumn(name = "fieldOfStudy_id"))
 	private List<FieldOfStudy> fieldsOfStudy;
 
 	public String getFirstName() {
@@ -83,13 +83,20 @@ public class Refugee extends AbstractEntity {
 		this.phoneNumber = phoneNumber;
 	}
 
-
 	public Date getBirthDate() {
 		return birthDate;
 	}
 
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
+	}
+
+	public Date getRegistrationDate() {
+		return registrationDate;
+	}
+
+	public void setRegistrationDate(Date registrationDate) {
+		this.registrationDate = registrationDate;
 	}
 
 	public Address getAddress() {
@@ -107,7 +114,6 @@ public class Refugee extends AbstractEntity {
 	public void setAccount(Account account) {
 		this.account = account;
 	}
-
 
 	public Civility getCivility() {
 		return civility;
@@ -132,8 +138,6 @@ public class Refugee extends AbstractEntity {
 	public void setLanguageSkills(List<LanguageSkill> languageSkills) {
 		this.languageSkills = languageSkills;
 	}
-	
-	
 
 	public List<FieldOfStudy> getFieldsOfStudy() {
 		return fieldsOfStudy;
@@ -154,7 +158,7 @@ public class Refugee extends AbstractEntity {
 	public String getFullName() {
 		return this.firstName + " " + this.lastName;
 	}
-	
+
 	@PrePersist
 	public void prePersist() {
 		if (this.account == null) {

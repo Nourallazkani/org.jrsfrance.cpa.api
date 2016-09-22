@@ -104,13 +104,6 @@ class JpaObjectStoreImpl implements ObjectStore {
 	}
 
 	@Override
-	public <T> List<T> find(Class<T> clazz, String hql, Object paramValue) {
-		TypedQuery<T> query = em.createQuery(hql, clazz);
-		query.setParameter(1, paramValue);
-		return query.getResultList();
-	}
-
-	@Override
 	public <T> List<T> findAll(Class<T> clazz) {
 		return find(clazz, "select c from "+clazz.getName()+" c ");
 	}
@@ -122,6 +115,13 @@ class JpaObjectStoreImpl implements ObjectStore {
 			return Optional.empty(); 
 		}
 		return Optional.of(items.get(0));
+	}
+	
+	@Override
+	public <T extends AbstractEntity> Long count(Class<T> clazz, String hql, Map<String, Object> args) {
+		TypedQuery<Long> query = em.createQuery(hql, Long.class).setFirstResult(0).setMaxResults(1);
+		args.forEach(query::setParameter);
+		return query.getSingleResult();
 	}
 
 }

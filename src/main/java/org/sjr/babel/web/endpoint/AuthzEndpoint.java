@@ -30,6 +30,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	private ResponseEntity<Map<String, Object>> successSignIn(int id, String name, Account account) {
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("name", name);
+		responseBody.put("profile", account.getAccessKey().substring(0, 1));
 		responseBody.put("accessKey", account.getAccessKey());
 		responseBody.put("id", id);
 		return ResponseEntity.accepted().body(responseBody);

@@ -55,6 +55,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			this.birthDate = v.getBirthDate();
 			this.mailAddress = v.getMailAddress();
 			this.phoneNumber = v.getPhoneNumber();
+			
 			this.address = safeTransform(v.getAddress(), x -> new AddressSummary(x));
 			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());

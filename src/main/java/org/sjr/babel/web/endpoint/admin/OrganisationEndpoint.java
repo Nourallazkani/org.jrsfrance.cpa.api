@@ -1,6 +1,5 @@
 package org.sjr.babel.web.endpoint.admin;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -37,9 +36,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			this.category = o.getCategory().getName();
 			this.contact = safeTransform(o.getContact(), ContactSummary::new);
 			this.address = safeTransform(o.getAddress(), x -> new AddressSummary(x));
-
 		}
-
 	}
 
 	@RequestMapping(path = "organisations", method = RequestMethod.POST)
@@ -56,8 +53,6 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		if (org.isPresent()) {
 			return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 		}
-		
-		o.setRegistrationDate(new Date());
 		
 		Account account = new Account();
 		

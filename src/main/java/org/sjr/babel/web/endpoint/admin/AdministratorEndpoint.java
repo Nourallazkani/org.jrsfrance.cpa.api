@@ -27,7 +27,6 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 
 		public AdministratorSummary(Administrator ad) {
 			this.id = ad.getId();
-			this.role = ad.getAccount().getRole();
 			this.civility = ad.getCivility().getName();
 			this.firstName = ad.getFirstName();
 			this.lastName = ad.getLastName();

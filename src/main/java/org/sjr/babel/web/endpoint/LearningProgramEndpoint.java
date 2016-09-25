@@ -9,7 +9,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.AbstractLearningProgram;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.HandlerMapping;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -105,12 +103,10 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			@RequestParam(required=false) Integer organisationId,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
-			@RequestParam(required=false) Boolean openForRegistration,
-			HttpServletRequest req
+			@RequestParam(required=false) Boolean openForRegistration
 		) { 
-		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 		
-		Class<? extends AbstractLearningProgram > targetClass = path.endsWith("language-programs") ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
+		Class<? extends AbstractLearningProgram > targetClass = requestedPathEquals("learnings/language-programs") ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
 
 		StringBuffer query = new StringBuffer("select c from ").append(targetClass.getSimpleName()).append(" c where 0=0 ") ;
 		Map<String, Object> args = new HashMap<>();
@@ -239,7 +235,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@CrossOrigin
 	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, HttpServletRequest req, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
+	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
 		if(input.id!=null){
 			return ResponseEntity.badRequest().build();
 		}
@@ -252,10 +248,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 		
-		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		
 		AbstractLearningProgram lp;
-		if(path.endsWith("language-programs")){
+		if(requestedPathEquals("learnings/language-programs")){
 			LanguageLearningProgram _lp = new LanguageLearningProgram();
 			_lp.setType(this.refDataProvider.resolve(LanguageLearningProgramType.class, input.type));
 			lp = _lp;

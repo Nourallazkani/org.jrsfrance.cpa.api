@@ -42,20 +42,31 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		public AddressSummary address;
 		public List<String> languages , fieldsOfStudy;
 		public Date birthDate;
+		public Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
+		public String activities;
 
 		public VolunteerSummary() {	}
 		
 		public VolunteerSummary(Volunteer v) {
 			this.id = v.getId();
-			this.civility = v.getCivility().getName();
+			
+			this.civility = safeTransform(v.getCivility(), x -> x.getName());
 			this.firstName = v.getFirstName();
 			this.lastName = v.getLastName();
 			this.birthDate = v.getBirthDate();
 			this.mailAddress = v.getMailAddress();
 			this.phoneNumber = v.getPhoneNumber();
-			this.address = new AddressSummary(v.getAddress());
+			this.address = safeTransform(v.getAddress(), x -> new AddressSummary(x));
 			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
+			
+			this.availableForConversation = v.getAvailableForConversation();
+			this.availableForInterpreting = v.getAvailableForInterpreting();
+			this.languages = v.getLanguages().stream().map(x->x.getName()).collect(Collectors.toList());
+			this.availableForSupportInStudies = v.getAvailableForSupportInStudies();
+			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
+			this.availableForActivities = v.getAvailableForActivities();
+			this.activities = v.getActivities();
 		}
 
 	}
@@ -107,17 +118,42 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			v.setFirstName(input.firstName);
 			v.setLastName(input.lastName);
 			v.setMailAddress(input.mailAddress);
-			v.setAddress(input.address.toAddress(this.refDataProvider));
+			v.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 			v.setPhoneNumber(input.phoneNumber);
+			
 			if(StringUtils.hasText(input.password)){
 				v.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 			}
+			
+			v.setAvailableForConversation(input.availableForConversation);
+			
+			v.setAvailableForInterpreting(input.availableForInterpreting);
 			if (input.languages != null && !input.languages.isEmpty()) {
-				v.setLanguages(input.languages.stream().map(x -> this.refDataProvider.resolve(Language.class, x)).collect(Collectors.toList()));	
+				List<Language> languages = input.languages.stream()
+						.filter(StringUtils::hasText)
+						.map(x -> this.refDataProvider.resolve(Language.class, x))
+						.collect(Collectors.toList()); 
+				v.setLanguages(languages);	
 			}
+			else{
+				v.setLanguages(null);
+			}
+			
+			v.setAvailableForSupportInStudies(input.availableForSupportInStudies);
 			if (input.fieldsOfStudy != null && !input.fieldsOfStudy.isEmpty()) {
-				v.setFieldsOfStudy(input.fieldsOfStudy.stream().map(x -> this.refDataProvider.resolve(FieldOfStudy.class, x)).collect(Collectors.toList()));
+				List<FieldOfStudy> fieldsOfStudy = input.fieldsOfStudy.stream()
+						.filter(StringUtils::hasText)
+						.map(x -> this.refDataProvider.resolve(FieldOfStudy.class, x))
+						.collect(Collectors.toList());
+				v.setFieldsOfStudy(fieldsOfStudy);
 			}
+			else{
+				v.setFieldsOfStudy(null);
+			}
+			
+			v.setAvailableForActivities(input.availableForActivities);
+			v.setActivities(input.activities);
+			
 			this.objectStore.save(v);
 			
 			return ResponseEntity.noContent().build();

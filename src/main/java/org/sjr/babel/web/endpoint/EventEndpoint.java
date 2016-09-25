@@ -107,9 +107,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			@RequestParam(required = false) Boolean openForRegistration,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
-			@RequestHeader("Accept-language") String language,
-			HttpServletRequest req
-		) 
+			@RequestHeader("Accept-language") String language)
 	{
 		if(!includePastEvents && !includeFutureEvents){
 			return new ArrayList<>();
@@ -125,8 +123,6 @@ public class EventEndpoint extends AbstractEndpoint {
 		else{
 			targetClass = AbstractEvent.class;
 		}
-		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		boolean isWorkshop = path.contains("workshop");
 		
 		StringBuffer hql = new StringBuffer("select e from ").append(targetClass.getName()).append(" e left join e.type t where 0=0 ");
 		HashMap<String, Object> args = new HashMap<>();
@@ -138,7 +134,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			hql.append("and e.organisation.id = :organisationId ");
 			args.put("organisationId", organisationId);
 		}
-		if (isWorkshop) {
+		if (requestedPathEquals("workshops")) {
 			hql.append("and t.stereotype = :stereotype ");
 			args.put("stereotype", EventType.Stereotype.WORKSHOP);
 		}

@@ -27,7 +27,7 @@ public class Refugee extends AbstractEntity {
 	private String firstName, lastName, mailAddress, phoneNumber;
 
 	@Temporal(TemporalType.DATE)
-	private Date birthDate, registrationDate;
+	private Date birthDate;
 
 	@Embedded
 	private Account account;
@@ -89,14 +89,6 @@ public class Refugee extends AbstractEntity {
 
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
-	}
-
-	public Date getRegistrationDate() {
-		return registrationDate;
-	}
-
-	public void setRegistrationDate(Date registrationDate) {
-		this.registrationDate = registrationDate;
 	}
 
 	public Address getAddress() {

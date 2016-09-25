@@ -2,9 +2,7 @@ package org.sjr.babel.entity;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,8 +11,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.sjr.babel.entity.reference.Civility;
 import org.sjr.babel.entity.reference.FieldOfStudy;
@@ -28,19 +24,14 @@ public class Volunteer extends AbstractEntity {
 	private Date birthDate;
 	private String mailAddress;
 	private String phoneNumber;
-	private String comments;
-
-	@Temporal(TemporalType.DATE)
-	private Date registrationDate;
+	private Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
+	private String activities;
 
 	@Embedded
 	private Address address;
 
 	@Embedded
 	private Account account;
-
-	@ElementCollection
-	private List<Availability> availabilities;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Civility civility;
@@ -99,20 +90,44 @@ public class Volunteer extends AbstractEntity {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public String getComments() {
-		return comments;
+	public Boolean getAvailableForConversation() {
+		return availableForConversation;
 	}
 
-	public void setComments(String comments) {
-		this.comments = comments;
+	public void setAvailableForConversation(Boolean availableForConversation) {
+		this.availableForConversation = availableForConversation;
 	}
 
-	public Date getRegistrationDate() {
-		return registrationDate;
+	public Boolean getAvailableForInterpreting() {
+		return availableForInterpreting;
 	}
 
-	public void setRegistrationDate(Date registrationDate) {
-		this.registrationDate = registrationDate;
+	public void setAvailableForInterpreting(Boolean availableForInterpreting) {
+		this.availableForInterpreting = availableForInterpreting;
+	}
+
+	public Boolean getAvailableForSupportInStudies() {
+		return availableForSupportInStudies;
+	}
+
+	public void setAvailableForSupportInStudies(Boolean availableForSupportInStudies) {
+		this.availableForSupportInStudies = availableForSupportInStudies;
+	}
+
+	public Boolean getAvailableForActivities() {
+		return availableForActivities;
+	}
+
+	public void setAvailableForActivities(Boolean availableForActivities) {
+		this.availableForActivities = availableForActivities;
+	}
+
+	public String getActivities() {
+		return activities;
+	}
+
+	public void setActivities(String activities) {
+		this.activities = activities;
 	}
 
 	public Address getAddress() {
@@ -129,14 +144,6 @@ public class Volunteer extends AbstractEntity {
 
 	public void setAccount(Account account) {
 		this.account = account;
-	}
-
-	public List<Availability> getAvailabilities() {
-		return availabilities;
-	}
-
-	public void setAvailabilities(List<Availability> availabilities) {
-		this.availabilities = availabilities;
 	}
 
 	public Civility getCivility() {
@@ -180,16 +187,6 @@ public class Volunteer extends AbstractEntity {
 	}
 
 	public String getFullName() {
-		return this.firstName + " " + this.lastName;
+		return String.format("%s %s", this.firstName, this.lastName);
 	}
-
-	// @PrePersist see AuthEndpoint::signUp
-	public void prePersist() {
-		if (this.account == null) {
-			setAccount(new Account());
-		}
-		getAccount().setAccessKey("V-" + UUID.randomUUID().toString());
-
-	}
-
 }

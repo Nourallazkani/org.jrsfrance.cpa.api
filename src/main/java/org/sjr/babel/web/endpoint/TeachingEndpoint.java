@@ -71,6 +71,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	public List<TeachingSummary> list(
 			@RequestParam(required = false) Integer organisationId,
 			@RequestParam(required = false) Integer fieldOfStudyId, 
+			@RequestParam(required=false) Integer levelId,
 			@RequestParam(required = false) String city,
 			@RequestParam(required=false) Boolean openForRegistration){
 		
@@ -78,15 +79,19 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		Map<String, Object> args = new HashMap<>();
 		if (organisationId != null ) {
 			args.put("oId" , organisationId);
-			hql.append(" and t.organisation.id = :oId");
+			hql.append(" and t.organisation.id = :oId ");
 		}
 		if (fieldOfStudyId != null ) {
 			args.put("fId" , fieldOfStudyId);
-			hql.append(" and t.fieldOfStudy.id = :fId");
+			hql.append(" and t.fieldOfStudy.id = :fId ");
+		}
+		if(levelId!=null){
+			args.put("lId", levelId);
+			hql.append(" and t.languageLevelRequired.id = :lId ");
 		}
 		if (city != null && !city.trim().equals("")) {
 			args.put("name" , city);
-			hql.append(" and  t.organisation.address.locality like :name");
+			hql.append(" and  t.organisation.address.locality like :name ");
 		}
 		Date now = new Date();
 		if(openForRegistration != null){

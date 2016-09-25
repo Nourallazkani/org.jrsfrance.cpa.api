@@ -64,14 +64,6 @@ insert into Organisation(name, street1, postalCode, locality, lat, lng, googleMa
 insert into Organisation(name, street1, postalCode, locality, lat, lng, googleMapId, country_id, contact, category_id) 
 	values ('Pole emploi', '10 rue Brancion', '75015', 'Paris', 48.8357559, 2.3035182, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 2);
 
-
-
-
-
-
-
-
-
 update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e4', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='o@o.o' where id=1;
 
 insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE_ADD(now(),INTERVAL -60 DAY), 4,1,'L', 1);
@@ -112,18 +104,18 @@ insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,org
 update Teaching set registrationClosingDate = DATE_ADD(now(), interval 7 DAY);
 update Teaching t, Organisation o set t.contact=o.contact, link = 'http://jrsfrance.org' where t.organisation_id=o.id;
 
-
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
+/*
+insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
 	values ('Abiir','ZATAR', date(now()), 'Alaric@gmail.com', '07908756','xyz','123456789','VOLUNTEER', 'bordeaux', 1, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
+insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
 	values ('lucile','BALOU', date(now()), 'lucile@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Toulouse', 1, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
+insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
 	values ('Nour', 'BADAN', date(now()), 'Nour@gmail.com', '07652436', 'xyz', '123456789', 'VOLUNTEER', 'Lyon', 2, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
+insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
 	values ('jawad', 'DODO', date(now()), 'jawad@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Paris', 2, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
+insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
 	values ('ABD', 'BADAN', date(now()), 'Nour@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'bordeaux ', 2, 1, 'working for JRS');
-insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, role, locality, civility_id, nationality_id, comments)
+insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
 	values ('Alaric', 'COUCOU', date(now()), 'Nour@gmail.com', '07908756', 'xyz', '123456789', 'VOLUNTEER', 'Renne', 2, 1, 'working for JRS');
 
 insert into Volunteer_Language(volunteer_id, language_id) values(1,1);
@@ -135,7 +127,7 @@ insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(5,2);
 insert into Volunteer_Language(volunteer_id, language_id) values(2,1);
 insert into Volunteer_Language(volunteer_id, language_id) values(2,2);
 insert into Volunteer_FieldOfStudy(volunteer_id, fieldOfStudy_id) values(1,2);
-
+*/
 
 	
 insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 

@@ -1,8 +1,5 @@
 package org.sjr.babel.entity;
 
-import java.util.Date;
-import java.util.UUID;
-
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Convert;
@@ -10,8 +7,6 @@ import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 import org.sjr.babel.entity.Contact.ContactConverter;
@@ -25,9 +20,6 @@ public class Organisation extends AbstractEntity {
 	@Basic
 	private String name, mailAddress;
 
-	@Temporal(TemporalType.DATE)
-	private Date registrationDate;
-	
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
 
@@ -60,14 +52,6 @@ public class Organisation extends AbstractEntity {
 		this.mailAddress = mailAddress;
 	}
 
-	public Date getRegistrationDate() {
-		return registrationDate;
-	}
-
-	public void setRegistrationDate(Date registrationDate) {
-		this.registrationDate = registrationDate;
-	}
-
 	public void setContact(Contact contact) {
 		this.contact = contact;
 	}
@@ -95,13 +79,4 @@ public class Organisation extends AbstractEntity {
 	public void setCategory(OrganisationCategory category) {
 		this.category = category;
 	}
-
-	// @PrePersist
-	public void prePersist() {
-		if (this.account == null) {
-			setAccount(new Account());
-		}
-		getAccount().setAccessKey("O-" + UUID.randomUUID().toString());
-	}
-
 }

@@ -1,7 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -31,10 +30,9 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	private ResponseEntity<Map<String, Object>> successSignIn(int id, String name, Account account) {
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("name", name);
-		responseBody.put("role", account.getRole());
 		responseBody.put("accessKey", account.getAccessKey());
 		responseBody.put("id", id);
-		return ResponseEntity.ok(responseBody);
+		return ResponseEntity.accepted().body(responseBody);
 	}
 	
 	public static class SignUpCommand{
@@ -46,8 +44,8 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "authz/signUp", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> signUp(SignUpCommand input) throws IOException {
-		if(!"V".equals(input.profile) || "R".equals(input.profile)){
+	public ResponseEntity<?> signUp(@RequestBody SignUpCommand input) throws IOException {
+		if(!"V".equals(input.profile) && !"R".equals(input.profile)){
 			return ResponseEntity.badRequest().build();
 		}
 		Class<? extends AbstractEntity> targetClass = input.profile=="V" ? Volunteer.class : Refugee.class;
@@ -69,7 +67,6 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			volunteer.setLastName(input.lastName);
 			volunteer.setMailAddress(input.mailAddress);
 			volunteer.setAccount(account);
-			volunteer.setRegistrationDate(new Date());
 			this.objectStore.save(volunteer);
 			return successSignIn(volunteer.getId(), volunteer.getFullName(), volunteer.getAccount());
 		}
@@ -79,9 +76,8 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			refugee.setLastName(input.lastName);
 			refugee.setMailAddress(input.mailAddress);
 			refugee.setAccount(account);
-			refugee.setRegistrationDate(new Date());
 			this.objectStore.save(refugee);
-			return successSignIn(refugee.getId(), refugee.getFullName(), refugee.getAccount());
+			return  successSignIn(refugee.getId(), refugee.getFullName(), refugee.getAccount());
 		}
 	}
 

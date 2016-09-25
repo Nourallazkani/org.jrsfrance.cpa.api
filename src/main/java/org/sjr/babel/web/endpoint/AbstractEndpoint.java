@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -49,26 +50,20 @@ public abstract class AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		}
 	}
-	/*
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	public static class Link {
-		public String title,href,rel;
-		public Link(String title, String href, String rel) {
-			this.href = href;
-			this.title = title;
-			this.rel= rel;
-		}
-	}*/
 	
 	@Autowired
 	private HttpServletRequest currentRequest;
 	
-	protected HttpServletRequest currentRequest(){
-		return currentRequest;
+	protected boolean requestedPathEquals(String path){
+		String p = (String)currentRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		if(p.startsWith("/")){
+			p = p.substring(1);
+		}
+		return p.equals(path);
 	}
 	
 	protected URI getUri(String path){
-		HttpRequest httpRequest = new ServletServerHttpRequest(currentRequest());
+		HttpRequest httpRequest = new ServletServerHttpRequest(currentRequest);
 		return UriComponentsBuilder.fromHttpRequest(httpRequest).path(path).build().toUri();
 	}
 	
@@ -84,7 +79,7 @@ public abstract class AbstractEndpoint {
 		return this.objectStore.findOne(Volunteer.class, "select v from Volunteer v where v.account.accessKey=:accessKey", args);
 	}
 	
-	@JsonIgnoreProperties(ignoreUnknown=true)
+	@JsonIgnoreProperties(ignoreUnknown=true /*for formatted_address*/ )
 	protected static class AddressSummary {
 		public String street1, street2, postalCode, locality;
 		public String country="France";
@@ -171,5 +166,4 @@ public abstract class AbstractEndpoint {
 			this.distanceFromOrigin = distanceFromOrigin;
 		}
 	}
-	
 }

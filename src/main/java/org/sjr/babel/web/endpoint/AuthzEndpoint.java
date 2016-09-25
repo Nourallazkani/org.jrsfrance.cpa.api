@@ -33,7 +33,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		responseBody.put("profile", account.getAccessKey().substring(0, 1));
 		responseBody.put("accessKey", account.getAccessKey());
 		responseBody.put("id", id);
-		return ResponseEntity.accepted().body(responseBody);
+		return ResponseEntity.ok(responseBody);
 	}
 	
 	public static class SignUpCommand{
@@ -49,14 +49,14 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		if(!"V".equals(input.profile) && !"R".equals(input.profile)){
 			return ResponseEntity.badRequest().build();
 		}
-		Class<? extends AbstractEntity> targetClass = input.profile=="V" ? Volunteer.class : Refugee.class;
+		
+		String query = "select count(x) from "+(input.profile.equals("V") ? Volunteer.class : Refugee.class)+" x where x.mailAddress = :mailAddress";
 		Map<String, Object> args = new HashMap<>();
 		args.put("mailAddress", input.mailAddress);
-		long n = objectStore.count(Volunteer.class, "select count(x) from "+targetClass.getName()+" x where x.mailAddress = :mailAddress", args);
+		long n = objectStore.count(Volunteer.class, query, args);
 		if (n > 0) {
-			return ResponseEntity.badRequest().body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 		}
-		
 		
 		Account account = new Account();
 		account.setPassword(EncryptionUtil.sha256(input.password));

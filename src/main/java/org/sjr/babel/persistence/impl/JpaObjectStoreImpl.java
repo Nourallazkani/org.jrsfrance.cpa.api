@@ -119,7 +119,7 @@ class JpaObjectStoreImpl implements ObjectStore {
 	
 	@Override
 	public <T extends AbstractEntity> Long count(Class<T> clazz, String hql, Map<String, Object> args) {
-		TypedQuery<Long> query = em.createQuery(hql, Long.class).setFirstResult(0).setMaxResults(1);
+		TypedQuery<Long> query = em.createQuery(hql, Long.class);
 		args.forEach(query::setParameter);
 		return query.getSingleResult();
 	}

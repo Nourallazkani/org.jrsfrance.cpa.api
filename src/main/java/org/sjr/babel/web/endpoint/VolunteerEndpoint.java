@@ -9,11 +9,14 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.sjr.babel.entity.AbstractEntity;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
+import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.Error;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -112,6 +115,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			Volunteer v = _v.get();
 			if (!hasAccess(accessKey, v)) {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			
+			String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress and x.id != :id";
+			Map<String, Object> args = new HashMap<>();
+			args.put("mailAddress", input.mailAddress);
+			args.put("id", id);
+			long n = objectStore.count(Volunteer.class, query, args);
+			if (n > 0) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
 			
 			v.setFirstName(input.firstName);

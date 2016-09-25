@@ -19,6 +19,7 @@ import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Country;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.Error;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -136,6 +137,15 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			Refugee r = _r.get();
 			if (!hasAccess(accessKey, r)) {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			
+			String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress and x.id != :id";
+			Map<String, Object> args = new HashMap<>();
+			args.put("mailAddress", input.mailAddress);
+			args.put("id", id);
+			long n = objectStore.count(Volunteer.class, query, args);
+			if (n > 0) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
 			
 			r.setFirstName(input.firstName);

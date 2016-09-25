@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
 import org.sjr.babel.entity.Administrator;
@@ -44,7 +43,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		public Date birthDate;
 		public Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
 		public String activities;
-
+		
 		public VolunteerSummary() {	}
 		
 		public VolunteerSummary(Volunteer v) {
@@ -82,8 +81,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return v.getAccount().getAccessKey().equals(accessKey);
 		}
 	}
-
-
+	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> getFullVolunteer(@PathVariable int id, @RequestHeader String accessKey) {
@@ -160,7 +158,6 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		}
 	}
 	
-
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.DELETE)
 	@Transactional
 	public ResponseEntity<Void> deleteVolunteer(@PathVariable int id, @RequestHeader String accessKey) {
@@ -176,30 +173,25 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		return ResponseEntity.notFound().build();
 	}
 
-	@RequestMapping(path = "/{id}/meetingRequests", method = RequestMethod.GET)
+	@RequestMapping(path = "/volunteers/{id}/meeting-requests", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestHeader String accsessKey) {
+	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		Volunteer volunteer = v.get();
-		if (!hasAccess(accsessKey, volunteer)) {
+		if (!hasAccess(accessKey, volunteer)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		} else {
 			List<MeetingRequest> meetings = volunteer.getMeetingRequests();
-			return ResponseEntity.ok(meetings);
+			return ResponseEntity.ok(meetings.stream().map(MeetingRequestSummary::new).collect(Collectors.toList()));
 		}
 	}
 	
-	public static class MeetingRequestAcceptationCommand {
-		public boolean accepted;
-	}
-	
-	@RequestMapping(path = "/{id}/meetingRequests/{meetingRequestId}", method = RequestMethod.POST)
+	@RequestMapping(path = "/volunteers/{id}/meeting-requests/{meetingRequestId}", method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed({ "ADMIN", "VOLUNTEER" })
-	public ResponseEntity<?> AcceptMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId, @RequestBody MeetingRequestAcceptationCommand accepted, @RequestHeader String accessKey) {
+	public ResponseEntity<?> AcceptMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId, @RequestHeader String accessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -212,9 +204,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		} else {
 			MeetingRequest meetingRequest = meeting.get();
-			meetingRequest.setAccepted(accepted.accepted);
+			if(meetingRequest.getVolunteer()!=null){
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
 			
+			meetingRequest.setVolunteer(v.get());
+			meetingRequest.setAcceptedDate(new Date());
 			objectStore.save(meetingRequest);
+			
+			System.out.println("send mail to "+meetingRequest.getRefugee().getMailAddress());
 			return ResponseEntity.ok().build();
 		}
 	}

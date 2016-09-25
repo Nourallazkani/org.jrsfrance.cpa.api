@@ -90,10 +90,10 @@ update AbstractLearningProgram a, Organisation o set
     a.googleMapId=o.googleMapId
 where a.organisation_id=o.id;
     
-	
+	/*
 insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(1, 1, true );
 insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(2, 1, false );
-
+*/
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,0,1,2,1, DATE_ADD(now(), interval -1 MONTH));
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (0,1,2,1,2, DATE_ADD(now(), interval -1 MONTH));
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,0,3,3,3, DATE_ADD(now(), interval -1 MONTH));
@@ -135,11 +135,10 @@ insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNum
 insert into Administrator(firstName,lastName,mailAddress,accessKey,role,phoneNumber,password,civility_id) 
 	values('Irinda','riquelme','irinda.r@gmail.com','xyz','ADMIN','07123456','123456789',1);
 
-insert into Refugee (firstName,lastName,birthDate,mailAddress,phoneNumber,accessKey,password)
-values ('Alaric', 'Hermant', NULL, 'r@r.r', NULL, 'R-a871ce00-e7d2-497e-8a4e-d272b8b5b520', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
+insert into Refugee (firstName,lastName, fieldOfStudy_id, birthDate,mailAddress,phoneNumber,accessKey,password)
+values ('Alaric', 'Hermant', 1,  NULL, 'r@r.r', NULL, 'R-a871ce00-e7d2-497e-8a4e-d272b8b5b520', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
 
-insert into Refugee_languageSkills(Refugee_id, language_id,level_id) values(1,1,1);
-insert into Refugee_FieldOfStudy(refugee_id, fieldOfStudy_id) values(1,1);
+insert into Refugee_Language(refugee_id, language_id) values(1,1);
 
 insert into AbstractEvent(audience, subject_defaultText, startDate,organisation_id ,type_id ,DTYPE)
 values ('REFUGEE', 'Comprendre les éléctions présidentielles',DATE_ADD(now(),INTERVAL 15 DAY),2,1,'O-E');

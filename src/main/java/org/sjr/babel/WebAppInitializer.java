@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
@@ -34,7 +35,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 	@Configuration 
 	@EnableWebMvc 
 	@EnableTransactionManagement
-	@EnableAspectJAutoProxy
+	@EnableAsync
 	@ComponentScan
 	public static class RestConfiguration extends WebMvcConfigurerAdapter{
 		
@@ -107,6 +108,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 		
 		DispatcherServlet springServlet = new DispatcherServlet(ctx);
 		Dynamic d = servletContext.addServlet("springServlet", springServlet);
+		d.setAsyncSupported(true);
 		d.addMapping("/");
 		d.setLoadOnStartup(0);		
 	}

@@ -125,15 +125,6 @@ create table AbstractLearningProgram (
 	foreign key (domain_id) references LanguageLearningProgramType(id)
 );
 
-create table AbstractLearningProgram_courses (
-	LearningProgram_id int not null,
-    startDate datetime default now(),
-	endDate datetime default now(),
-    level_id  int not null,
-    translatorRequired bool default false,
-    foreign key (LearningProgram_id) references AbstractLearningProgram (id),
-    foreign key (level_id) references Level (id)
-);
 
 create table Volunteer(
 	id int auto_increment PRIMARY key,
@@ -164,14 +155,6 @@ create table Volunteer(
 	foreign key (civility_id) references Civility (id),
 	foreign key (nationality_id) references Country (id),
 	foreign key (organisation_id) references Organisation (id)
-);
-
-create table Volunteer_availabilities (
-	Volunteer_id int not null,
-	dayOfWeek varchar(9) not null,
-	startTime int not null,
-	endTime int not null,
-	foreign key (Volunteer_id) references Volunteer(id)
 );
 
 
@@ -266,7 +249,8 @@ create table Refugee(
     googleMapId varchar(255) null,
     country_id int,
     
-    firstLanguage_id int,
+    firstLanguage_id int null,
+    fieldOfStudy_id int null,
     civility_id int,
 	nationality_id int,
     foreign key (firstLanguage_id) references Language(id),
@@ -275,30 +259,32 @@ create table Refugee(
 	foreign key (nationality_id) references Country (id)
 );
 
-create table Refugee_FieldOfStudy(
+create table Refugee_Language(
 	refugee_id int not null,
-    fieldOfStudy_id int not null,
-    foreign key (refugee_id) references Refugee(id),
-    foreign key (fieldOfStudy_id) references FieldOfStudy(id)
-);
-create table Refugee_languageSkills(
-	Refugee_id int not null,
     language_id int not null,
-    level_id int not null,
-    foreign key (level_id) references Level(id),
     foreign key (Refugee_id) references Refugee(id),
     foreign key (language_id) references Language(id)
 );
 
-create table MeetingRequests(
+create table MeetingRequest(
 	id int PRIMARY key auto_increment,
-	refugee_id int not null,
-	volunteer_id int not null,
-	startDate date not null,
-	endDate date not null,
+	startDate date null,
+	endDate date null,
     reason varchar(20),
-	subject varchar (500),
-    accepted bool null,
+	additionalInformations varchar (500),
+    postDate datetime not null default now(),
+    acceptedDate datetime null,
+	street1 varchar(255),
+    street2 varchar(255),
+    postalCode varchar(255),
+    locality varchar(255),
+    lat decimal(10, 8) null, 
+    lng DECIMAL(11, 8) null,
+    matchesCount int not null,
+    googleMapId varchar(255) null,
+   	refugee_id int not null,
+   	volunteer_id int null,
+    country_id int,
     foreign key (Refugee_id) references Refugee(id),
     foreign key (Volunteer_id) references Volunteer(id)
 );

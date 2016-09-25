@@ -50,7 +50,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"/organisations", "/libraries"}, method = RequestMethod.GET)
 	@Transactional
-	public List<OrganisationSummary> list(@RequestParam(required=false) String name, @RequestParam(required=false) String city) 
+	public List<OrganisationSummary> list(@RequestParam(required=false) String name, @RequestParam(required=false) Integer categoryId, @RequestParam(required=false) String city) 
 	{
 		StringBuffer query = new StringBuffer("select o from Organisation o join o.category c where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
@@ -65,6 +65,10 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		if(requestedPathEquals("libraries")){
 			query.append("and c.stereotype = :stereotype ");
 			args.put("stereotype", OrganisationCategory.Stereotype.LIBRARY);
+		}
+		else if(categoryId!=null){
+			query.append("and c.id = :categoryId ");
+			args.put("categoryId", categoryId);
 		}
 		
 		List<Organisation> results = objectStore.find(Organisation.class, query.toString(), args);

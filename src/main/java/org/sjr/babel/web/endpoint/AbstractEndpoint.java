@@ -1,16 +1,21 @@
 package org.sjr.babel.web.endpoint;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.sjr.babel.entity.AbstractEntity;
 import org.sjr.babel.entity.Address;
 import org.sjr.babel.entity.Contact;
+import org.sjr.babel.entity.MeetingRequest;
+import org.sjr.babel.entity.MeetingRequest.Reason;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Country;
@@ -26,6 +31,7 @@ import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public abstract class AbstractEndpoint {
 
@@ -79,7 +85,7 @@ public abstract class AbstractEndpoint {
 		return this.objectStore.findOne(Volunteer.class, "select v from Volunteer v where v.account.accessKey=:accessKey", args);
 	}
 	
-	@JsonIgnoreProperties(ignoreUnknown=true /*for formatted_address*/ )
+	@JsonIgnoreProperties("formatted_address")
 	protected static class AddressSummary {
 		public String street1, street2, postalCode, locality;
 		public String country="France";
@@ -130,6 +136,43 @@ public abstract class AbstractEndpoint {
 			c.setName(this.name);
 			c.setPhoneNumber(this.phoneNumber);
 			return c;
+		}
+	}
+	
+	public static class MeetingRequestSummary{
+		public ContactSummary refugee, volunteer;
+		public Reason reason;
+		public String additionalInformations;
+		public Date startDate, endDate;
+		public AddressSummary refugeeLocation;
+		
+		public @JsonInclude(JsonInclude.Include.NON_NULL) String fieldOfStudy;
+		public @JsonInclude(JsonInclude.Include.NON_EMPTY) List<String> languages;
+	
+		public MeetingRequestSummary() {}
+		
+		public MeetingRequestSummary(MeetingRequest entity){
+			this.reason = entity.getReason();
+			this.startDate = entity.getStartDate();
+			this.endDate = entity.getEndDate();
+			this.additionalInformations = entity.getAdditionalInformations();
+			if(Reason.INTERPRETING.equals(this.reason) && entity.getRefugee().getLanguages() != null){
+				this.languages=entity.getRefugee().getLanguages().stream().map(x->x.getName()).collect(Collectors.toList());
+			}
+			if(Reason.SUPPORT_IN_STUDIES.equals(this.reason) && entity.getRefugee().getFieldOfStudy() != null){
+				this.fieldOfStudy = entity.getRefugee().getFieldOfStudy().getName();
+			}
+			this.refugee = new ContactSummary();
+			this.refugee.name = entity.getRefugee().getFullName();
+			this.refugee.mailAddress = entity.getRefugee().getMailAddress();
+			this.refugee.phoneNumber = entity.getRefugee().getPhoneNumber();
+			
+			if(entity.getVolunteer() != null){
+				this.volunteer = new ContactSummary();
+				this.volunteer.name = entity.getVolunteer().getFullName();
+				this.volunteer.mailAddress = entity.getVolunteer().getMailAddress();
+				this.volunteer.phoneNumber = entity.getVolunteer().getPhoneNumber();	
+			}
 		}
 	}
 	

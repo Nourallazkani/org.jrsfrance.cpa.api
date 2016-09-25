@@ -2,9 +2,7 @@ package org.sjr.babel.entity;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,11 +11,11 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.sjr.babel.entity.reference.Civility;
+import org.sjr.babel.entity.reference.Country;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
 
@@ -32,11 +30,14 @@ public class Refugee extends AbstractEntity {
 	@Embedded
 	private Account account;
 
-	@ManyToOne
-	private Language firstLanguage;
-
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Civility civility;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Country nationality;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	private FieldOfStudy fieldOfStudy;
 
 	@Embedded
 	private Address address;
@@ -44,12 +45,10 @@ public class Refugee extends AbstractEntity {
 	@OneToMany(mappedBy = "refugee", fetch = FetchType.LAZY)
 	private List<MeetingRequest> meetingRequests;
 
-	@ElementCollection(fetch = FetchType.LAZY)
-	private List<LanguageSkill> languageSkills;
+	@ManyToMany
+	@JoinTable(name = "Refugee_Language", joinColumns = @JoinColumn(name = "refugee_id"), inverseJoinColumns = @JoinColumn(name = "language_id"))
+	private List<Language> languages;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "fieldOfStudy_id"))
-	private List<FieldOfStudy> fieldsOfStudy;
 
 	public String getFirstName() {
 		return firstName;
@@ -115,28 +114,28 @@ public class Refugee extends AbstractEntity {
 		this.civility = civility;
 	}
 
-	public Language getFirstLanguage() {
-		return firstLanguage;
+	public Country getNationality() {
+		return nationality;
 	}
 
-	public void setFirstLanguage(Language firstLanguage) {
-		this.firstLanguage = firstLanguage;
+	public void setNationality(Country nationality) {
+		this.nationality = nationality;
 	}
 
-	public List<LanguageSkill> getLanguageSkills() {
-		return languageSkills;
+	public FieldOfStudy getFieldOfStudy() {
+		return fieldOfStudy;
 	}
 
-	public void setLanguageSkills(List<LanguageSkill> languageSkills) {
-		this.languageSkills = languageSkills;
+	public void setFieldOfStudy(FieldOfStudy fieldOfStudy) {
+		this.fieldOfStudy = fieldOfStudy;
 	}
 
-	public List<FieldOfStudy> getFieldsOfStudy() {
-		return fieldsOfStudy;
+	public List<Language> getLanguages() {
+		return languages;
 	}
 
-	public void setFieldsOfStudy(List<FieldOfStudy> fieldsOfStudy) {
-		this.fieldsOfStudy = fieldsOfStudy;
+	public void setLanguages(List<Language> languages) {
+		this.languages = languages;
 	}
 
 	public List<MeetingRequest> getMeetingRequests() {
@@ -150,14 +149,4 @@ public class Refugee extends AbstractEntity {
 	public String getFullName() {
 		return this.firstName + " " + this.lastName;
 	}
-
-	@PrePersist
-	public void prePersist() {
-		if (this.account == null) {
-			setAccount(new Account());
-		}
-		getAccount().setAccessKey("R-" + UUID.randomUUID().toString());
-
-	}
-
 }

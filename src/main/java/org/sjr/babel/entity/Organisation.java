@@ -1,8 +1,11 @@
 package org.sjr.babel.entity;
 
+import java.util.Map;
+
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Convert;
+import javax.persistence.Converter;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +14,9 @@ import javax.persistence.ManyToOne;
 import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 import org.sjr.babel.entity.Contact.ContactConverter;
 import org.sjr.babel.entity.reference.OrganisationCategory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Entity // @Table(name="Organisation")
 @Cacheable
@@ -31,6 +37,9 @@ public class Organisation extends AbstractEntity {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private OrganisationCategory category;
+	
+	@Convert(converter=MapConverter.class)
+	private Map<String, String> additionalInformations;
 
 	public String getName() {
 		return name;
@@ -78,5 +87,38 @@ public class Organisation extends AbstractEntity {
 
 	public void setCategory(OrganisationCategory category) {
 		this.category = category;
+	}
+
+	public Map<String, String> getAdditionalInformations() {
+		return additionalInformations;
+	}
+
+	public void setAdditionalInformations(Map<String, String> additionalInformations) {
+		this.additionalInformations = additionalInformations;
+	}
+	
+
+	@Converter
+	public static class MapConverter implements javax.persistence.AttributeConverter<Map<String,String>, String>{
+
+		private static ObjectMapper jackson = new ObjectMapper();
+		@Override
+		public String convertToDatabaseColumn(Map<String, String> attribute) {
+			try {
+				return jackson.writeValueAsString(attribute);
+			} catch (JsonProcessingException e) {
+				return null;
+			}
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public Map<String, String> convertToEntityAttribute(String dbData) {
+			try{
+				return jackson.readValue(dbData, Map.class);
+			}catch(Exception e){
+				return null;
+			}
+		}
 	}
 }

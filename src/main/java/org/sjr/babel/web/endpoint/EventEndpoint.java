@@ -47,8 +47,8 @@ public class EventEndpoint extends AbstractEndpoint {
 		
 		public EventSummary(AbstractEvent event, String language) {
 			this.id = event.getId();
-			this.subject = event.getSubject().getText(language);
-			this.description = event.getDescription().getText(language);
+			this.subject = event.getSubject().getText(language, true);
+			this.description = event.getDescription().getText(language, true);
 			this.audience = event.getAudience().name();
 			this.address = safeTransform(event.getAddress(), x -> new AddressSummary(x));
 			this.startDate = event.getStartDate();
@@ -165,7 +165,8 @@ public class EventEndpoint extends AbstractEndpoint {
 			args.put("d", now);
 		}
 		hql.append("order by e.startDate");
-		return objectStore.find(AbstractEvent.class, hql.toString(), args).stream().map(x->new EventSummary(x, language))
+		return objectStore.find(AbstractEvent.class, hql.toString(), args)
+				.stream().map(x -> new EventSummary(x, language))
 				.collect(Collectors.toList());
 	}
 

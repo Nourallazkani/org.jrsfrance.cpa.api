@@ -47,7 +47,8 @@ create table FieldOfStudy (
 create table OrganisationCategory(
 	id int auto_increment primary key ,
 	name varchar(50),
-	stereotype varchar(25)
+	stereotype varchar(25),
+	additionalInformations varchar(50)
 );
 
 create table Organisation(
@@ -64,6 +65,7 @@ create table Organisation(
     accessKey varchar (255) null,
     contact varchar(512),
     mailAddress varchar(255),
+	additionalInformations varchar(500),
     category_id int not null,
     country_id int null,
     foreign key (country_id) references Country (id),
@@ -115,6 +117,7 @@ create table AbstractLearningProgram (
     level_id int,
     startDate date,
     endDate date,
+    groupSize int,
 	domain_id int,	/* only if DTYPE = P (ProfessionalLearningProgram)  */
 	type_id int,	/* only if DTYPE = L (LanguageLearningProgram) */
 	DTYPE varchar(1) not NULL,
@@ -159,17 +162,17 @@ create table Volunteer(
 
 
 create table Volunteer_Language(
-	volunteer_id int not null,
-    language_id int not null,
-    foreign key (volunteer_id) references Volunteer(id),
-    foreign key (language_id) references Language(id)
+	Volunteer_id int not null,
+    Language_id int not null,
+    foreign key (Volunteer_id) references Volunteer(id),
+    foreign key (Language_id) references Language(id)
 );
 
 create table Volunteer_FieldOfStudy (
-	volunteer_id int not null,
-	fieldOfStudy_id int not null,
-	foreign key (volunteer_id) references Volunteer(id),
-	foreign key (fieldOfStudy_id) references FieldOfStudy(id)
+	Volunteer_id int not null,
+	FieldOfStudy_id int not null,
+	foreign key (Volunteer_id) references Volunteer(id),
+	foreign key (FieldOfStudy_id) references FieldOfStudy(id)
 );
 create table Administrator (
 	id int auto_increment primary key ,
@@ -260,10 +263,10 @@ create table Refugee(
 );
 
 create table Refugee_Language(
-	refugee_id int not null,
-    language_id int not null,
+	Refugee_id int not null,
+    Language_id int not null,
     foreign key (Refugee_id) references Refugee(id),
-    foreign key (language_id) references Language(id)
+    foreign key (Language_id) references Language(id)
 );
 
 create table MeetingRequest(
@@ -280,11 +283,17 @@ create table MeetingRequest(
     locality varchar(255),
     lat decimal(10, 8) null, 
     lng DECIMAL(11, 8) null,
-    matchesCount int not null,
     googleMapId varchar(255) null,
    	refugee_id int not null,
    	volunteer_id int null,
     country_id int,
-    foreign key (Refugee_id) references Refugee(id),
-    foreign key (Volunteer_id) references Volunteer(id)
+    foreign key (refugee_id) references Refugee(id),
+    foreign key (volunteer_id) references Volunteer(id)
 );
+
+create table MeetingRequest_Volunteer(
+	MeetingRequest_id int not null,
+	Volunteer_id int not null,
+	foreign key (MeetingRequest_id) references MeetingRequest(id),
+    foreign key (Volunteer_id) references Volunteer(id)
+)

@@ -64,6 +64,7 @@ class JpaObjectStoreImpl implements ObjectStore {
 	@Override // pour l appelant : Organisation o =
 				// superdao.getById(Organisation.class, 3);
 	public <T extends AbstractEntity> Optional<T> getById(Class<T> clazz, int id) {
+		
 		T entity = em.find(clazz, id);
 		if (entity != null) {
 			return Optional.of(entity);

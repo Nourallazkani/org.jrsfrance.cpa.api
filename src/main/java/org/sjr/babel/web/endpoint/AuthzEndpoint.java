@@ -1,10 +1,8 @@
 package org.sjr.babel.web.endpoint;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import javax.transaction.Transactional;
 
@@ -35,52 +33,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		responseBody.put("id", id);
 		return ResponseEntity.ok(responseBody);
 	}
-	
-	public static class SignUpCommand{
-		public String firstName, lastName;
-		public String profile;
-		public String mailAddress;
-		public String password;
-	}
-	
-	@RequestMapping(path = "authz/signUp", method = RequestMethod.POST)
-	@Transactional
-	public ResponseEntity<?> signUp(@RequestBody SignUpCommand input) throws IOException {
-		if(!"V".equals(input.profile) && !"R".equals(input.profile)){
-			return ResponseEntity.badRequest().build();
-		}
-		
-		String query = "select count(x) from "+(input.profile.equals("V") ? Volunteer.class : Refugee.class)+" x where x.mailAddress = :mailAddress";
-		Map<String, Object> args = new HashMap<>();
-		args.put("mailAddress", input.mailAddress);
-		long n = objectStore.count(Volunteer.class, query, args);
-		if (n > 0) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
-		}
-		
-		Account account = new Account();
-		account.setPassword(EncryptionUtil.sha256(input.password));
-		account.setAccessKey(input.profile + "-" + UUID.randomUUID().toString());
-		
-		if(input.profile.equals("V")){
-			Volunteer volunteer = new Volunteer();
-			volunteer.setFirstName(input.firstName);
-			volunteer.setLastName(input.lastName);
-			volunteer.setMailAddress(input.mailAddress);
-			volunteer.setAccount(account);
-			this.objectStore.save(volunteer);
-			return successSignIn(volunteer.getId(), volunteer.getFullName(), volunteer.getAccount());
-		}
-		else{
-			Refugee refugee = new Refugee();
-			refugee.setFirstName(input.firstName);
-			refugee.setLastName(input.lastName);
-			refugee.setMailAddress(input.mailAddress);
-			refugee.setAccount(account);
-			this.objectStore.save(refugee);
-			return  successSignIn(refugee.getId(), refugee.getFullName(), refugee.getAccount());
-		}
-	}
+
 
 	public static class SignInCommand {
 		public String mailAddress, password, accessKey, realm;
@@ -150,7 +103,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		return ResponseEntity.accepted().build();
 	}
 	
-	@RequestMapping(path = "authz/signIn", method = RequestMethod.POST)
+	@RequestMapping(path = "authentication", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) {
 		

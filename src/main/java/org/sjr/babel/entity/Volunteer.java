@@ -40,11 +40,11 @@ public class Volunteer extends AbstractEntity {
 	private Organisation organisation;
 
 	@ManyToMany
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "fieldOfStudy_id"))
+	@JoinTable(joinColumns=@JoinColumn(name="Volunteer_id"), inverseJoinColumns = @JoinColumn(name = "FieldOfStudy_id"))
 	private List<FieldOfStudy> fieldsOfStudy;
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(inverseJoinColumns = @JoinColumn(name = "language_id"))
+	@JoinTable(joinColumns=@JoinColumn(name="Volunteer_id"), inverseJoinColumns = @JoinColumn(name = "Language_id"))
 	private List<Language> languages;
 
 	@OneToMany(mappedBy = "volunteer")

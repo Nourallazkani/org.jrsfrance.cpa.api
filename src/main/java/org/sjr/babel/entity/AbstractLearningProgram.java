@@ -1,7 +1,6 @@
 package org.sjr.babel.entity;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
@@ -10,11 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
 import org.sjr.babel.entity.Contact.ContactConverter;
 
@@ -24,6 +20,8 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	private String name, link;
 
+	private Integer groupSize;
+	
 	@Temporal(TemporalType.DATE)
 	private Date registrationOpeningDate, registrationClosingDate;
 
@@ -36,15 +34,9 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
 
-	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "cursus")
-	@Transient
-	//@ElementCollection
-	//@OrderBy("startDate")
-	//@JsonInclude(Include.NON_EMPTY)
-	private List<Course> courses;
-
 	@Embedded
 	private Address address;
+
 	@ManyToOne
 	private Level level;
 
@@ -62,6 +54,14 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	public void setLink(String link) {
 		this.link = link;
+	}
+
+	public Integer getGroupSize() {
+		return groupSize;
+	}
+
+	public void setGroupSize(Integer groupSize) {
+		this.groupSize = groupSize;
 	}
 
 	public Date getStartDate() {
@@ -112,14 +112,6 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 		this.contact = contact;
 	}
 
-	public List<Course> getCourses() {
-		return courses;
-	}
-
-	public void setCourses(List<Course> courses) {
-		this.courses = courses;
-	}
-
 	public Address getAddress() {
 		return address;
 	}
@@ -134,14 +126,5 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	public void setLevel(Level level) {
 		this.level = level;
-	}
-
-	@PrePersist
-	@PreUpdate
-	public void afterPropertiesSet() {
-		if (courses != null) {
-			this.startDate = this.courses.get(0).getStartDate();
-			this.endDate = this.courses.get(courses.size() - 1).getEndDate();
-		}
 	}
 }

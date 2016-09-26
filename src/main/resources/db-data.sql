@@ -43,7 +43,6 @@ insert into Country(name , isoCode) values ('Germany' , 'Gr');
 insert into Country(name , isoCode) values ('Iraque' , 'Irq');
 
 
-insert into Language(name) values('Français');
 insert into Language(name) values('Anglais');
 insert into Language(name) values('Arabe');
 insert into Language(name) values('Dari');

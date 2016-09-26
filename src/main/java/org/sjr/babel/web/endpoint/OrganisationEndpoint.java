@@ -37,6 +37,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		public String name, category;
 		public AddressSummary address;
 		public ContactSummary contact;
+		public Map<String, String> additionalInformations;
 
 		public OrganisationSummary(Organisation o) {
 			this.id = o.getId();
@@ -45,6 +46,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			this.category = o.getCategory().getName();
 			this.contact = safeTransform(o.getContact(), ContactSummary::new);
 			this.address = safeTransform(o.getAddress(), x -> new AddressSummary(x));
+			this.additionalInformations = o.getAdditionalInformations();
 		}
 	}
 	
@@ -101,6 +103,14 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		if(!hasAccess(organisation, accessKey)){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
+		
+		if(organisation.getCategory().getAdditionalInformations()!=null && !organisation.getCategory().getAdditionalInformations().isEmpty()){
+			for(String key : organisation.getCategory().getAdditionalInformations()){
+				if(!organisation.getAdditionalInformations().containsKey(key)){
+					organisation.getAdditionalInformations().put(key, null);
+				}
+			}
+		}
 
 		return ResponseEntity.ok(new OrganisationSummary(organisation));
 	}
@@ -124,12 +134,12 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		organisation.setName(input.name);
 		organisation.setAddress(safeTransform(input.address, a -> a.toAddress(this.refDataProvider)));
 		organisation.setContact(safeTransform(input.contact, c -> c.toContact()));
-
+		
 		organisation.setMailAddress(input.mailAddress);
 		if (StringUtils.hasText(input.password)) {
 			organisation.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 		}
-				
+		organisation.setAdditionalInformations(input.additionalInformations);
 		objectStore.save(organisation);
 		return ResponseEntity.noContent().build();
 	}

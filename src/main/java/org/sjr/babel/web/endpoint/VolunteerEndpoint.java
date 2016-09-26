@@ -1,22 +1,22 @@
 package org.sjr.babel.web.endpoint;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import org.sjr.babel.entity.AbstractEntity;
+import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
-import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.Error;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -84,6 +84,56 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		} else {
 			return v.getAccount().getAccessKey().equals(accessKey);
 		}
+	}
+	
+	private ResponseEntity<Map<String, Object>> successSignUp(Volunteer volunteer) {
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("name", volunteer.getFullName());
+		responseBody.put("profile", "V");
+		responseBody.put("accessKey", volunteer.getAccount().getAccessKey());
+		responseBody.put("id", volunteer.getId());
+		return ResponseEntity.ok(responseBody);
+	}
+	
+	@RequestMapping(path = "volunteers", method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> signUp(@RequestBody VolunteerSummary input) throws IOException {
+		
+		String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress";
+		Map<String, Object> args = new HashMap<>();
+		args.put("mailAddress", input.mailAddress);
+		long n = objectStore.count(Volunteer.class, query, args);
+		if (n > 0) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+		}
+		
+		Account account = new Account();
+		account.setPassword(EncryptionUtil.sha256(input.password));
+		account.setAccessKey("V-" + UUID.randomUUID().toString());
+		
+		Volunteer volunteer = new Volunteer();
+		volunteer.setFirstName(input.firstName);
+		volunteer.setLastName(input.lastName);
+		volunteer.setMailAddress(input.mailAddress);
+		volunteer.setAddress(safeTransform(input.address, x -> x.toAddress(refDataProvider)));	
+		
+		volunteer.setPhoneNumber(input.phoneNumber);
+		if(input.fieldsOfStudy!=null){
+			List<FieldOfStudy> fieldsOfStudy = input.fieldsOfStudy.stream()
+					.map(x->this.refDataProvider.resolve(FieldOfStudy.class, x))
+					.collect(Collectors.toList()); 
+			volunteer.setFieldsOfStudy(fieldsOfStudy);
+		}
+		if(input.languages!=null){
+			List<Language> languages = input.languages.stream()
+					.map(x->this.refDataProvider.resolve(Language.class, x))
+					.collect(Collectors.toList()); 
+			volunteer.setLanguages(languages);				
+		}
+		volunteer.setAccount(account);
+		this.objectStore.save(volunteer);
+		
+		return successSignUp(volunteer);
 	}
 	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.GET)

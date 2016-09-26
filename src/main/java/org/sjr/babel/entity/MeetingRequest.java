@@ -1,10 +1,14 @@
 package org.sjr.babel.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -27,8 +31,6 @@ public class MeetingRequest extends AbstractEntity {
 
 	private String additionalInformations;
 
-	private int matchesCount;
-
 	private Address refugeeLocation;
 
 	@ManyToOne
@@ -36,6 +38,10 @@ public class MeetingRequest extends AbstractEntity {
 
 	@ManyToOne
 	private Volunteer volunteer;
+	
+	@ManyToMany()
+	@JoinTable(name="MeetingRequest_Volunteer", joinColumns=@JoinColumn(name="MeetingRequest_id"), inverseJoinColumns=@JoinColumn(name="Volunteer_id"))
+	private List<Volunteer> matches;
 
 	public Date getStartDate() {
 		return startDate;
@@ -85,13 +91,7 @@ public class MeetingRequest extends AbstractEntity {
 		this.additionalInformations = additionalInformations;
 	}
 
-	public int getMatchesCount() {
-		return matchesCount;
-	}
-
-	public void setMatchesCount(int matchesCount) {
-		this.matchesCount = matchesCount;
-	}
+	
 
 	public Address getRefugeeLocation() {
 		return refugeeLocation;
@@ -115,5 +115,13 @@ public class MeetingRequest extends AbstractEntity {
 
 	public void setVolunteer(Volunteer volunteer) {
 		this.volunteer = volunteer;
+	}
+
+	public List<Volunteer> getMatches() {
+		return matches;
+	}
+
+	public void setMatches(List<Volunteer> matches) {
+		this.matches = matches;
 	}
 }

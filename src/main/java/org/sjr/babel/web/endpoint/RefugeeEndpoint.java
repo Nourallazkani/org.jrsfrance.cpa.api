@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,10 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.MeetingRequest.Reason;
@@ -19,7 +22,6 @@ import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Country;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.Error;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -47,6 +49,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		public String mailAddress;
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
 		public String civility, firstName, lastName, phoneNumber;
+		public AddressSummary address;
 		public List<String> languages;
 		public String fieldOfStudy;
 		public Date birthDate;
@@ -60,11 +63,57 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			this.firstName = r.getFirstName();
 			this.lastName = r.getLastName();
 			this.mailAddress = r.getMailAddress();
+			this.address = safeTransform(r.getAddress(), AddressSummary::new);
 			this.birthDate = r.getBirthDate();
 			this.phoneNumber = r.getPhoneNumber();
-			this.fieldOfStudy = r.getFieldOfStudy().getName();
+			this.fieldOfStudy = safeTransform(r.getFieldOfStudy(), x->x.getName());
 			this.languages = r.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 		}
+	}
+	
+	private ResponseEntity<Map<String, Object>> successSignUp(Refugee refugee) {
+		Map<String, Object> responseBody = new HashMap<>();
+		responseBody.put("name", refugee.getFullName());
+		responseBody.put("profile", "R");
+		responseBody.put("accessKey", refugee.getAccount().getAccessKey());
+		responseBody.put("id", refugee.getId());
+		return ResponseEntity.ok(responseBody);
+	}
+	
+	@RequestMapping(method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> signUp(@RequestBody RefugeeSummary input) throws IOException {
+		
+		String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress";
+		Map<String, Object> args = new HashMap<>();
+		args.put("mailAddress", input.mailAddress);
+		long n = objectStore.count(Volunteer.class, query, args);
+		if (n > 0) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+		}
+		
+		Account account = new Account();
+		account.setPassword(EncryptionUtil.sha256(input.password));
+		account.setAccessKey("R" + "-" + UUID.randomUUID().toString());
+		
+		Refugee refugee = new Refugee();
+		refugee.setFirstName(input.firstName);
+		refugee.setLastName(input.lastName);
+		refugee.setMailAddress(input.mailAddress);
+		refugee.setAccount(account);
+		refugee.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+		refugee.setPhoneNumber(input.phoneNumber);
+		refugee.setFieldOfStudy(this.refDataProvider.resolve(FieldOfStudy.class, input.fieldOfStudy));
+		if(input.languages!=null){
+			List<Language> languages = input.languages.stream()
+					.map(x->this.refDataProvider.resolve(Language.class, x))
+					.collect(Collectors.toList()); 
+			refugee.setLanguages(languages);				
+		}			
+			
+		this.objectStore.save(refugee);
+		return  successSignUp(refugee);
+		
 	}
 
 	@RequestMapping(method = RequestMethod.GET)
@@ -152,6 +201,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			r.setLastName(input.lastName);
 			r.setMailAddress(input.mailAddress);
 			r.setPhoneNumber(input.phoneNumber);
+			r.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 			if(StringUtils.hasText(input.password)){
 				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 			}
@@ -242,7 +292,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			matches = new ArrayList<>();
 		}
 		
-		mr.setMatchesCount(matches.size());
+		mr.setMatches(matches);
+
 		this.objectStore.save(mr);
 		for (Volunteer volunteer : matches) {
 			String link = String.format("http://localhost:9000/volunteers/meeting-requests?a=a&id=%s&ak=%s", mr.getId(), volunteer.getAccount().getAccessKey());

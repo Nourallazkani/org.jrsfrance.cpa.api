@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.persistence.Cacheable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 import javax.persistence.metamodel.EntityType;
 import javax.servlet.ServletContext;
@@ -86,6 +87,8 @@ public class WebAppInitializer implements WebApplicationInitializer
 		ctx.addApplicationListener((ApplicationContextEvent event) -> {
 			EntityManagerFactory emf = event.getApplicationContext().getBean(EntityManagerFactory.class);
 			EntityManager em = emf.createEntityManager();
+			EntityTransaction tx = em.getTransaction();
+			tx.begin();
 			Set<EntityType<?>> entities = emf.getMetamodel().getEntities();
 			
 			/*
@@ -102,7 +105,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 				.filter(c -> c.isAnnotationPresent(Cacheable.class) && c.isAnnotationPresent(CacheOnStartup.class))
 				.sorted((c1, c2) -> c1.getAnnotation(CacheOnStartup.class).order() - c2.getAnnotation(CacheOnStartup.class).order())
 				.forEach((x)-> em.createQuery("select o from "+x.getName()+" o").getResultList());
-			
+			tx.commit();
 			em.close();		
 		});
 		

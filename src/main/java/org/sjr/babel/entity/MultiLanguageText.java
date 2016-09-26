@@ -39,19 +39,21 @@ public class MultiLanguageText {
 		this.textAr = textAr;
 	}
 
-	public String getText(String language) {
+	public String getText(String language, boolean fallbackTodefaultText) {
+		String text = null;
 		if("fr".equals(language)){
-			return this.defaultText;
+			text = this.defaultText;
 		}
 		else if("en".equals(language)){
-			return this.textEn;
+			text = this.textEn;
 		}
 		else if("ar".equals(language)){
-			return this.textAr;
+			text = this.textAr;
 		}
 		else if("prs".equals(language)){
-			return this.textPrs;
+			text = this.textPrs;
 		}
-		return this.defaultText;
+		
+		return text != null || fallbackTodefaultText == false ? text : this.defaultText;
 	}
 }

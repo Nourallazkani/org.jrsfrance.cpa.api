@@ -46,7 +46,7 @@ public class Refugee extends AbstractEntity {
 	private List<MeetingRequest> meetingRequests;
 
 	@ManyToMany
-	@JoinTable(name = "Refugee_Language", joinColumns = @JoinColumn(name = "refugee_id"), inverseJoinColumns = @JoinColumn(name = "language_id"))
+	@JoinTable(name = "Refugee_Language", joinColumns = @JoinColumn(name = "Refugee_id"), inverseJoinColumns = @JoinColumn(name = "Language_id"))
 	private List<Language> languages;
 
 

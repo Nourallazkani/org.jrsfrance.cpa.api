@@ -41,8 +41,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 
 	public static class LearningProgramSummary {
 		public Integer id;
-		public String level, organisation;
-		public String link;
+		public String level, organisation, link;
+		public Integer groupSize;
 		public AddressSummary address;
 		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
 		public boolean openForRegistration;
@@ -53,29 +53,30 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		public LearningProgramSummary() {} // for jackson deserialisation
 		
-		public LearningProgramSummary(AbstractLearningProgram lp) {
-			this.id = lp.getId();
-			this.level = lp.getLevel().getName();
-			this.organisation = lp.getOrganisation().getName();
-			this.link = lp.getLink();
-			this.address = safeTransform(lp.getAddress(), x -> new AddressSummary(x));
-			this.registrationOpeningDate = lp.getRegistrationOpeningDate();
-			this.registrationClosingDate = lp.getRegistrationClosingDate();
-			this.startDate = lp.getStartDate();
-			this.endDate = lp.getEndDate();
-			if(lp.getContact()!=null){
-				this.contact = new ContactSummary(lp.getContact());
+		public LearningProgramSummary(AbstractLearningProgram entity) {
+			this.id = entity.getId();
+			this.level = entity.getLevel().getName();
+			this.organisation = entity.getOrganisation().getName();
+			this.link = entity.getLink();
+			this.groupSize = entity.getGroupSize();
+			this.address = safeTransform(entity.getAddress(), x -> new AddressSummary(x));
+			this.registrationOpeningDate = entity.getRegistrationOpeningDate();
+			this.registrationClosingDate = entity.getRegistrationClosingDate();
+			this.startDate = entity.getStartDate();
+			this.endDate = entity.getEndDate();
+			if(entity.getContact()!=null){
+				this.contact = new ContactSummary(entity.getContact());
 			}
-			else if (lp.getOrganisation().getContact() != null) {
-				this.contact = new ContactSummary(lp.getOrganisation().getContact());	
+			else if (entity.getOrganisation().getContact() != null) {
+				this.contact = new ContactSummary(entity.getOrganisation().getContact());	
 			}
 			
-			if (lp instanceof LanguageLearningProgram){
-				LanguageLearningProgram l = (LanguageLearningProgram) lp ;
+			if (entity instanceof LanguageLearningProgram){
+				LanguageLearningProgram l = (LanguageLearningProgram) entity ;
 				this.type = safeTransform(l.getType(), x -> x.getName(), "");
 				
-			}else if ( lp instanceof ProfessionalLearningProgram) {
-				ProfessionalLearningProgram p = (ProfessionalLearningProgram) lp;
+			}else if ( entity instanceof ProfessionalLearningProgram) {
+				ProfessionalLearningProgram p = (ProfessionalLearningProgram) entity;
 				this.domain = safeTransform(p.getDomain(), x -> x.getName(), "");
 			}
 			
@@ -204,30 +205,31 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		}
 		
-		AbstractLearningProgram learningProgram = _learningProgram.get();
-		if (!hasAccess(accessKey, learningProgram)) {
+		AbstractLearningProgram entity = _learningProgram.get();
+		if (!hasAccess(accessKey, entity)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		
-		if(learningProgram instanceof LanguageLearningProgram){
-			((LanguageLearningProgram)learningProgram).setType(this.refDataProvider.resolve(LanguageLearningProgramType.class, input.type));
+		if(entity instanceof LanguageLearningProgram){
+			((LanguageLearningProgram)entity).setType(this.refDataProvider.resolve(LanguageLearningProgramType.class, input.type));
 		}
 		else{
-			((ProfessionalLearningProgram)learningProgram).setDomain(this.refDataProvider.resolve(ProfessionalLearningProgramDomain.class, input.domain));
+			((ProfessionalLearningProgram)entity).setDomain(this.refDataProvider.resolve(ProfessionalLearningProgramDomain.class, input.domain));
 		}
 		
-		learningProgram.setStartDate(input.startDate);
-		learningProgram.setEndDate(input.endDate);
-		learningProgram.setRegistrationOpeningDate(input.registrationOpeningDate);
-		learningProgram.setRegistrationClosingDate(input.registrationClosingDate);
-		learningProgram.setLink(input.link);
+		entity.setStartDate(input.startDate);
+		entity.setEndDate(input.endDate);
+		entity.setGroupSize(input.groupSize);
+		entity.setRegistrationOpeningDate(input.registrationOpeningDate);
+		entity.setRegistrationClosingDate(input.registrationClosingDate);
+		entity.setLink(input.link);
 		
-		learningProgram.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
-		learningProgram.setContact(safeTransform(input.contact, x -> x.toContact()));
+		entity.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+		entity.setContact(safeTransform(input.contact, x -> x.toContact()));
 		
-		learningProgram.setLevel(this.refDataProvider.resolve(Level.class, input.level));
+		entity.setLevel(this.refDataProvider.resolve(Level.class, input.level));
 		
-		objectStore.save(learningProgram);
+		objectStore.save(entity);
 		return ResponseEntity.noContent().build();
 
 	}
@@ -248,33 +250,35 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 		
-		AbstractLearningProgram lp;
+		AbstractLearningProgram entity;
+		
 		if(requestedPathEquals("learnings/language-programs")){
 			LanguageLearningProgram _lp = new LanguageLearningProgram();
 			_lp.setType(this.refDataProvider.resolve(LanguageLearningProgramType.class, input.type));
-			lp = _lp;
+			entity = _lp;
 		}
 		else{
 			ProfessionalLearningProgram _lp = new ProfessionalLearningProgram();
 			_lp.setDomain(this.refDataProvider.resolve(ProfessionalLearningProgramDomain.class, input.domain));
-			lp = _lp;
+			entity = _lp;
 		}
 		
-		lp.setOrganisation(o.get());
-		lp.setStartDate(input.startDate);
-		lp.setEndDate(input.endDate);
-		lp.setRegistrationOpeningDate(input.registrationOpeningDate);
-		lp.setRegistrationClosingDate(input.registrationClosingDate);
-		lp.setLink(input.link);
-		lp.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
-		lp.setContact(safeTransform(input.contact, x -> x.toContact()));
+		entity.setOrganisation(o.get());
+		entity.setStartDate(input.startDate);
+		entity.setEndDate(input.endDate);
+		entity.setGroupSize(input.groupSize);
+		entity.setRegistrationOpeningDate(input.registrationOpeningDate);
+		entity.setRegistrationClosingDate(input.registrationClosingDate);
+		entity.setLink(input.link);
+		entity.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+		entity.setContact(safeTransform(input.contact, x -> x.toContact()));
 		
-		lp.setLevel(this.refDataProvider.resolve(Level.class, input.level));
+		entity.setLevel(this.refDataProvider.resolve(Level.class, input.level));
 		
 		
-		objectStore.save(lp);
-		input.id = lp.getId();
+		objectStore.save(entity);
+		input.id = entity.getId();
 		
-		return ResponseEntity.created(getUri("/language-programs/" + lp.getId())).body(input);
+		return ResponseEntity.created(getUri("/language-programs/" + entity.getId())).body(input);
 	}
 }

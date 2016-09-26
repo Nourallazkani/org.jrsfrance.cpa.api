@@ -108,6 +108,7 @@ public class ReferenceDataHelper {
 			cities.put("professionalLearningProgram", this.objectStore.find(String.class, "select distinct address.locality from ProfessionalLearningProgram"));
 			cities.put("workshop", this.objectStore.find(String.class, "select distinct e.address.locality from AbstractEvent e join e.type t where t.stereotype='WORKSHOP'"));
 			cities.put("event", this.objectStore.find(String.class, "select distinct e.address.locality from AbstractEvent e join e.type t where t.stereotype is null"));
+			cities.put("library", this.objectStore.find(String.class, "select distinct o.address.locality from Organisation o join o.category c on c.stereotype='LIBRARY'"));
 			return cities;
 		});
 	}

@@ -30,7 +30,7 @@ public class MailHelper {
 		VOLUNTEER_SIGN_UP_CONFIRMATION,
 		VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION,
 		VOLUNTEER_RESET_PASSWORD,
-		}
+	}
 	
 	public static class MailMessageTemplate{
 		public String from;

@@ -12,6 +12,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Administrator;
@@ -22,9 +23,11 @@ import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Country;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
+import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -82,7 +85,10 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> signUp(@RequestBody RefugeeSummary input) throws IOException {
+	public ResponseEntity<?> signUp(@RequestBody @Valid RefugeeSummary input, BindingResult binding) throws IOException {
+		if(binding.hasErrors()){
+			return badRequest(binding);
+		}
 		
 		String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress";
 		Map<String, Object> args = new HashMap<>();
@@ -103,7 +109,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		refugee.setAccount(account);
 		refugee.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 		refugee.setPhoneNumber(input.phoneNumber);
-		refugee.setFieldOfStudy(this.refDataProvider.resolve(FieldOfStudy.class, input.fieldOfStudy));
+		refugee.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
 		if(input.languages!=null){
 			List<Language> languages = input.languages.stream()
 					.map(x->this.refDataProvider.resolve(Language.class, x))
@@ -112,6 +118,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}			
 			
 		this.objectStore.save(refugee);
+		
+		this.mailHelper.send(MailType.REFUGEE_SIGN_UP_CONFIRMATION, "fr", refugee.getMailAddress(), refugee.getMailAddress(), input.password);
 		return  successSignUp(refugee);
 		
 	}
@@ -175,7 +183,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> update(@PathVariable int id, @RequestBody RefugeeSummary input, @RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid RefugeeSummary input, BindingResult binding, @RequestHeader String accessKey) {
 		if (input.id != id) {
 			return ResponseEntity.badRequest().build();
 		} else {
@@ -188,7 +196,11 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
 			
-			String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress and x.id != :id";
+			if(binding.hasErrors()){
+				return badRequest(binding);
+			}
+			
+			String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress and x.id != :id";
 			Map<String, Object> args = new HashMap<>();
 			args.put("mailAddress", input.mailAddress);
 			args.put("id", id);
@@ -204,7 +216,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			r.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 			if(StringUtils.hasText(input.password)){
 				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
+				this.mailHelper.send(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, "fr", r.getMailAddress(), r.getMailAddress(), input.password);
 			}
+			
 			r.setNationality(safeTransform(input.nationality, x -> this.refDataProvider.resolve(Country.class, x)));
 			r.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
 			if(input.languages!=null){

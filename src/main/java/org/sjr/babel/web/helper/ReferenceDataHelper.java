@@ -18,6 +18,7 @@ import org.sjr.babel.entity.reference.ProfessionalLearningProgramDomain;
 import org.sjr.babel.persistence.ObjectStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class ReferenceDataHelper {
@@ -45,7 +46,7 @@ public class ReferenceDataHelper {
 
 	@SuppressWarnings("unchecked")
 	public <T extends AbstractReferenceEntity> T resolve(Class<T> clazz, String name){
-		if (name == null){
+		if (!StringUtils.hasText(name)){
 			return null;
 		}
 		List<?> allElements = this.referenceData.get(getRegion(clazz)).get("all");

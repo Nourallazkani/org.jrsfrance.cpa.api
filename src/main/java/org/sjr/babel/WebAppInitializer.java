@@ -16,10 +16,9 @@ import org.sjr.babel.entity.AbstractEntity.CacheOnStartup;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.WebApplicationInitializer;
@@ -29,14 +28,12 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 public class WebAppInitializer implements WebApplicationInitializer
 {
 	@Configuration 
 	@EnableWebMvc 
 	@EnableTransactionManagement
-	@EnableAsync
+	@PropertySource("classpath:conf.properties")
 	@ComponentScan
 	public static class RestConfiguration extends WebMvcConfigurerAdapter{
 		

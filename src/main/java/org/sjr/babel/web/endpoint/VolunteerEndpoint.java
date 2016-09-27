@@ -10,6 +10,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Administrator;
@@ -17,9 +20,12 @@ import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
+import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -38,10 +44,12 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	public static class VolunteerSummary {
 
 		public int id;
-		public String mailAddress;
+		
+		public @NotNull String mailAddress;
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
-		public String civility, firstName, lastName, phoneNumber;
-		public AddressSummary address;
+		public @NotNull @Size(min=1) String firstName, lastName;
+		public @NotNull @Valid AddressSummary address;
+		public String civility, phoneNumber;
 		public List<String> languages , fieldsOfStudy;
 		public Date birthDate;
 		public Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
@@ -97,7 +105,10 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "volunteers", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> signUp(@RequestBody VolunteerSummary input) throws IOException {
+	public ResponseEntity<?> signUp(@RequestBody @Valid VolunteerSummary input, BindingResult binding) throws IOException {
+		if(binding.hasErrors()){
+			return badRequest(binding);
+		}
 		
 		String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress";
 		Map<String, Object> args = new HashMap<>();
@@ -133,6 +144,8 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		volunteer.setAccount(account);
 		this.objectStore.save(volunteer);
 		
+		this.mailHelper.send(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, "fr", volunteer.getMailAddress(), volunteer.getMailAddress(), input.password);
+		
 		return successSignUp(volunteer);
 	}
 	
@@ -152,9 +165,20 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 
 	}
 
+	static class ValidationError{
+		public String field;
+		public String message;
+		
+		public ValidationError(FieldError fieldError) {
+			super();
+			this.field = fieldError.getField();
+			this.message = fieldError.getDefaultMessage();
+		}
+	}
+	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody VolunteerSummary input, @RequestHeader String accessKey) {
+	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, BindingResult binding, @RequestHeader String accessKey) {
 		if (input.id!=id) {
 			return ResponseEntity.badRequest().build();
 		} else {
@@ -165,6 +189,12 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			Volunteer v = _v.get();
 			if (!hasAccess(accessKey, v)) {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			System.out.println(input.firstName);
+			System.out.println(binding.getFieldErrorCount());
+			if(binding.hasErrors()){
+				
+				return badRequest(binding);
 			}
 			
 			String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress and x.id != :id";
@@ -184,6 +214,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			if(StringUtils.hasText(input.password)){
 				v.getAccount().setPassword(EncryptionUtil.sha256(input.password));
+				this.mailHelper.send(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, "fr", v.getMailAddress(), v.getMailAddress(), input.password);
 			}
 			
 			v.setAvailableForConversation(input.availableForConversation);

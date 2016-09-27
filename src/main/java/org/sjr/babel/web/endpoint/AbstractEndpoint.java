@@ -10,6 +10,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 import org.sjr.babel.entity.AbstractEntity;
 import org.sjr.babel.entity.Address;
@@ -20,6 +22,7 @@ import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Country;
 import org.sjr.babel.persistence.ObjectStore;
+import org.sjr.babel.web.helper.MailHelper;
 import org.sjr.babel.web.helper.ReferenceDataHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -40,6 +44,11 @@ public abstract class AbstractEndpoint {
 	
 	@Autowired
 	protected ReferenceDataHelper refDataProvider;
+	
+	@Autowired
+	protected MailHelper mailHelper;
+	
+	protected Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -55,6 +64,18 @@ public abstract class AbstractEndpoint {
 		} else {
 			return ResponseEntity.notFound().build();
 		}
+	}
+	
+	protected ResponseEntity<Map<String, String>> badRequest(BindingResult br){
+		Map<String, String> errors = br.getFieldErrors()
+				.stream()
+				.collect(Collectors.toMap(x -> x.getField(), x -> x.getDefaultMessage()));
+		
+		return badRequest(errors);
+	}
+	
+	protected ResponseEntity<Map<String, String>> badRequest(Map<String, String> errors){
+		return ResponseEntity.badRequest().body(errors);
 	}
 	
 	@Autowired

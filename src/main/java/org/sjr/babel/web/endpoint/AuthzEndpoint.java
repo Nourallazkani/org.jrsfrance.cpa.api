@@ -12,6 +12,9 @@ import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
+import org.sjr.babel.web.helper.MailHelper;
+import org.sjr.babel.web.helper.MailHelper.MailType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -25,6 +28,9 @@ import util.EncryptionUtil;
 @RestController
 public class AuthzEndpoint extends AbstractEndpoint {
 
+	@Autowired
+	private MailHelper mailHelper;
+	
 	private ResponseEntity<Map<String, Object>> successSignIn(int id, String name, Account account) {
 		Map<String, Object> responseBody = new HashMap<>();
 		responseBody.put("name", name);
@@ -36,7 +42,8 @@ public class AuthzEndpoint extends AbstractEndpoint {
 
 
 	public static class SignInCommand {
-		public String mailAddress, password, accessKey, realm;
+		public String mailAddress,password,realm;
+		public String accessKey;
 	}
 
 	
@@ -70,12 +77,16 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "authz/passwordRecovery", method = RequestMethod.POST)
 	public ResponseEntity<?> passwordRecovery(@RequestBody SignInCommand input){
 		if (!StringUtils.hasText(input.realm) || !StringUtils.hasText(input.mailAddress)) {
-			return ResponseEntity.badRequest().build();
+			Map<String, String> errors = new HashMap<>();
+			if(input.mailAddress == null) errors.put("mailAddress", null);
+			if(input.realm == null) errors.put("realm", null);
+			return badRequest(errors);
 		}
 		if(input.realm.equals("R")){
 			Optional<Refugee> _user = tryGetUser(input, Refugee.class);
 			if(_user.isPresent()){
 				Refugee refugee = _user.get();
+				this.mailHelper.send(MailType.REFUGEE_RESET_PASSWORD, "fr", refugee.getMailAddress(), refugee.getAccount().getAccessKey());
 				System.out.println(refugee.getAccount().getAccessKey());
 			}
 		}
@@ -90,7 +101,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Volunteer> _user = tryGetUser(input, Volunteer.class);
 			if(_user.isPresent()){
 				Volunteer volunteer = _user.get();
-				System.out.println(volunteer.getAccount().getAccessKey());
+				this.mailHelper.send(MailType.VOLUNTEER_RESET_PASSWORD, "fr", volunteer.getMailAddress(), volunteer.getAccount().getAccessKey());
 			}
 		}
 		else if(input.realm.equals("A")){
@@ -106,6 +117,13 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "authentication", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) {
+		if(input.accessKey==null && (input.mailAddress==null || input.password==null || input.realm==null)){
+			Map<String, String> errors = new HashMap<>();
+			if(input.mailAddress==null) errors.put("mailAddress", null);
+			if(input.password==null) errors.put("password", null);
+			if(input.realm==null) errors.put("realm", null);
+			return badRequest(errors);
+		}
 		
 		if(input.realm==null && StringUtils.hasText(input.accessKey)){
 			input.realm = input.accessKey.substring(0, 1);

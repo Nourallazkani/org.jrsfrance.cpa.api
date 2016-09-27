@@ -50,12 +50,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 		public PlatformTransactionManager txManager(EntityManagerFactory emf){
 			return new JpaTransactionManager(emf);
 		}
-	
-		@Bean
-		public ObjectMapper jackson (){
-			return new ObjectMapper();
-		}
-		
+
 		@Override
 		public void addCorsMappings(CorsRegistry registry) {
 			registry

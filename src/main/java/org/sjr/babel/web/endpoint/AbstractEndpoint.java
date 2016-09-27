@@ -139,7 +139,7 @@ public abstract class AbstractEndpoint {
 		}
 	}
 	
-	public static class MeetingRequestSummary{
+	protected static class MeetingRequestSummary{
 		public ContactSummary refugee, volunteer;
 		public Reason reason;
 		public String additionalInformations;
@@ -175,6 +175,7 @@ public abstract class AbstractEndpoint {
 			}
 		}
 	}
+	
 	
 	// this function transform something (input) in something else based on a function provided by the caller, but only if the input is not null 
 	protected static <T, U> U safeTransform(T input, Function<T, U> transformer){

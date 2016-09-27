@@ -49,27 +49,27 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		
 		public VolunteerSummary() {	}
 		
-		public VolunteerSummary(Volunteer v) {
-			this.id = v.getId();
+		public VolunteerSummary(Volunteer entity) {
+			this.id = entity.getId();
 			
-			this.civility = safeTransform(v.getCivility(), x -> x.getName());
-			this.firstName = v.getFirstName();
-			this.lastName = v.getLastName();
-			this.birthDate = v.getBirthDate();
-			this.mailAddress = v.getMailAddress();
-			this.phoneNumber = v.getPhoneNumber();
+			this.civility = safeTransform(entity.getCivility(), x -> x.getName());
+			this.firstName = entity.getFirstName();
+			this.lastName = entity.getLastName();
+			this.birthDate = entity.getBirthDate();
+			this.mailAddress = entity.getMailAddress();
+			this.phoneNumber = entity.getPhoneNumber();
 			
-			this.address = safeTransform(v.getAddress(), x -> new AddressSummary(x));
-			this.languages = v.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
-			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
+			this.address = safeTransform(entity.getAddress(), x -> new AddressSummary(x));
+			this.languages = entity.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
+			this.fieldsOfStudy = entity.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
 			
-			this.availableForConversation = v.getAvailableForConversation();
-			this.availableForInterpreting = v.getAvailableForInterpreting();
-			this.languages = v.getLanguages().stream().map(x->x.getName()).collect(Collectors.toList());
-			this.availableForSupportInStudies = v.getAvailableForSupportInStudies();
-			this.fieldsOfStudy = v.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
-			this.availableForActivities = v.getAvailableForActivities();
-			this.activities = v.getActivities();
+			this.availableForConversation = entity.getAvailableForConversation();
+			this.availableForInterpreting = entity.getAvailableForInterpreting();
+			this.languages = entity.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
+			this.availableForSupportInStudies = entity.getAvailableForSupportInStudies();
+			this.fieldsOfStudy = entity.getFieldsOfStudy().stream().map(x -> x.getName()).collect(Collectors.toList());
+			this.availableForActivities = entity.getAvailableForActivities();
+			this.activities = entity.getActivities();
 		}
 
 	}

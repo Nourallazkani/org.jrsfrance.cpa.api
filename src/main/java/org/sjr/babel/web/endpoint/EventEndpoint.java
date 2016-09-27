@@ -40,26 +40,26 @@ public class EventEndpoint extends AbstractEndpoint {
 		public Integer id;
 		public String subject, description, organisedBy,type, audience,link;
 		public AddressSummary address;
-		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
+		public Date startDate, endDate,registrationOpeningDate,registrationClosingDate;
 		public ContactSummary contact;
 
 		public EventSummary() {	} // for jackson deserialisation
 		
-		public EventSummary(AbstractEvent event, String language) {
-			this.id = event.getId();
-			this.subject = event.getSubject().getText(language, true);
-			this.description = event.getDescription().getText(language, true);
-			this.audience = event.getAudience().name();
-			this.address = safeTransform(event.getAddress(), x -> new AddressSummary(x));
-			this.startDate = event.getStartDate();
-			this.endDate = event.getEndDate();
-			this.registrationOpeningDate = event.getRegistrationOpeningDate();
-			this.registrationClosingDate = event.getRegistrationClosingDate();
-			this.type = safeTransform(event.getType(), x -> x.getName());
-			this.link = event.getLink();
-			this.contact = safeTransform(event.getContact(), ContactSummary::new);
-			if (event instanceof VolunteerEvent) {
-				VolunteerEvent e = (VolunteerEvent) event;
+		public EventSummary(AbstractEvent entity, String language) {
+			this.id = entity.getId();
+			this.subject = entity.getSubject().getText(language, true);
+			this.description = entity.getDescription().getText(language, true);
+			this.audience = entity.getAudience().name();
+			this.address = safeTransform(entity.getAddress(), x -> new AddressSummary(x));
+			this.startDate =entity.getStartDate();
+			this.endDate = entity.getEndDate();
+			this.registrationOpeningDate = entity.getRegistrationOpeningDate();
+			this.registrationClosingDate = entity.getRegistrationClosingDate();
+			this.type = safeTransform(entity.getType(), x -> x.getName());
+			this.link = entity.getLink();
+			this.contact = safeTransform(entity.getContact(), ContactSummary::new);
+			if (entity instanceof VolunteerEvent) {
+				VolunteerEvent e = (VolunteerEvent) entity;
 				this.organisedBy = e.getVolunteer().getFullName();
 				if(this.contact == null){
 					Contact c = new Contact();
@@ -68,8 +68,8 @@ public class EventEndpoint extends AbstractEndpoint {
 					c.setPhoneNumber(e.getVolunteer().getPhoneNumber());
 					this.contact = new ContactSummary(c);
 				}
-			} else if (event instanceof OrganisationEvent) {
-				OrganisationEvent e = (OrganisationEvent) event;
+			} else if (entity instanceof OrganisationEvent) {
+				OrganisationEvent e = (OrganisationEvent) entity;
 				this.organisedBy = e.getOrganisation().getName();
 				if(this.contact == null){
 					this.contact = new ContactSummary(e.getOrganisation().getContact());
@@ -238,7 +238,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		}
 
 		event.setStartDate(input.startDate);
-		event.setEndDate(event.getEndDate());
+		event.setEndDate(input.endDate);
 		event.setLink(input.link);
 		event.setRegistrationClosingDate(input.registrationClosingDate);
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
@@ -309,13 +309,11 @@ public class EventEndpoint extends AbstractEndpoint {
 		event.setRegistrationClosingDate(input.registrationClosingDate);
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
 		event.setStartDate(input.startDate);
-		event.setEndDate(event.getEndDate());
-		
+		event.setEndDate(input.endDate);
 		
 		this.objectStore.save(event);
 		input.id = event.getId();
 		URI uri = isWorkshop ? getUri("/workshops/"+event.getId()) : getUri("/events/"+event.getId());
 		return ResponseEntity.created(uri).body(input);
 	}
-
 }

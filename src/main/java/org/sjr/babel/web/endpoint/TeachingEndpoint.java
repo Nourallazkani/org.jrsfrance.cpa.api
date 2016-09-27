@@ -40,18 +40,18 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public TeachingSummary(){
 			
 		}
-		public TeachingSummary(Teaching t) {
-			this.id = t.getId();
-			this.fieldOfStudy = t.getFieldOfStudy().getName();
-			this.languageLevelRequired  = t.getLanguageLevelRequired().getName();
-			this.link = t.getLink();
-			this.organisation = t.getOrganisation().getName();
-			this.contact = safeTransform(t.getContact(), ContactSummary::new);
-			this.address = safeTransform(t.getOrganisation().getAddress(), x -> new AddressSummary(x));
-			this.master = t.getMaster();
-			this.licence = t.getLicence();
-			this.registrationOpeningDate = t.getRegistrationOpeningDate();
-			this.registrationClosingDate = t.getRegistrationClosingDate();
+		public TeachingSummary(Teaching entity) {
+			this.id = entity.getId();
+			this.fieldOfStudy = entity.getFieldOfStudy().getName();
+			this.languageLevelRequired  = entity.getLanguageLevelRequired().getName();
+			this.link = entity.getLink();
+			this.organisation = entity.getOrganisation().getName();
+			this.contact = safeTransform(entity.getContact(), ContactSummary::new);
+			this.address = safeTransform(entity.getOrganisation().getAddress(), x -> new AddressSummary(x));
+			this.master = entity.getMaster();
+			this.licence = entity.getLicence();
+			this.registrationOpeningDate = entity.getRegistrationOpeningDate();
+			this.registrationClosingDate = entity.getRegistrationClosingDate();
 		}
 	}
 	

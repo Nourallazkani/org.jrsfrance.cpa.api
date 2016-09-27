@@ -48,7 +48,7 @@ create table OrganisationCategory(
 	id int auto_increment primary key ,
 	name varchar(50),
 	stereotype varchar(25),
-	additionalInformations varchar(50)
+	additionalInformations varchar(255)
 );
 
 create table Organisation(
@@ -214,10 +214,10 @@ create table AbstractEvent (
 	subject_textAr varchar(255) null,
 	subject_textPrs varchar(255) null,
 	link varchar(255) null,
-	description_defaultText varchar(255) null,
-	description_textEn varchar(255) null,
-	description_textAr varchar(255) null,
-	description_textPrs varchar(255) null,
+	description_defaultText text null,
+	description_textEn text null,
+	description_textAr text null,
+	description_textPrs text null,
     country_id int /*not*/ null,
     type_id int null,
     organisation_id int null,
@@ -228,10 +228,7 @@ create table AbstractEvent (
     foreign key (organisation_id) References Organisation(id),
     foreign key (country_id) References Country(id)
 );
-alter table AbstractEvent modify column description_defaultText varchar(8000);
-alter table AbstractEvent modify column description_defaultText varchar(8000);
-alter table AbstractEvent modify column description_defaultText varchar(8000);
-alter table AbstractEvent modify column description_defaultText varchar(8000);
+
 
 create table Refugee(
 	id int auto_increment primary key,

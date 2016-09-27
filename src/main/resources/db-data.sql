@@ -30,7 +30,7 @@ insert into LanguageLearningProgramType(name) values ('Francais');
 
 
 insert into OrganisationCategory(name, stereotype) values ('université', 'UNIVERSITY');
-insert into OrganisationCategory(name, stereotype) values ('bibliothéque', 'LIBRARY');
+insert into OrganisationCategory(name, stereotype, additionalInformations) values ('bibliothéque', 'LIBRARY', '["Horaires d''ouverture", "Initiation par des bénévomes"]');
 insert into OrganisationCategory(name, stereotype) values ('association', 'NGO');
 
 insert into Civility(name) values ( 'Mme' );
@@ -64,13 +64,14 @@ insert into Organisation(name, street1, postalCode, locality, lat, lng, googleMa
 	values ('Pole emploi', '10 rue Brancion', '75015', 'Paris', 48.8357559, 2.3035182, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 2);
 
 update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e4', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='o@o.o' where id=1;
+update Organisation set additionalInformations='{"Horaires d''ouverture":"Du lundi au vendredi de 9h00 à 19h00"}' where category_id =2;
 
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE_ADD(now(),INTERVAL -60 DAY), 4,1,'L', 1);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE_ADD(now(),INTERVAL -30 DAY), 4,3,'L', 3);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now(), 6,1,'L', 2);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE_ADD(now(),INTERVAL 30 DAY), 6,3,'L', 1);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, domain_id) values(DATE_ADD(now(),INTERVAL 60 DAY), 5,1,'P', 1);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, domain_id) values(DATE_ADD(now(),INTERVAL 90 DAY), 7,3,'P', 2);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE_ADD(DATE(now()),INTERVAL -60 DAY), 4,1,'L', 1);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE_ADD(DATE(now()),INTERVAL -30 DAY), 4,3,'L', 3);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE(now()), 6,1,'L', 2);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(DATE_ADD(DATE(now()),INTERVAL 30 DAY), 6,3,'L', 1);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, domain_id) values(DATE_ADD(DATE(now()),INTERVAL 60 DAY), 5,1,'P', 1);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, domain_id) values(DATE_ADD(DATE(now()),INTERVAL 90 DAY), 7,3,'P', 2);
 
 update AbstractLearningProgram set 
 	link='http://www.jrsfrance.org/',
@@ -93,29 +94,29 @@ where a.organisation_id=o.id;
 insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(1, 1, true );
 insert into AbstractLearningProgram_courses(LearningProgram_id, level_id, translatorRequired) values(2, 1, false );
 */
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,0,1,2,1, DATE_ADD(now(), interval -1 MONTH));
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (0,1,2,1,2, DATE_ADD(now(), interval -1 MONTH));
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,0,3,3,3, DATE_ADD(now(), interval -1 MONTH));
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (0,1,4,2,1, DATE_ADD(now(), interval -1 MONTH));
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (0,1,5,2,2, DATE_ADD(now(), interval -1 MONTH));
-insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,1,6,2,3, DATE_ADD(now(), interval -1 MONTH));
+insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,0,1,2,1, DATE_ADD(DATE(now()), interval -1 MONTH));
+insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (0,1,2,1,2, DATE_ADD(DATE(now()), interval -1 MONTH));
+insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,0,3,3,3, DATE_ADD(DATE(now()), interval -1 MONTH));
+insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (0,1,4,2,1, DATE_ADD(DATE(now()), interval -1 MONTH));
+insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (0,1,5,2,2, DATE_ADD(DATE(now()), interval -1 MONTH));
+insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (1,1,6,2,3, DATE_ADD(DATE(now()), interval -1 MONTH));
 
-update Teaching set registrationClosingDate = DATE_ADD(now(), interval 7 DAY);
+update Teaching set registrationClosingDate = DATE_ADD(DATE(now()), interval 7 DAY);
 update Teaching t, Organisation o set t.contact=o.contact, link = 'http://jrsfrance.org' where t.organisation_id=o.id;
 
 /*
 insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
-	values ('Abiir','ZATAR', date(now()), 'Alaric@gmail.com', '07908756','xyz','123456789','VOLUNTEER', 'bordeaux', 1, 1, 'working for JRS');
+	values ('Abiir','ZATAR', date(DATE(now())), 'Alaric@gmail.com', '07908756','xyz','123456789','VOLUNTEER', 'bordeaux', 1, 1, 'working for JRS');
 insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
-	values ('lucile','BALOU', date(now()), 'lucile@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Toulouse', 1, 1, 'working for JRS');
+	values ('lucile','BALOU', date(DATE(now())), 'lucile@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Toulouse', 1, 1, 'working for JRS');
 insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
-	values ('Nour', 'BADAN', date(now()), 'Nour@gmail.com', '07652436', 'xyz', '123456789', 'VOLUNTEER', 'Lyon', 2, 1, 'working for JRS');
+	values ('Nour', 'BADAN', date(DATE(now())), 'Nour@gmail.com', '07652436', 'xyz', '123456789', 'VOLUNTEER', 'Lyon', 2, 1, 'working for JRS');
 insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
-	values ('jawad', 'DODO', date(now()), 'jawad@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Paris', 2, 1, 'working for JRS');
+	values ('jawad', 'DODO', date(DATE(now())), 'jawad@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'Paris', 2, 1, 'working for JRS');
 insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
-	values ('ABD', 'BADAN', date(now()), 'Nour@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'bordeaux ', 2, 1, 'working for JRS');
+	values ('ABD', 'BADAN', date(DATE(now())), 'Nour@gmail.com', '07765432', 'xyz', '123456789', 'VOLUNTEER', 'bordeaux ', 2, 1, 'working for JRS');
 insert into Volunteer(firstname, lastname, birthdate, mailAddress, phoneNumber, accessKey, password, locality, civility_id, nationality_id, comments)
-	values ('Alaric', 'COUCOU', date(now()), 'Nour@gmail.com', '07908756', 'xyz', '123456789', 'VOLUNTEER', 'Renne', 2, 1, 'working for JRS');
+	values ('Alaric', 'COUCOU', date(DATE(now())), 'Nour@gmail.com', '07908756', 'xyz', '123456789', 'VOLUNTEER', 'Renne', 2, 1, 'working for JRS');
 
 insert into Volunteer_Language(volunteer_id, language_id) values(1,1);
 insert into Volunteer_Language(volunteer_id, language_id) values(1,2);
@@ -140,13 +141,13 @@ values ('Alaric', 'Hermant', 1,  NULL, 'r@r.r', NULL, 'R-a871ce00-e7d2-497e-8a4e
 insert into Refugee_Language(refugee_id, language_id) values(1,1);
 
 insert into AbstractEvent(audience, subject_defaultText, startDate,organisation_id ,type_id ,DTYPE)
-values ('REFUGEE', 'Comprendre les éléctions présidentielles',DATE_ADD(now(),INTERVAL 15 DAY),2,1,'O-E');
+values ('REFUGEE', 'Comprendre les éléctions présidentielles',DATE_ADD(DATE(now()),INTERVAL 15 DAY),2,1,'O-E');
 insert into AbstractEvent(audience, subject_defaultText, startDate,organisation_id ,type_id ,DTYPE)
-values ('REFUGEE', 'Chercher un emploi',DATE_ADD(now(),INTERVAL 30 DAY),4,1,'O-E');
+values ('REFUGEE', 'Chercher un emploi',DATE_ADD(DATE(now()),INTERVAL 30 DAY),4,1,'O-E');
 insert into AbstractEvent(audience, subject_defaultText, startDate,organisation_id ,type_id ,DTYPE)
-values ('REFUGEE', 'Visite du musée du Louvre',DATE_ADD(now(),INTERVAL 45 DAY),5,2,'O-E');
+values ('REFUGEE', 'Visite du musée du Louvre',DATE_ADD(DATE(now()),INTERVAL 45 DAY),5,2,'O-E');
 insert into AbstractEvent(audience, subject_defaultText, startDate,organisation_id ,type_id ,DTYPE)
-values ('VOLUNTEER', 'Initiation FLE', DATE_ADD(now(),INTERVAL 60 DAY),5,2,'O-E');
+values ('VOLUNTEER', 'Initiation FLE', DATE_ADD(DATE(now()),INTERVAL 60 DAY),5,2,'O-E');
 
 update AbstractEvent set
     endDate = date_add(startDate, interval 2 hour),

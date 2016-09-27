@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 @RestController @RequestMapping(path = "learnings")
 public class LearningProgramEndpoint extends AbstractEndpoint {
 
-	public static class LearningProgramSummary {
+	static class LearningProgramSummary {
 		public Integer id;
 		public String level, organisation, link;
 		public Integer groupSize;
@@ -51,9 +51,9 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		@JsonInclude(value=Include.NON_NULL)
 		public String domain, type;
 		
-		public LearningProgramSummary() {} // for jackson deserialisation
+		LearningProgramSummary() {} // for jackson deserialisation
 		
-		public LearningProgramSummary(AbstractLearningProgram entity) {
+		LearningProgramSummary(AbstractLearningProgram entity) {
 			this.id = entity.getId();
 			this.level = entity.getLevel().getName();
 			this.organisation = entity.getOrganisation().getName();
@@ -104,6 +104,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			@RequestParam(required=false) Integer organisationId,
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
+			@RequestParam(defaultValue="false") boolean includeClosedEvents,
 			@RequestParam(required=false) Boolean openForRegistration
 		) { 
 		
@@ -145,6 +146,10 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		if(!includeFutureEvents){
 			query.append("and c.startDate <= :d ");
+			args.put("d", now);
+		}
+		if(!includeClosedEvents){
+			query.append("and c.registrationClosingDate >= :d ");
 			args.put("d", now);
 		}
 		if(!includePastEvents){

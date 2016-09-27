@@ -42,7 +42,7 @@ import util.EncryptionUtil;
 @RequestMapping(path = "/refugees")
 public class RefugeeEndpoint extends AbstractEndpoint {
 
-	public static class RefugeeSummary {
+	static class RefugeeSummary {
 
 		public int id;
 		public String nationality;
@@ -54,20 +54,20 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		public String fieldOfStudy;
 		public Date birthDate;
 		
-		public RefugeeSummary() {}
+		RefugeeSummary() {}
 		
-		public RefugeeSummary(Refugee r) {
-			this.id = r.getId();
-			this.civility = safeTransform(r.getCivility(), x -> x.getName());
-			this.nationality = safeTransform(r.getNationality(), x -> x.getName());
-			this.firstName = r.getFirstName();
-			this.lastName = r.getLastName();
-			this.mailAddress = r.getMailAddress();
-			this.address = safeTransform(r.getAddress(), AddressSummary::new);
-			this.birthDate = r.getBirthDate();
-			this.phoneNumber = r.getPhoneNumber();
-			this.fieldOfStudy = safeTransform(r.getFieldOfStudy(), x->x.getName());
-			this.languages = r.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
+		RefugeeSummary(Refugee entity) {
+			this.id = entity.getId();
+			this.civility = safeTransform(entity.getCivility(), x -> x.getName());
+			this.nationality = safeTransform(entity.getNationality(), x -> x.getName());
+			this.firstName = entity.getFirstName();
+			this.lastName = entity.getLastName();
+			this.mailAddress = entity.getMailAddress();
+			this.address = safeTransform(entity.getAddress(), AddressSummary::new);
+			this.birthDate = entity.getBirthDate();
+			this.phoneNumber = entity.getPhoneNumber();
+			this.fieldOfStudy = safeTransform(entity.getFieldOfStudy(), x->x.getName());
+			this.languages = entity.getLanguages().stream().map(x -> x.getName()).collect(Collectors.toList());
 		}
 	}
 	

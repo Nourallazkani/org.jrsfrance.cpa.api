@@ -30,7 +30,7 @@ import util.EncryptionUtil;
 @RestController
 public class OrganisationEndpoint extends AbstractEndpoint {
 
-	class OrganisationSummary {
+	static class OrganisationSummary {
 		public Integer id;
 		public String mailAddress;
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
@@ -38,31 +38,30 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		public AddressSummary address;
 		public ContactSummary contact;
 		public Map<String, String> additionalInformations;
-
-		public OrganisationSummary(Organisation o) {
-			this.id = o.getId();
-			this.name = o.getName();
-			this.mailAddress = o.getMailAddress();
-			this.category = o.getCategory().getName();
-			this.contact = safeTransform(o.getContact(), ContactSummary::new);
-			this.address = safeTransform(o.getAddress(), x -> new AddressSummary(x));
-			this.additionalInformations = o.getAdditionalInformations();
+		
+		OrganisationSummary() {}
+		
+		OrganisationSummary(Organisation entity) {
+			this.id = entity.getId();
+			this.name = entity.getName();
+			this.mailAddress = entity.getMailAddress();
+			this.category = entity.getCategory().getName();
+			this.contact = safeTransform(entity.getContact(), ContactSummary::new);
+			this.address = safeTransform(entity.getAddress(), x -> new AddressSummary(x));
+			this.additionalInformations = entity.getAdditionalInformations();
 		}
 	}
 	
 	@RequestMapping(path = {"/organisations", "/libraries"}, method = RequestMethod.GET)
 	@Transactional
-	public List<OrganisationSummary> list(@RequestParam(required=false) String name, @RequestParam(required=false) Integer categoryId, @RequestParam(required=false) String city) 
+	public List<OrganisationSummary> list(@RequestParam(required=false) Integer categoryId, @RequestParam(required=false) String city) 
 	{
 		StringBuffer query = new StringBuffer("select o from Organisation o join o.category c where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
-		if(StringUtils.hasText(name)){
-			query.append("and o.name like :name ");
-			args.put("name", name);	
-		}
+
 		if(StringUtils.hasText(city)){
-			query.append("and o.address.city like :city ");
-			args.put("city", name);	
+			query.append("and o.address.locality like :locality ");
+			args.put("locality", city);	
 		}
 		if(requestedPathEquals("libraries")){
 			query.append("and c.stereotype = :stereotype ");
@@ -105,7 +104,11 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		}
 		
 		if(organisation.getCategory().getAdditionalInformations()!=null && !organisation.getCategory().getAdditionalInformations().isEmpty()){
+			if(organisation.getAdditionalInformations()==null){
+				organisation.setAdditionalInformations(new HashMap<>());
+			}
 			for(String key : organisation.getCategory().getAdditionalInformations()){
+				
 				if(!organisation.getAdditionalInformations().containsKey(key)){
 					organisation.getAdditionalInformations().put(key, null);
 				}

@@ -106,6 +106,9 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "volunteers", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signUp(@RequestBody @Valid VolunteerSummary input, BindingResult binding) throws IOException {
+		if(!StringUtils.hasText(input.password)){
+			binding.addError(new FieldError("input", "password", "password cannot be null"));
+		}
 		if(binding.hasErrors()){
 			return badRequest(binding);
 		}

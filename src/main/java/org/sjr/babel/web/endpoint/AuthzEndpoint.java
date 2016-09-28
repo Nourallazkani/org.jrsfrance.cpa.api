@@ -119,9 +119,9 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) {
 		if(input.accessKey==null && (input.mailAddress==null || input.password==null || input.realm==null)){
 			Map<String, String> errors = new HashMap<>();
-			if(input.mailAddress==null) errors.put("mailAddress", null);
-			if(input.password==null) errors.put("password", null);
-			if(input.realm==null) errors.put("realm", null);
+			if(!StringUtils.hasText(input.mailAddress)) errors.put("mailAddress", "_");
+			if(!StringUtils.hasText(input.password)) errors.put("password", "_");
+			if(!StringUtils.hasText(input.realm)) errors.put("realm", "_");
 			return badRequest(errors);
 		}
 		

@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -86,6 +87,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signUp(@RequestBody @Valid RefugeeSummary input, BindingResult binding) throws IOException {
+		if(!StringUtils.hasText(input.password)){
+			binding.addError(new FieldError("input", "password", "password cannot be null"));
+		}
 		if(binding.hasErrors()){
 			return badRequest(binding);
 		}

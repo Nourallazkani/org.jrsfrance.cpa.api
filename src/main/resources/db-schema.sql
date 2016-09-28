@@ -268,8 +268,7 @@ create table Refugee_Language(
 
 create table MeetingRequest(
 	id int PRIMARY key auto_increment,
-	startDate date null,
-	endDate date null,
+	dateConstraint varchar(255) null,
     reason varchar(20),
 	additionalInformations varchar (500),
     postDate datetime not null default now(),

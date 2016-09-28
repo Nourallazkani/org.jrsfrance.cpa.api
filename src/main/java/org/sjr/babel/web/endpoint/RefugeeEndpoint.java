@@ -274,7 +274,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}/meeting-requests", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> createMeetingRequest(@PathVariable int id, @RequestBody MeetingRequestSummary input, @RequestHeader String accessKey) {
+	public ResponseEntity<?> createMeetingRequest(@PathVariable int id, @Valid @RequestBody MeetingRequestSummary input, BindingResult binding, @RequestHeader String accessKey) {
 
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		Refugee refugee = r.get();
@@ -283,13 +283,14 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		} else if (!hasAccess(accessKey, refugee)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		
+		if(binding.hasErrors()){
+			return badRequest(binding);
+		}
 		MeetingRequest mr = new MeetingRequest();
 		mr.setRefugeeLocation(input.refugeeLocation.toAddress(refDataProvider));
 		mr.setPostDate(new Date());
 		mr.setRefugee(refugee);
-		mr.setStartDate(input.startDate);
-		mr.setEndDate(input.endDate);
+		mr.setDateConstraint(input.dateConstraint);
 		mr.setReason(input.reason);
 		mr.setAdditionalInformations(input.additionalInformations);
 		

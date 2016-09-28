@@ -20,8 +20,7 @@ public class MeetingRequest extends AbstractEntity {
 		SUPPORT_IN_STUDIES, INTERPRETING, CONVERSATION
 	}
 
-	@Temporal(TemporalType.DATE)
-	private Date startDate, endDate;
+	private String dateConstraint;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date postDate, acceptedDate;
@@ -43,20 +42,14 @@ public class MeetingRequest extends AbstractEntity {
 	@JoinTable(name="MeetingRequest_Volunteer", joinColumns=@JoinColumn(name="MeetingRequest_id"), inverseJoinColumns=@JoinColumn(name="Volunteer_id"))
 	private List<Volunteer> matches;
 
-	public Date getStartDate() {
-		return startDate;
+	
+
+	public String getDateConstraint() {
+		return dateConstraint;
 	}
 
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
-
-	public Date getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
+	public void setDateConstraint(String dateConstraint) {
+		this.dateConstraint = dateConstraint;
 	}
 
 	public Date getPostDate() {

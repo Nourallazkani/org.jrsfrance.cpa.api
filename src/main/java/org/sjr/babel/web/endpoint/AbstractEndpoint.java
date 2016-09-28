@@ -1,7 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,8 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.sjr.babel.entity.AbstractEntity;
 import org.sjr.babel.entity.Address;
@@ -108,7 +109,9 @@ public abstract class AbstractEndpoint {
 	
 	@JsonIgnoreProperties("formatted_address")
 	protected static class AddressSummary {
-		public String street1, street2, postalCode, locality;
+		public String street1, street2;
+		@NotNull @Size(min = 1)
+		public String postalCode, locality;
 		public String country="France";
 		public Double lat,lng; 
 		
@@ -161,10 +164,14 @@ public abstract class AbstractEndpoint {
 	}
 	
 	protected static class MeetingRequestSummary{
-		public ContactSummary refugee, volunteer;
+		
+		public ContactSummary refugee; 
+		public ContactSummary volunteer;
+		@NotNull
 		public Reason reason;
 		public String additionalInformations;
-		public Date startDate, endDate;
+		public String dateConstraint;
+		@NotNull
 		public AddressSummary refugeeLocation;
 		
 		public @JsonInclude(JsonInclude.Include.NON_NULL) String fieldOfStudy;
@@ -174,8 +181,7 @@ public abstract class AbstractEndpoint {
 		
 		public MeetingRequestSummary(MeetingRequest entity){
 			this.reason = entity.getReason();
-			this.startDate = entity.getStartDate();
-			this.endDate = entity.getEndDate();
+			this.dateConstraint = entity.getDateConstraint();
 			this.additionalInformations = entity.getAdditionalInformations();
 			if(Reason.INTERPRETING.equals(this.reason) && entity.getRefugee().getLanguages() != null){
 				this.languages=entity.getRefugee().getLanguages().stream().map(x->x.getName()).collect(Collectors.toList());

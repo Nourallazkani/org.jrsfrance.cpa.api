@@ -8,6 +8,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Level;
@@ -16,6 +19,7 @@ import org.sjr.babel.entity.Teaching;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,10 +34,15 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	public static class TeachingSummary {
 		public Integer id;
-		public String organisation, fieldOfStudy, languageLevelRequired, link;
+		public String organisation;
+		@NotNull @Size(min = 1)
+		public String fieldOfStudy, languageLevelRequired;
+		public String link;
 		public AddressSummary address;
+		@NotNull @Valid
 		public ContactSummary contact;
 		public Boolean master,licence;
+		@NotNull
 		public Date registrationOpeningDate,registrationClosingDate;
 		// public List<Link> links;
 
@@ -141,7 +150,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<Void> update(@PathVariable int id, @RequestBody TeachingSummary input, @RequestHeader("accessKey") String accessKey) {
+	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid TeachingSummary input, BindingResult binding, @RequestHeader("accessKey") String accessKey) {
 		if (input.id ==null || !input.id.equals((id))) {
 			return ResponseEntity.badRequest().build();
 		} else {
@@ -154,6 +163,17 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			
 			if(!hasAccess(accessKey, teaching)){
 				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			}
+
+			Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+			
+			if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+				errors.put("registrationOpeningDate", "_");
+				errors.put("registrationClosingDate", "_");
+			}
+			
+			if(!errors.isEmpty()){
+				return badRequest(errors);
 			}
 			
 			teaching.setContact(safeTransform(input.contact, x -> x.toContact()));
@@ -175,7 +195,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping( method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> create(@RequestBody TeachingSummary input, @RequestHeader("accessKey") String accessKey) {
+	public ResponseEntity<?> create(@RequestBody @Valid TeachingSummary input, BindingResult binding, @RequestHeader("accessKey") String accessKey) {
 		if (input.id != null) {
 			return ResponseEntity.badRequest().build();
 		}
@@ -184,6 +204,17 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		if(!o.isPresent()){
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}		
+
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+			errors.put("registrationOpeningDate", "_");
+			errors.put("registrationClosingDate", "_");
+		}
+		
+		if(!errors.isEmpty()){
+			return badRequest(errors);
+		}
 		
 		//objectStore.save(t);
 		Teaching teaching = new Teaching();

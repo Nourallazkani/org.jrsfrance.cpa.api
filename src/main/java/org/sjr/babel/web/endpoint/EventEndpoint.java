@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.sjr.babel.entity.AbstractEvent;
 import org.sjr.babel.entity.AbstractEvent.Audience;
@@ -24,6 +27,7 @@ import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.EventType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -38,9 +42,14 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	public static class EventSummary {
 		public Integer id;
-		public String subject, description, organisedBy,type, audience,link;
+		@NotNull @Size(min = 1)
+		public String subject, description, audience;
+		public String organisedBy, type, link;
+		@NotNull @Valid
 		public AddressSummary address;
+		@NotNull
 		public Date startDate, endDate,registrationOpeningDate,registrationClosingDate;
+		@NotNull @Valid
 		public ContactSummary contact;
 
 		public EventSummary() {	} // for jackson deserialisation
@@ -199,7 +208,7 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"events/{id}", "workshops/{id}"}, method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> update(@RequestBody EventSummary input,  @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@RequestBody @Valid EventSummary input, BindingResult binding,  @PathVariable int id, @RequestHeader String accessKey) {
 		if (input.id == null || !input.id.equals(id)) {
 			return ResponseEntity.badRequest().build();
 		}
@@ -212,6 +221,20 @@ public class EventEndpoint extends AbstractEndpoint {
 		if(!hasAccess(accessKey, event))
 		{
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		
+		if(input.startDate !=null && input.endDate!=null && input.endDate.before(input.startDate)){
+			errors.put("startDate", "_");
+			errors.put("endDate", "_");
+		}
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+			errors.put("registrationOpeningDate", "_");
+			errors.put("registrationClosingDate", "_");
+		}
+		if(!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		
 		event.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
@@ -249,10 +272,11 @@ public class EventEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"events", "workshops"}, method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> save(@RequestBody EventSummary input, @RequestHeader String accessKey, HttpServletRequest req){
+	public ResponseEntity<?> save(@RequestBody @Valid EventSummary input, BindingResult binding, @RequestHeader String accessKey, HttpServletRequest req){
 		if (input.id != null) {
 			return ResponseEntity.badRequest().build();
 		}
+		
 		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 		boolean isWorkshop = path.contains("workshop");
 		
@@ -277,6 +301,20 @@ public class EventEndpoint extends AbstractEndpoint {
 		}
 		else{
 			return ResponseEntity.badRequest().build();
+		}
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		
+		if(input.startDate !=null && input.endDate!=null && input.endDate.before(input.startDate)){
+			errors.put("startDate", "_");
+			errors.put("endDate", "_");
+		}
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+			errors.put("registrationOpeningDate", "_");
+			errors.put("registrationClosingDate", "_");
+		}
+		if(!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		
 		event.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));

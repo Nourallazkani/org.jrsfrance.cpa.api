@@ -106,11 +106,16 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "volunteers", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signUp(@RequestBody @Valid VolunteerSummary input, BindingResult binding) throws IOException {
+		
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		
 		if(!StringUtils.hasText(input.password)){
-			binding.addError(new FieldError("input", "password", "password cannot be null"));
+			errors.put("password", "password cannot be null");
 		}
-		if(binding.hasErrors()){
-			return badRequest(binding);
+		
+		if(!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		
 		String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress";
@@ -193,11 +198,11 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			if (!hasAccess(accessKey, v)) {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
-			System.out.println(input.firstName);
-			System.out.println(binding.getFieldErrorCount());
-			if(binding.hasErrors()){
-				
-				return badRequest(binding);
+
+			Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+			
+			if(!errors.isEmpty()){
+				return badRequest(errors);
 			}
 			
 			String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress and x.id != :id";

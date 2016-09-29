@@ -7,13 +7,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+import org.hibernate.validator.constraints.Email;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.reference.OrganisationCategory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,10 +37,13 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 
 	static class OrganisationSummary {
 		public Integer id;
-		public String mailAddress;
+		@NotNull @Size(min = 1)
+		public String name, mailAddress;
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
-		public String name, category;
+		public String category;
+		@NotNull @Valid
 		public AddressSummary address;
+		@NotNull @Valid
 		public ContactSummary contact;
 		public Map<String, String> additionalInformations;
 		
@@ -120,7 +128,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "organisations/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateOrg(@RequestBody OrganisationSummary input, @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> updateOrg(@RequestBody @Valid OrganisationSummary input, BindingResult binding,  @PathVariable int id, @RequestHeader String accessKey) {
 		if (input.id == null || !input.id.equals(id)) {
 			return ResponseEntity.badRequest().build();
 		}
@@ -132,6 +140,11 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		
 		if(!hasAccess(organisation, accessKey)){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		if (!errors.isEmpty()) {
+			return badRequest(errors);
 		}
 		
 		organisation.setName(input.name);

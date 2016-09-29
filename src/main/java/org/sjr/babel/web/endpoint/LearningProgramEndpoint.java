@@ -10,6 +10,9 @@ import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.sjr.babel.entity.AbstractLearningProgram;
 import org.sjr.babel.entity.Administrator;
@@ -22,6 +25,7 @@ import org.sjr.babel.entity.reference.ProfessionalLearningProgramDomain;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,12 +45,18 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 
 	static class LearningProgramSummary {
 		public Integer id;
-		public String level, organisation, link;
+		@NotNull @Size(min = 1)
+		public String level;
+		public String organisation, link;
 		public Integer groupSize;
+		@NotNull @Valid
 		public AddressSummary address;
+		@NotNull
 		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
 		public boolean openForRegistration;
+		@NotNull @Valid
 		public ContactSummary contact;
+		
 		
 		@JsonInclude(value=Include.NON_NULL)
 		public String domain, type;
@@ -196,13 +206,10 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> learningProgram(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @PathVariable int id, @RequestHeader String accessKey) {
 
 		if (input.id == null || !input.id.equals(id)) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
-		}
-		if (input.endDate.before(input.startDate)) {
-			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
 		}
 		
 		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);
@@ -213,6 +220,26 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		AbstractLearningProgram entity = _learningProgram.get();
 		if (!hasAccess(accessKey, entity)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		
+		if(input.startDate !=null && input.endDate!=null && input.endDate.before(input.startDate)){
+			errors.put("startDate", "_");
+			errors.put("endDate", "_");
+		}
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+			errors.put("registrationOpeningDate", "_");
+			errors.put("registrationClosingDate", "_");
+		}
+		if(requestedPathEquals("learnings/language-programs") && !StringUtils.hasText(input.type)){
+			errors.put("type", "_");
+		}
+		if(requestedPathEquals("learnings/professional-programs") && !StringUtils.hasText(input.domain)){
+			errors.put("domain", "_");
+		}		
+		if(!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		
 		if(entity instanceof LanguageLearningProgram){
@@ -242,17 +269,34 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@CrossOrigin
 	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> learningProgram(@RequestBody LearningProgramSummary input, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
+	public ResponseEntity<?> learningProgram(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
 		if(input.id!=null){
 			return ResponseEntity.badRequest().build();
-		}
-		if (input.endDate.before(input.startDate)) {
-			return ResponseEntity.badRequest().body(Error.INVALID_DATE_RANGE);
 		}
 		
 		Optional<Organisation> o = getOrganisationByAccessKey(accessKey);
 		if(!o.isPresent()){
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		
+		if(input.startDate !=null && input.endDate!=null && input.endDate.before(input.startDate)){
+			errors.put("startDate", "_");
+			errors.put("endDate", "_");
+		}
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+			errors.put("registrationOpeningDate", "_");
+			errors.put("registrationClosingDate", "_");
+		}
+		if(requestedPathEquals("learnings/language-programs") && !StringUtils.hasText(input.type)){
+			errors.put("type", "_");
+		}
+		if(requestedPathEquals("learnings/professional-programs") && !StringUtils.hasText(input.domain)){
+			errors.put("domain", "_");
+		}		
+		if(!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		
 		AbstractLearningProgram entity;

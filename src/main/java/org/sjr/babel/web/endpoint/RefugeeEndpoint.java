@@ -90,8 +90,10 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		if(!StringUtils.hasText(input.password)){
 			binding.addError(new FieldError("input", "password", "password cannot be null"));
 		}
-		if(binding.hasErrors()){
-			return badRequest(binding);
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		if(!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		
 		String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress";
@@ -200,8 +202,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
 			
-			if(binding.hasErrors()){
-				return badRequest(binding);
+			Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+			if(!errors.isEmpty()){
+				return badRequest(errors);
 			}
 			
 			String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress and x.id != :id";
@@ -283,8 +286,10 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		} else if (!hasAccess(accessKey, refugee)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		if(binding.hasErrors()){
-			return badRequest(binding);
+		
+		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		if(!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		MeetingRequest mr = new MeetingRequest();
 		mr.setRefugeeLocation(input.refugeeLocation.toAddress(refDataProvider));

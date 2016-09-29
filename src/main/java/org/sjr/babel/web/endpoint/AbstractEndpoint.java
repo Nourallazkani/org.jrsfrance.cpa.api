@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -67,16 +67,12 @@ public abstract class AbstractEndpoint {
 		}
 	}
 	
-	protected ResponseEntity<Map<String, String>> badRequest(BindingResult br){
-		Map<String, String> errors = br.getFieldErrors()
-				.stream()
-				.collect(Collectors.toMap(x -> x.getField(), x -> x.getDefaultMessage()));
-		
-		return badRequest(errors);
+	protected ResponseEntity<?> badRequest(Map<String, String> errors){
+		return errors==null || errors.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.badRequest().body(errors);
 	}
 	
-	protected ResponseEntity<Map<String, String>> badRequest(Map<String, String> errors){
-		return ResponseEntity.badRequest().body(errors);
+	protected Map<String, String> errorsAsMap(List<FieldError> errors){
+		return errors.stream().collect(Collectors.toMap(x -> x.getField(), x -> x.getDefaultMessage()));
 	}
 	
 	@Autowired
@@ -144,7 +140,9 @@ public abstract class AbstractEndpoint {
 	}
 	
 	protected static class ContactSummary{ // same as contact for the time being, may differ later.
-		public String name, mailAddress, phoneNumber;
+		@NotNull @Size(min = 1)
+		public String name, mailAddress;
+		public String phoneNumber;
 
 		public ContactSummary(){}
 		

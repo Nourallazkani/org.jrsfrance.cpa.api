@@ -2,6 +2,7 @@ package org.sjr.babel.entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -47,8 +48,12 @@ public class Volunteer extends AbstractEntity {
 	@JoinTable(joinColumns=@JoinColumn(name="Volunteer_id"), inverseJoinColumns = @JoinColumn(name = "Language_id"))
 	private List<Language> languages;
 
+	@ManyToMany()
+	@JoinTable(name="MeetingRequest_Volunteer", joinColumns=@JoinColumn(name="Volunteer_id"), inverseJoinColumns=@JoinColumn(name="MeetingRequest_id"))
+	private Set<MeetingRequest> meetingRequests;
+	
 	@OneToMany(mappedBy = "volunteer")
-	private List<MeetingRequest> meetingRequests;
+	private Set<MeetingRequest> acceptedMeetingRequests;
 
 	public String getFirstName() {
 		return firstName;
@@ -178,15 +183,23 @@ public class Volunteer extends AbstractEntity {
 		this.languages = languages;
 	}
 
-	public List<MeetingRequest> getMeetingRequests() {
+	public Set<MeetingRequest> getMeetingRequests() {
 		return meetingRequests;
 	}
 
-	public void setMeetingRequests(List<MeetingRequest> meetingRequests) {
+	public void setMeetingRequests(Set<MeetingRequest> meetingRequests) {
 		this.meetingRequests = meetingRequests;
 	}
 
+	public Set<MeetingRequest> getAcceptedMeetingRequests() {
+		return acceptedMeetingRequests;
+	}
+
+	public void setAcceptedMeetingRequests(Set<MeetingRequest> acceptedMeetingRequests) {
+		this.acceptedMeetingRequests = acceptedMeetingRequests;
+	}
+	
 	public String getFullName() {
-		return String.format("%s %s", this.firstName, this.lastName);
+		return this.firstName + " " + this.lastName;
 	}
 }

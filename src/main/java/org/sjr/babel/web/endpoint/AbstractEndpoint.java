@@ -1,6 +1,7 @@
 package org.sjr.babel.web.endpoint;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,6 +164,7 @@ public abstract class AbstractEndpoint {
 	
 	protected static class MeetingRequestSummary{
 		
+		public Integer id;
 		public ContactSummary refugee; 
 		public ContactSummary volunteer;
 		@NotNull
@@ -174,10 +176,13 @@ public abstract class AbstractEndpoint {
 		
 		public @JsonInclude(JsonInclude.Include.NON_NULL) String fieldOfStudy;
 		public @JsonInclude(JsonInclude.Include.NON_EMPTY) List<String> languages;
+		
+		public Date postDate,acceptedDate;
 	
 		public MeetingRequestSummary() {}
 		
 		public MeetingRequestSummary(MeetingRequest entity){
+			this.id = entity.getId(); 
 			this.reason = entity.getReason();
 			this.dateConstraint = entity.getDateConstraint();
 			this.additionalInformations = entity.getAdditionalInformations();
@@ -189,6 +194,7 @@ public abstract class AbstractEndpoint {
 			}
 			this.refugee = new ContactSummary();
 			this.refugee.name = entity.getRefugee().getFullName();
+			this.refugeeLocation = safeTransform(entity.getRefugeeLocation(), x -> new AddressSummary(x));
 			this.refugee.mailAddress = entity.getRefugee().getMailAddress();
 			this.refugee.phoneNumber = entity.getRefugee().getPhoneNumber();
 			
@@ -198,6 +204,8 @@ public abstract class AbstractEndpoint {
 				this.volunteer.mailAddress = entity.getVolunteer().getMailAddress();
 				this.volunteer.phoneNumber = entity.getVolunteer().getPhoneNumber();	
 			}
+			this.postDate = entity.getPostDate();
+			this.acceptedDate = entity.getAcceptedDate();
 		}
 	}
 	

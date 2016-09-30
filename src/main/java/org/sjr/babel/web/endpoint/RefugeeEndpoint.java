@@ -2,12 +2,13 @@ package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -301,7 +302,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		
 		Map<String, Object> args = new HashMap<>();
 		args.put("available", true);
-		List<Volunteer> matches = new ArrayList<>();
+		Set<Volunteer> matches = new HashSet<>();
 		if (Reason.INTERPRETING.equals(input.reason)) {
 			String query = "select v from Volunteer v join v.languages l where v.availableForInterpreting = :available and l in :languages";
 			args.put("languages", refugee.getLanguages());
@@ -313,7 +314,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			matches.addAll(this.objectStore.find(Volunteer.class, query, args));
 		}
 		else{
-			matches = new ArrayList<>();
+			matches = new HashSet<>();
 		}
 		
 		mr.setMatches(matches);

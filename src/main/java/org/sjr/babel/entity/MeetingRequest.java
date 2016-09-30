@@ -1,7 +1,7 @@
 package org.sjr.babel.entity;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -40,9 +40,7 @@ public class MeetingRequest extends AbstractEntity {
 	
 	@ManyToMany()
 	@JoinTable(name="MeetingRequest_Volunteer", joinColumns=@JoinColumn(name="MeetingRequest_id"), inverseJoinColumns=@JoinColumn(name="Volunteer_id"))
-	private List<Volunteer> matches;
-
-	
+	private Set<Volunteer> matches;
 
 	public String getDateConstraint() {
 		return dateConstraint;
@@ -110,11 +108,11 @@ public class MeetingRequest extends AbstractEntity {
 		this.volunteer = volunteer;
 	}
 
-	public List<Volunteer> getMatches() {
+	public Set<Volunteer> getMatches() {
 		return matches;
 	}
 
-	public void setMatches(List<Volunteer> matches) {
+	public void setMatches(Set<Volunteer> matches) {
 		this.matches = matches;
 	}
 }

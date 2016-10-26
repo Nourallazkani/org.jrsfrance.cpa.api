@@ -39,8 +39,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 		
 		@Bean
 		public EntityManagerFactory emf(){
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory("abcd");
-			return emf;
+			return Persistence.createEntityManagerFactory("abcd");
 		}
 		
 		@Bean

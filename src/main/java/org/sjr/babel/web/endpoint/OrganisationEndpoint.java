@@ -17,7 +17,6 @@ import org.sjr.babel.entity.reference.OrganisationCategory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -127,9 +126,9 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "organisations/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateOrg(@RequestBody @Valid OrganisationSummary input, BindingResult binding,  @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> updateOrg(@RequestBody @Valid OrganisationSummary input, @PathVariable int id, @RequestHeader String accessKey) {
 		if (input.id == null || !input.id.equals(id)) {
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		}
 		Optional<Organisation> _organisation = this.objectStore.getById(Organisation.class, id);
 		if(!_organisation.isPresent()){
@@ -139,11 +138,6 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		
 		if(!hasAccess(organisation, accessKey)){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-		}
-		
-		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
-		if (!errors.isEmpty()) {
-			return badRequest(errors);
 		}
 		
 		organisation.setName(input.name);

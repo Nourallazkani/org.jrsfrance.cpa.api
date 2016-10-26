@@ -209,7 +209,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> learningProgram(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @PathVariable int id, @RequestHeader String accessKey) {
 
 		if (input.id == null || !input.id.equals(id)) {
-			return ResponseEntity.badRequest().body("Id is not correct!");
+			return badRequest("Id is not correct!");
 		}
 		
 		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);

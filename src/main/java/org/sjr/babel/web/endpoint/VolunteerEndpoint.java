@@ -1,7 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -18,18 +17,15 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.engine.transaction.jta.platform.internal.BorlandEnterpriseServerJtaPlatform;
 import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
+import org.sjr.babel.entity.MeetingRequest.Reason;
 import org.sjr.babel.entity.Message;
 import org.sjr.babel.entity.Message.Direction;
-import org.sjr.babel.entity.Refugee;
-import org.sjr.babel.entity.MeetingRequest.Reason;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.FieldOfStudy;
 import org.sjr.babel.entity.reference.Language;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.MessageSummary;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -197,7 +193,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, BindingResult binding, @RequestHeader String accessKey) {
+	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, /*BindingResult binding, */@RequestHeader String accessKey) {
 		if (input.id!=id) {
 			return ResponseEntity.badRequest().build();
 		} else {
@@ -210,12 +206,6 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
 
-			Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
-			
-			if(!errors.isEmpty()){
-				return badRequest(errors);
-			}
-			
 			String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress and x.id != :id";
 			Map<String, Object> args = new HashMap<>();
 			args.put("mailAddress", input.mailAddress);
@@ -320,7 +310,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (_v.isPresent()) {
 			Volunteer v = _v.get();
 			if (!hasAccess(accessKey, v)) {
-				return ResponseEntity.badRequest().build();
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
 			this.objectStore.delete(v);
 			return ResponseEntity.noContent().build();
@@ -442,9 +432,9 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (!_mr.isPresent()){
 			return ResponseEntity.notFound().build();
 		}
-		Map<String, String> errorsMap = errorsAsMap(br.getFieldErrors());
-		if (!errorsMap.isEmpty()){
-			return badRequest(errorsMap);
+		Map<String, String> errors = errorsAsMap(br.getFieldErrors());
+		if (!errors.isEmpty()){
+			return badRequest(errors);
 		}
 		MeetingRequest mr = _mr.get();
 		Message m = new Message();

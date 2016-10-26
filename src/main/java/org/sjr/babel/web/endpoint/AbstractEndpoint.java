@@ -32,9 +32,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -70,12 +73,24 @@ public abstract class AbstractEndpoint {
 		}
 	}
 	
-	protected ResponseEntity<?> badRequest(Map<String, String> errors){
-		return errors==null || errors.isEmpty() ? ResponseEntity.badRequest().build() : ResponseEntity.badRequest().body(errors);
+	protected ResponseEntity<?> badRequest(){
+		return badRequest(null);
 	}
 	
-	protected Map<String, String> errorsAsMap(List<FieldError> errors){
-		return errors.stream().collect(Collectors.toMap(x -> x.getField(), x -> x.getDefaultMessage()));
+	protected ResponseEntity<?> badRequest(Object body){
+		return ResponseEntity.badRequest().body(body);
+	}
+	
+	protected ResponseEntity<?> notFound(){
+		return ResponseEntity.notFound().build();
+	}
+	
+	protected ResponseEntity<?> forbidden(){
+		return forbidden(null);
+	}
+	
+	protected ResponseEntity<?> forbidden(Object body){
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
 	}
 	
 	@Autowired
@@ -255,6 +270,18 @@ public abstract class AbstractEndpoint {
 			this.defaultMessage = defaultMessage;
 		}
 	}
+	
+	protected Map<String, String> errorsAsMap(List<FieldError> errors){
+		return errors.stream().collect(Collectors.toMap(x -> x.getField(), x -> x.getCode()));
+	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class)
+	public ResponseEntity<Map<String, String>> validationErrorsHandler(MethodArgumentNotValidException ex){
+		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+		Map<String, String> errorsMap = errorsAsMap(fieldErrors);
+		return ResponseEntity.badRequest().body(errorsMap);
+	}
+	
 	
 	
 	public static class LocalizableObjectSummary<T>{

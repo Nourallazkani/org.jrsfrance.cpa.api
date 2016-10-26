@@ -1,0 +1,29 @@
+<configuration>
+
+	<appender name="ConsoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- encoders are assigned the type ch.qos.logback.classic.encoder.PatternLayoutEncoder 
+			by default -->
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="org.hibernate.SQL" additivity="true">
+        <level value="debug" />
+    </logger>
+
+
+    <logger name="org.springframework.orm.jpa.JpaTransactionManager" additivity="true">
+        <level value="debug" />
+    </logger>
+
+
+    <logger name="org.sjr.babel" additivity="true">
+        <level value="debug" /><!-- config spécifique pour les messages émis depuis une méthode d'une classe du package org.sjr.babel -->
+    </logger>
+
+	<root level="warn"><!-- configuration par défaut -->
+		<appender-ref ref="ConsoleAppender" />
+	</root>
+</configuration>

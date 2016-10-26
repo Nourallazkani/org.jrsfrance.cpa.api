@@ -302,4 +302,4 @@ create table MeetingRequest_messages (
 		readDate datetime,
 		foreign key (volunteer_id) references Volunteer(id),
 		foreign key (MeetingRequest_id) references MeetingRequest(id)
-	);
+);

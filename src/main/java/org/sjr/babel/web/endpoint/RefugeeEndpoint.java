@@ -30,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -89,13 +88,14 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	@RequestMapping(method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signUp(@RequestBody @Valid RefugeeSummary input, BindingResult binding) throws IOException {
-		if(!StringUtils.hasText(input.password)){
-			binding.addError(new FieldError("input", "password", "password cannot be null"));
-		}
+
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
+		if(!StringUtils.hasText(input.password)){
+			errors.put("password",  "NotNull");
+		}
 		if(!errors.isEmpty()){
-			return badRequest(errors);
+			return ResponseEntity.badRequest().body(errors);
 		}
 		
 		String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress";
@@ -191,7 +191,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid RefugeeSummary input, BindingResult binding, @RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid RefugeeSummary input, @RequestHeader String accessKey) {
 		if (input.id != id) {
 			return ResponseEntity.badRequest().build();
 		} else {
@@ -202,11 +202,6 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			Refugee r = _r.get();
 			if (!hasAccess(accessKey, r)) {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-			}
-			
-			Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
-			if(!errors.isEmpty()){
-				return badRequest(errors);
 			}
 			
 			String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress and x.id != :id";
@@ -279,20 +274,17 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}/meeting-requests", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> createMeetingRequest(@PathVariable int id, @Valid @RequestBody MeetingRequestSummary input, BindingResult binding, @RequestHeader String accessKey) {
+	public ResponseEntity<?> createMeetingRequest(@PathVariable int id, @Valid @RequestBody MeetingRequestSummary input, @RequestHeader String accessKey) {
 
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		Refugee refugee = r.get();
 		if (!r.isPresent()) {
-			return ResponseEntity.badRequest().build();
+			return ResponseEntity.notFound().build();
 		} else if (!hasAccess(accessKey, refugee)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		
-		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
-		if(!errors.isEmpty()){
-			return badRequest(errors);
-		}
+
 		MeetingRequest mr = new MeetingRequest();
 		mr.setRefugeeLocation(input.refugeeLocation.toAddress(refDataProvider));
 		mr.setPostDate(new Date());

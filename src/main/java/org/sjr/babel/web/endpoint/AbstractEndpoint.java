@@ -20,6 +20,8 @@ import org.sjr.babel.entity.Address;
 import org.sjr.babel.entity.Contact;
 import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.MeetingRequest.Reason;
+import org.sjr.babel.entity.Message;
+import org.sjr.babel.entity.Message.Direction;
 import org.sjr.babel.entity.Organisation;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Country;
@@ -162,6 +164,27 @@ public abstract class AbstractEndpoint {
 		}
 	}
 	
+	protected static class MessageSummary {
+		public String txt ;
+		public Date   postDate ;
+		public String from,to;
+		
+		public MessageSummary(){}
+		
+		public MessageSummary(MeetingRequest mr,Message msg){
+			this.txt = msg.getText();
+			this.postDate = msg.getPostedDate();
+			if (Direction.VOLUNTEER_TO_REFUGEE.equals(msg.getDirection())){
+				this.from =  msg.getVolunteer().getFullName();
+				this.to	= mr.getRefugee().getFullName();
+			}
+			else if (Direction.REFUGEE_TO_VOLUNTEER.equals(msg.getDirection())) {
+				this.from	=  mr.getRefugee().getFullName();
+				this.to 	=  msg.getVolunteer().getFullName();
+			}
+		}	
+	}
+	
 	protected static class MeetingRequestSummary{
 		
 		public Integer id;
@@ -243,4 +266,5 @@ public abstract class AbstractEndpoint {
 			this.distanceFromOrigin = distanceFromOrigin;
 		}
 	}
+
 }

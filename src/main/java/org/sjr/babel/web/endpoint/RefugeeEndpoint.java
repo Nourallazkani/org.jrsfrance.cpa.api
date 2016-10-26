@@ -19,6 +19,7 @@ import org.sjr.babel.entity.Account;
 import org.sjr.babel.entity.Administrator;
 import org.sjr.babel.entity.MeetingRequest;
 import org.sjr.babel.entity.MeetingRequest.Reason;
+import org.sjr.babel.entity.Message;
 import org.sjr.babel.entity.Refugee;
 import org.sjr.babel.entity.Volunteer;
 import org.sjr.babel.entity.reference.Country;
@@ -344,5 +345,25 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			this.objectStore.delete(mr);
 			return ResponseEntity.noContent().build();
 		}
+	}
+	
+	@RequestMapping (path="/{rId}/metting-requests/{mId}/messages", method = RequestMethod.GET)
+	@Transactional
+	public ResponseEntity<?> getMessages (@PathVariable int rId, @PathVariable int mId, @RequestHeader String accessKey){
+		Optional<Refugee> _r = objectStore.getById(Refugee.class, rId);
+		if (!_r.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		Refugee r = _r.get();
+		if (!hasAccess(accessKey, r)){
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		Optional<MeetingRequest> _mr = r.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findAny();
+		if (!_mr.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		MeetingRequest mr = _mr.get();
+		List<Message> msgs = mr.getMessages();
+		return ResponseEntity.ok(msgs.stream().map(x -> new MessageSummary(mr,x)).collect(Collectors.toList()));
 	}
 }

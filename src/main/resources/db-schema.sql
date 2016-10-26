@@ -293,3 +293,13 @@ create table MeetingRequest_Volunteer(
 	foreign key (MeetingRequest_id) references MeetingRequest(id),
     foreign key (Volunteer_id) references Volunteer(id)
 )
+
+create table MeetingRequest_messages (
+		MeetingRequest_id int not null,
+        volunteer_id int,
+		text varchar(500),
+		postedDate datetime NOT NULL DEFAULT NOW(),
+		readDate datetime,
+		foreign key (volunteer_id) references Volunteer(id),
+		foreign key (MeetingRequest_id) references MeetingRequest(id)
+	);

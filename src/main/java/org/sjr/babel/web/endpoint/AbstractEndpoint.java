@@ -43,6 +43,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 public abstract class AbstractEndpoint {
 
@@ -73,23 +75,32 @@ public abstract class AbstractEndpoint {
 		}
 	}
 	
-	protected ResponseEntity<?> badRequest(){
+
+	protected <T> ResponseEntity<T> created(URI newResourceUri, T newResource){
+		if (newResourceUri==null) {
+			return ResponseEntity.status(HttpStatus.CREATED).body(newResource);
+		}else {
+			return ResponseEntity.created(newResourceUri).body(newResource);
+		} 
+	}
+	
+	protected ResponseEntity<Void> badRequest(){
 		return badRequest(null);
 	}
 	
-	protected ResponseEntity<?> badRequest(Object body){
+	protected <T> ResponseEntity<T> badRequest(T body){
 		return ResponseEntity.badRequest().body(body);
 	}
 	
-	protected ResponseEntity<?> notFound(){
+	protected ResponseEntity<Void> notFound(){
 		return ResponseEntity.notFound().build();
 	}
 	
-	protected ResponseEntity<?> forbidden(){
+	protected ResponseEntity<Void> forbidden(){
 		return forbidden(null);
 	}
 	
-	protected ResponseEntity<?> forbidden(Object body){
+	protected <T> ResponseEntity<T> forbidden(T body){
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
 	}
 	
@@ -180,24 +191,27 @@ public abstract class AbstractEndpoint {
 	}
 	
 	protected static class MessageSummary {
-		public String txt ;
-		public Date   postDate ;
-		public String from,to;
-		
+		@NotNull @Size(min = 1)
+		public String text ;
+		@JsonProperty(access = Access.READ_ONLY)
+		public Date postDate;
+		@JsonProperty(access = Access.READ_ONLY)
+		public String from;
+		public String to;
+
 		public MessageSummary(){}
 		
-		public MessageSummary(MeetingRequest mr,Message msg){
-			this.txt = msg.getText();
+		public MessageSummary(MeetingRequest mr, Message msg) {
+			this.text = msg.getText();
 			this.postDate = msg.getPostedDate();
-			if (Direction.VOLUNTEER_TO_REFUGEE.equals(msg.getDirection())){
-				this.from =  msg.getVolunteer().getFullName();
-				this.to	= mr.getRefugee().getFullName();
+			if (Direction.VOLUNTEER_TO_REFUGEE.equals(msg.getDirection())) {
+				this.from = msg.getVolunteer().getFullName();
+				this.to = mr.getRefugee().getFullName();
+			} else if (Direction.REFUGEE_TO_VOLUNTEER.equals(msg.getDirection())) {
+				this.from = mr.getRefugee().getFullName();
+				this.to = msg.getVolunteer().getFullName();
 			}
-			else if (Direction.REFUGEE_TO_VOLUNTEER.equals(msg.getDirection())) {
-				this.from	=  mr.getRefugee().getFullName();
-				this.to 	=  msg.getVolunteer().getFullName();
-			}
-		}	
+		}
 	}
 	
 	protected static class MeetingRequestSummary{

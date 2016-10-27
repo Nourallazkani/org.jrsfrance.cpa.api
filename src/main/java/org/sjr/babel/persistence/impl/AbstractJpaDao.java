@@ -4,7 +4,8 @@ package org.sjr.babel.persistence.impl;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import org.sjr.babel.entity.AbstractEntity;
+
+import org.sjr.babel.model.entity.AbstractEntity;
 
 
 public abstract class AbstractJpaDao<T extends AbstractEntity> {

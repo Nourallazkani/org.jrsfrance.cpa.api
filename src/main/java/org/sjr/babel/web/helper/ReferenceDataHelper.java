@@ -7,14 +7,14 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.sjr.babel.entity.AbstractReferenceEntity;
-import org.sjr.babel.entity.Level;
-import org.sjr.babel.entity.reference.Country;
-import org.sjr.babel.entity.reference.EventType;
-import org.sjr.babel.entity.reference.FieldOfStudy;
-import org.sjr.babel.entity.reference.Language;
-import org.sjr.babel.entity.reference.LanguageLearningProgramType;
-import org.sjr.babel.entity.reference.ProfessionalLearningProgramDomain;
+import org.sjr.babel.model.entity.reference.AbstractReferenceEntity;
+import org.sjr.babel.model.entity.reference.Country;
+import org.sjr.babel.model.entity.reference.EventType;
+import org.sjr.babel.model.entity.reference.FieldOfStudy;
+import org.sjr.babel.model.entity.reference.Language;
+import org.sjr.babel.model.entity.reference.LanguageLearningProgramType;
+import org.sjr.babel.model.entity.reference.Level;
+import org.sjr.babel.model.entity.reference.ProfessionalLearningProgramDomain;
 import org.sjr.babel.persistence.ObjectStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

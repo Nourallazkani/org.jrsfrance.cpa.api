@@ -9,7 +9,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.TypedQuery;
 
-import org.sjr.babel.entity.AbstractEntity;
+import org.sjr.babel.model.entity.AbstractEntity;
 import org.sjr.babel.persistence.ObjectStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

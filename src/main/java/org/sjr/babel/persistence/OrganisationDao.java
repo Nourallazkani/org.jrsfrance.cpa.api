@@ -2,7 +2,7 @@ package org.sjr.babel.persistence;
 
 import java.util.List;
 
-import org.sjr.babel.entity.Organisation;
+import org.sjr.babel.model.entity.Organisation;
 
 public interface OrganisationDao {
 	

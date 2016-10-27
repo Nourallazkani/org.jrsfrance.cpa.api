@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.sjr.babel.entity.AbstractEntity;
+import org.sjr.babel.model.entity.AbstractEntity;
 
 public interface ObjectStore {
 

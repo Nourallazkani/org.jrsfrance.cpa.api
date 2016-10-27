@@ -2,7 +2,7 @@ package org.sjr.babel.persistence;
 
 import java.util.List;
 
-import org.sjr.babel.entity.AbstractLearningProgram;
+import org.sjr.babel.model.entity.AbstractLearningProgram;
 
 public interface CursusDao {
 	

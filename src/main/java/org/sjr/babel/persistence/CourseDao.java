@@ -2,7 +2,7 @@ package org.sjr.babel.persistence;
 
 import java.util.List;
 
-import org.sjr.babel.entity.Course;
+import org.sjr.babel.model.entity.Course;
 
 public interface CourseDao {
 	

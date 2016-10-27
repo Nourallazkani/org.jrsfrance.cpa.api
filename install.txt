@@ -1,0 +1,2 @@
+installation PostgreSQL 9.5 sur Linux : 
+https://www.howtoforge.com/tutorial/how-to-install-postgresql-95-on-ubuntu-12_04-15_10/

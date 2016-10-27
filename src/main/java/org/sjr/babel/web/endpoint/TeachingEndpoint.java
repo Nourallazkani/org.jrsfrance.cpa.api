@@ -12,11 +12,11 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.sjr.babel.entity.Administrator;
-import org.sjr.babel.entity.Level;
-import org.sjr.babel.entity.Organisation;
-import org.sjr.babel.entity.Teaching;
-import org.sjr.babel.entity.reference.FieldOfStudy;
+import org.sjr.babel.model.entity.Administrator;
+import org.sjr.babel.model.entity.Organisation;
+import org.sjr.babel.model.entity.Teaching;
+import org.sjr.babel.model.entity.reference.FieldOfStudy;
+import org.sjr.babel.model.entity.reference.Level;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

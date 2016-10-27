@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
-import org.sjr.babel.entity.AbstractEntity;
-import org.sjr.babel.entity.Account;
-import org.sjr.babel.entity.Administrator;
-import org.sjr.babel.entity.Organisation;
-import org.sjr.babel.entity.Refugee;
-import org.sjr.babel.entity.Volunteer;
+import org.sjr.babel.model.component.Account;
+import org.sjr.babel.model.entity.AbstractEntity;
+import org.sjr.babel.model.entity.Administrator;
+import org.sjr.babel.model.entity.Organisation;
+import org.sjr.babel.model.entity.Refugee;
+import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.web.helper.MailHelper;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 
 	
 	public boolean successfulSignIn(SignInCommand command, Account userAccount){
-		if(command==null || (command.password==null && command.accessKey==null) || userAccount==null){
+		if (command == null || (command.password == null && command.accessKey == null) || userAccount == null) {
 			return false;
 		}
 		else if(StringUtils.hasText(command.password)){
@@ -63,7 +63,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	}
 	
 	private <T extends AbstractEntity> Optional<T> tryGetUser(SignInCommand input, Class<T> clazz){
-		if(input.realm==null && StringUtils.hasText(input.accessKey)){
+		if (input.realm == null && StringUtils.hasText(input.accessKey)) {
 			input.realm = input.accessKey.substring(0, 1);
 		}
 		Map<String, Object> args = new HashMap<>();
@@ -117,7 +117,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "authentication", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) {
-		if(input.accessKey==null && (input.mailAddress==null || input.password==null || input.realm==null)){
+		if (input.accessKey == null && (input.mailAddress == null || input.password == null || input.realm == null)) {
 			Map<String, String> errors = new HashMap<>();
 			if(!StringUtils.hasText(input.mailAddress)) errors.put("mailAddress", "_");
 			if(!StringUtils.hasText(input.password)) errors.put("password", "_");
@@ -125,7 +125,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			return badRequest(errors);
 		}
 		
-		if(input.realm==null && StringUtils.hasText(input.accessKey)){
+		if (input.realm == null && StringUtils.hasText(input.accessKey)) {
 			input.realm = input.accessKey.substring(0, 1);
 		}
 

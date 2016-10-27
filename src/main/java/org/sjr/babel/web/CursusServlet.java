@@ -8,7 +8,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 
 import org.sjr.babel.WebAppInitializer;
-import org.sjr.babel.entity.AbstractLearningProgram;
+import org.sjr.babel.model.entity.AbstractLearningProgram;
 import org.sjr.babel.persistence.ObjectStore;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

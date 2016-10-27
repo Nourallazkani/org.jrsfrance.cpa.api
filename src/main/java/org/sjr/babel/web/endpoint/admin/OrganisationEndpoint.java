@@ -8,8 +8,8 @@ import java.util.UUID;
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 
-import org.sjr.babel.entity.Account;
-import org.sjr.babel.entity.Organisation;
+import org.sjr.babel.model.component.Account;
+import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.web.endpoint.AbstractEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

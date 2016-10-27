@@ -11,9 +11,9 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.sjr.babel.entity.Administrator;
-import org.sjr.babel.entity.Organisation;
-import org.sjr.babel.entity.reference.OrganisationCategory;
+import org.sjr.babel.model.entity.Administrator;
+import org.sjr.babel.model.entity.Organisation;
+import org.sjr.babel.model.entity.reference.OrganisationCategory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;

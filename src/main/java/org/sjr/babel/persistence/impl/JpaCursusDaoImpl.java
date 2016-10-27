@@ -2,7 +2,8 @@ package org.sjr.babel.persistence.impl;
 
 import java.util.List;
 import javax.persistence.TypedQuery;
-import org.sjr.babel.entity.AbstractLearningProgram;
+
+import org.sjr.babel.model.entity.AbstractLearningProgram;
 import org.sjr.babel.persistence.CursusDao;
 import org.springframework.stereotype.Repository;
 

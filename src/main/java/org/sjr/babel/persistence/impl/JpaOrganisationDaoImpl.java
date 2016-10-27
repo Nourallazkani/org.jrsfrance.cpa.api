@@ -3,7 +3,7 @@ package org.sjr.babel.persistence.impl;
 import java.util.List;
 import javax.persistence.TypedQuery;
 
-import org.sjr.babel.entity.Organisation;
+import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.persistence.OrganisationDao;
 import org.springframework.stereotype.Repository;
 

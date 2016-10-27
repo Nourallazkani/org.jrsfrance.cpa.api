@@ -17,15 +17,15 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.sjr.babel.entity.Account;
-import org.sjr.babel.entity.Administrator;
-import org.sjr.babel.entity.MeetingRequest;
-import org.sjr.babel.entity.MeetingRequest.Reason;
-import org.sjr.babel.entity.Message;
-import org.sjr.babel.entity.Message.Direction;
-import org.sjr.babel.entity.Volunteer;
-import org.sjr.babel.entity.reference.FieldOfStudy;
-import org.sjr.babel.entity.reference.Language;
+import org.sjr.babel.model.component.Account;
+import org.sjr.babel.model.component.Message;
+import org.sjr.babel.model.component.Message.Direction;
+import org.sjr.babel.model.entity.Administrator;
+import org.sjr.babel.model.entity.MeetingRequest;
+import org.sjr.babel.model.entity.Volunteer;
+import org.sjr.babel.model.entity.MeetingRequest.Reason;
+import org.sjr.babel.model.entity.reference.FieldOfStudy;
+import org.sjr.babel.model.entity.reference.Language;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -407,16 +407,13 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		Optional<MeetingRequest> _mr = v.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findFirst();
-		System.out.println("befor the if");
 		if (!_mr.isPresent()){
-			System.out.println("in the if");
 			return ResponseEntity.notFound().build();
 		}
 		MeetingRequest mr = _mr.get();
 		List<Message> msgs = mr.getMessages();
 		return ResponseEntity.ok(msgs.stream().map(x -> new MessageSummary(mr,x)).collect(Collectors.toList()));
 	}
-	
 	
 	@RequestMapping (path="volunteers/{vId}/metting-requests/{mId}/messages", method = RequestMethod.POST)
 	@Transactional

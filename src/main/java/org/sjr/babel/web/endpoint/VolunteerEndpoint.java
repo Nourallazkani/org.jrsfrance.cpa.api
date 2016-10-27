@@ -406,8 +406,10 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (!hasAccess(accessKey, v)){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
-		Optional<MeetingRequest> _mr = v.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findAny();
+		Optional<MeetingRequest> _mr = v.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findFirst();
+		System.out.println("befor the if");
 		if (!_mr.isPresent()){
+			System.out.println("in the if");
 			return ResponseEntity.notFound().build();
 		}
 		MeetingRequest mr = _mr.get();

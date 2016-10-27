@@ -181,10 +181,10 @@ update AbstractEvent a, Organisation o set
 where a.organisation_id=o.id;
 
 insert into volunteer (firstName, lastName, birthDate, mailAddress, phoneNumber, accessKey, password, street1, street2, postalCode, locality, lat, lng, googleMapId, availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities, activities, civility_id, country_id, nationality_id, organisation_id)
-values('Alaric', 'Hermant', NULL, 'v@v.v', NULL, 'V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', NULL, NULL, '75007', 'Paris', 48.85433450, 2.31340290, NULL, NULL,1, 1, 0, NULL, NULL, '1', NULL, NULL)
+values('Alaric', 'Hermant', NULL, 'v@v.v', NULL, 'V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', NULL, NULL, '75007', 'Paris', 48.85433450, 2.31340290, NULL, NULL,1, 1, 0, NULL, NULL, '1', NULL, NULL);
 
 insert into meetingRequest ( dateConstraint, reason, additionalInformations, postDate, acceptedDate, street1, street2, postalCode, locality, lat, lng, googleMapId, refugee_id, volunteer_id, country_id)
- values('Lundi 24 octobre', 'SUPPORT_IN_STUDIES', 'Malheureusement, mon portable (ne marche pas)! ', '2016-10-17 07:06:45', '2016-10-17 07:37:19', NULL, NULL, '75001', 'Paris', 48.86404930, 2.33105260, NULL, 1, 1, 1)
+ values('Lundi 24 octobre', 'SUPPORT_IN_STUDIES', 'Malheureusement, mon portable (ne marche pas)! ', '2016-10-17 07:06:45', '2016-10-17 07:37:19', NULL, NULL, '75001', 'Paris', 48.86404930, 2.33105260, NULL, 1, 1, 1);
 
  insert into meetingrequest_messages (MeetingRequest_id,volunteer_id,text,direction,postedDate,readDate) 
-		values (1,1,'bonjour','VOLUNTEER_TO_REFUGEE',DATE(now()),null)
+		values (1,1,'bonjour','VOLUNTEER_TO_REFUGEE',DATE(now()),null);

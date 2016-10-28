@@ -420,7 +420,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping (path="volunteers/{vId}/metting-requests/{mId}/messages", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> postMsg (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey, @Valid @RequestBody MessageSummary input, BindingResult br){
+	public ResponseEntity<?> postMsg (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey, @Valid @RequestBody MessageSummary input){
 		Date now = new Date();
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, vId);
 		if (!_v.isPresent()){
@@ -434,10 +434,6 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (!_mr.isPresent()){
 			return ResponseEntity.notFound().build();
 		}
-		Map<String, String> errors = errorsAsMap(br.getFieldErrors());
-		if (!errors.isEmpty()){
-			return badRequest(errors);
-		}
 		MeetingRequest mr = _mr.get();
 		Message m = new Message();
 		m.setDirection(Direction.VOLUNTEER_TO_REFUGEE);
@@ -447,8 +443,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		mr.getMessages().add(m);
 		input.from = v.getFullName();
 		input.to = mr.getRefugee().getFullName();
-		input.postDate = now;
+		input.postedDate = now;
 		return ResponseEntity.created(null).body(input);
-	}
-	
+	}	
 }

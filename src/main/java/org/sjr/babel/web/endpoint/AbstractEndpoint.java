@@ -194,7 +194,7 @@ public abstract class AbstractEndpoint {
 		@NotNull @Size(min = 1)
 		public String text ;
 		@JsonProperty(access = Access.READ_ONLY)
-		public Date postDate;
+		public Date postedDate;
 		@JsonProperty(access = Access.READ_ONLY)
 		public String from;
 		public String to;
@@ -203,7 +203,7 @@ public abstract class AbstractEndpoint {
 		
 		public MessageSummary(MeetingRequest mr, Message msg) {
 			this.text = msg.getText();
-			this.postDate = msg.getPostedDate();
+			this.postedDate = msg.getPostedDate();
 			if (Direction.VOLUNTEER_TO_REFUGEE.equals(msg.getDirection())) {
 				this.from = msg.getVolunteer().getFullName();
 				this.to = mr.getRefugee().getFullName();

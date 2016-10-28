@@ -389,7 +389,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		m.setText(input.text);
 		mr.getMessages().add(m);
 		input.from = r.getFullName();
-		input.postDate = now;
+		input.postedDate = now;
 		return created(null, input);
 	}
 }

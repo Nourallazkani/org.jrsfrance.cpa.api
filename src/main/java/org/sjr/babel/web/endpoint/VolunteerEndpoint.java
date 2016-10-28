@@ -22,8 +22,8 @@ import org.sjr.babel.model.component.Message;
 import org.sjr.babel.model.component.Message.Direction;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.MeetingRequest;
-import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
+import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
 import org.sjr.babel.web.helper.MailHelper.MailType;
@@ -54,7 +54,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		
 		public @NotNull String mailAddress;
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
-		public @NotNull @Size(min=1) String firstName, lastName;
+		public @NotNull @Size(min = 1) String firstName, lastName;
 		public @NotNull @Valid AddressSummary address;
 		public String civility, phoneNumber;
 		public List<String> languages , fieldsOfStudy;
@@ -385,13 +385,16 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		} else {
 			MeetingRequest meetingRequest = meeting.get();
-			if(meetingRequest.getVolunteer()==null || !meetingRequest.getVolunteer().getId().equals(id)){
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			if(meetingRequest.getVolunteer()!=null && meetingRequest.getVolunteer().getId().equals(id)){
+				// send email to refugee.
+				meetingRequest.setVolunteer(null);
+			}
+			else{
+				meetingRequest.getMatches().removeIf(x -> x.getId().equals(id));
 			}
 			
-			meetingRequest.setVolunteer(null);
 			objectStore.save(meetingRequest);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.noContent().build();
 		}
 	}
 	

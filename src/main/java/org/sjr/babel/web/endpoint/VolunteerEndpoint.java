@@ -398,7 +398,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		}
 	}
 	
-	@RequestMapping (path="volunteers/{vId}/metting-requests/{mId}/messages", method = RequestMethod.GET)
+	@RequestMapping (path="volunteers/{vId}/meeting-requests/{mId}/messages", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> getMeetingRequestMessages (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey){
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, vId);
@@ -418,7 +418,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		return ResponseEntity.ok(msgs.stream().map(x -> new MessageSummary(mr,x)).collect(Collectors.toList()));
 	}
 	
-	@RequestMapping (path="volunteers/{vId}/metting-requests/{mId}/messages", method = RequestMethod.POST)
+	@RequestMapping (path="volunteers/{vId}/meeting-requests/{mId}/messages", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> postMeetingRequestMessage (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey, @Valid @RequestBody MessageSummary input){
 		Date now = new Date();
@@ -444,6 +444,6 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		input.from = v.getFullName();
 		input.to = mr.getRefugee().getFullName();
 		input.postedDate = now;
-		return ResponseEntity.created(null).body(input);
+		return created(null, input);
 	}	
 }

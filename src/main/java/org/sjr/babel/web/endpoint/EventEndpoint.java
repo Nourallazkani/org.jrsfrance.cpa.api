@@ -108,7 +108,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			
 	@RequestMapping(path={"events", "workshops"}, method = RequestMethod.GET)
 	@Transactional
-	public List<EventSummary> events(
+	public List<EventSummary> fullSearch(
 			@RequestParam(required = false) String city,
 			@RequestParam(required = false) Integer organisationId,
 			@RequestParam(required = false) Integer volunteerId,
@@ -181,7 +181,7 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"events/{id}", "workshops/{id}"}, method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getWorkshopSummary(@PathVariable int id, @RequestHeader("Accept-language") String language) {
+	public ResponseEntity<?> summarySearch(@PathVariable int id, @RequestHeader("Accept-language") String language) {
 
 		Optional<EventSummary> w = objectStore.getById(AbstractEvent.class, id).map(ws -> new EventSummary(ws, language));
 		if (w.isPresent()) {
@@ -193,7 +193,7 @@ public class EventEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"events/{id}", "workshops/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<Void> deleteWorkshop(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<Void> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<AbstractEvent> w = objectStore.getById(AbstractEvent.class, id);
 		if (w.isPresent()) {
 			if (hasAccess(accessKey, w.get())) {
@@ -272,7 +272,7 @@ public class EventEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"events", "workshops"}, method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> save(@RequestBody @Valid EventSummary input, BindingResult binding, @RequestHeader String accessKey, HttpServletRequest req){
+	public ResponseEntity<?> create(@RequestBody @Valid EventSummary input, BindingResult binding, @RequestHeader String accessKey, HttpServletRequest req){
 		if (input.id != null) {
 			return ResponseEntity.badRequest().build();
 		}

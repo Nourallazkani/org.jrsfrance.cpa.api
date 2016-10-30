@@ -106,7 +106,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"language-programs", "professional-programs"} ,method = RequestMethod.GET)
 	@Transactional
-	public List<LearningProgramSummary> learningPrograms(
+	public List<LearningProgramSummary> search(
 			@RequestParam(required=false, name = "city") String city, 
 			@RequestParam(required=false) Integer levelId,
 			@RequestParam(required=false) Integer domainId,
@@ -176,7 +176,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> learningProgram(@PathVariable Integer id) {
+	public ResponseEntity<?> getOne(@PathVariable Integer id) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
 		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (c.isPresent()) {
@@ -188,7 +188,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
 	@RolesAllowed({ "ADMIN", "ORGANISATION" })
-	public ResponseEntity<?> learningProgram(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<AbstractLearningProgram> _lp = objectStore.getById(AbstractLearningProgram.class, id);
 		if (!_lp.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -206,7 +206,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> learningProgram(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @PathVariable int id, @RequestHeader String accessKey) {
 
 		if (input.id == null || !input.id.equals(id)) {
 			return badRequest("Id is not correct!");
@@ -269,7 +269,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@CrossOrigin
 	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> learningProgram(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
+	public ResponseEntity<?> create(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
 		if(input.id!=null){
 			return ResponseEntity.badRequest().build();
 		}

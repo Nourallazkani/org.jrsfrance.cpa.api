@@ -166,7 +166,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getFullVolunteer(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> getOne(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, id);
 		if (_v.isPresent()) {
 			Volunteer v = _v.get();
@@ -193,7 +193,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateVolunteer(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, /*BindingResult binding, */@RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, /*BindingResult binding, */@RequestHeader String accessKey) {
 		if (input.id!=id) {
 			return ResponseEntity.badRequest().build();
 		} else {
@@ -305,7 +305,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<Void> deleteVolunteer(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<Void> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, id);
 		if (_v.isPresent()) {
 			Volunteer v = _v.get();
@@ -400,7 +400,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping (path="volunteers/{vId}/metting-requests/{mId}/messages", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getMessages (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey){
+	public ResponseEntity<?> getMeetingRequestMessages (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey){
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, vId);
 		if (!_v.isPresent()){
 			return ResponseEntity.notFound().build();
@@ -420,7 +420,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping (path="volunteers/{vId}/metting-requests/{mId}/messages", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> postMsg (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey, @Valid @RequestBody MessageSummary input){
+	public ResponseEntity<?> postMeetingRequestMessage (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey, @Valid @RequestBody MessageSummary input){
 		Date now = new Date();
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, vId);
 		if (!_v.isPresent()){

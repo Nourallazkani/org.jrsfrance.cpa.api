@@ -60,7 +60,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"/organisations", "/libraries"}, method = RequestMethod.GET)
 	@Transactional
-	public List<OrganisationSummary> list(@RequestParam(required=false) Integer categoryId, @RequestParam(required=false) String city) 
+	public List<OrganisationSummary> search(@RequestParam(required=false) Integer categoryId, @RequestParam(required=false) String city) 
 	{
 		StringBuffer query = new StringBuffer("select o from Organisation o join o.category c where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
@@ -98,7 +98,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/organisations/{id}", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> orgSummary(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> getOne(@PathVariable int id, @RequestHeader String accessKey) {
 		
 		Optional<Organisation> _organisation = objectStore.getById(Organisation.class, id);
 		if(!_organisation.isPresent()){
@@ -126,7 +126,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "organisations/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> updateOrg(@RequestBody @Valid OrganisationSummary input, @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@RequestBody @Valid OrganisationSummary input, @PathVariable int id, @RequestHeader String accessKey) {
 		if (input.id == null || !input.id.equals(id)) {
 			return badRequest();
 		}

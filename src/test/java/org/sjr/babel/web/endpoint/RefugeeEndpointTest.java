@@ -23,40 +23,40 @@ public class RefugeeEndpointTest {
 	
 	@Test
 	public void testGetRefugeeSummaryOk(){
-		ResponseEntity<?> x = endpoint.getRefugeeSummary(1, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.search(1, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
 	}
 	
 	@Test
 	public void testGetRefugeeSummaryNotFound(){
-		ResponseEntity<?> x = endpoint.getRefugeeSummary(2, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.search(2, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
 	}
 	
 	@Test
 	public void testGetRefugeeSummaryForbidden(){
-		ResponseEntity<?> x = endpoint.getRefugeeSummary(1, "R-a171ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.search(1, "R-a171ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
 	}
 	
 	@Test
 	public void testGetRefugeeMeetingRequestMessagesOk(){
-		ResponseEntity<?> x = endpoint.getMessages(1, 1, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.getMeetingRequestMessages(1, 1, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
 	}
 	@Test
 	public void testGetRefugeeMeetingRequestMessagesNotFound(){
-		ResponseEntity<?> x = endpoint.getMessages(11010, 900020, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.getMeetingRequestMessages(11010, 900020, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
 	}
 	@Test
 	public void testGetRefugeeMeetingRequestMessagesForbidden(){
-		ResponseEntity<?> x = endpoint.getMessages(1, 1, "R-a171ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.getMeetingRequestMessages(1, 1, "R-a171ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
 	}

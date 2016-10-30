@@ -77,7 +77,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping( method = RequestMethod.GET)
 	@Transactional
-	public List<TeachingSummary> list(
+	public List<TeachingSummary> search(
 			@RequestParam(required = false) Integer organisationId,
 			@RequestParam(required = false) Integer fieldOfStudyId, 
 			@RequestParam(required=false) Integer levelId,
@@ -123,7 +123,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "{id}", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getSummary(@PathVariable int id) {
+	public ResponseEntity<?> getOne(@PathVariable int id) {
 
 		Optional<TeachingSummary> t = objectStore.getById(Teaching.class, id).map(te -> new TeachingSummary(te));
 		if (t.isPresent()) {

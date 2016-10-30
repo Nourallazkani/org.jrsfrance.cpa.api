@@ -25,20 +25,20 @@ public class TeachingEndpointTest {
 	
 	@Test
 	public void testList() {
-		List<TeachingSummary> result = endpoint.list(null, null, null, null, null);
+		List<TeachingSummary> result = endpoint.search(null, null, null, null, null);
 		Assert.assertNotNull(result);
 	}
 	
 	@Test
 	public void testGetOK(){
-		ResponseEntity<?> x = endpoint.getSummary(2);
+		ResponseEntity<?> x = endpoint.getOne(2);
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
 	}
 	
 	@Test
 	public void testGetNotFound(){
-		ResponseEntity<?> x = endpoint.getSummary(11313);
+		ResponseEntity<?> x = endpoint.getOne(11313);
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
 	}

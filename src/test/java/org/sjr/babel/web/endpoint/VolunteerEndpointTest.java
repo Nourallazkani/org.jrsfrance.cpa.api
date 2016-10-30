@@ -22,27 +22,27 @@ public class VolunteerEndpointTest {
 
 	@Test
 	public void testGetVolunteerSummaryOk() {
-		ResponseEntity<?> x = endpoint.getFullVolunteer(1, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
+		ResponseEntity<?> x = endpoint.getOne(1, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
 	}
 	@Test
 	public void testGetVolunteerSummaryNotFound() {
-		ResponseEntity<?> x = endpoint.getFullVolunteer(2000, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
+		ResponseEntity<?> x = endpoint.getOne(2000, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
 	}
 	@Test
 	public void testGetVolunteerSummaryForbidden() {
-		ResponseEntity<?> x = endpoint.getFullVolunteer(1, "V-11eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
+		ResponseEntity<?> x = endpoint.getOne(1, "V-11eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
 	}
-	/*@Test
+	@Test
 	public void testGetVolunteerMeetingRequestMessagesOK() {
-		ResponseEntity<?> x = endpoint.getMessages(1, 1, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec"); //it's always returns 404!
+		ResponseEntity<?> x = endpoint.getMeetingRequestMessages(1, 1, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
-	}*/
+	}
 
 }

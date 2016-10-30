@@ -135,7 +135,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(method = RequestMethod.GET)
 	@Transactional
-	public List<RefugeeSummary> list(@RequestParam(required = false) String name,
+	public List<RefugeeSummary> getFullRefugee(@RequestParam(required = false) String name,
 			@RequestParam(required = false) Integer languageId, @RequestParam(required = false) String city,
 			@RequestParam(required = false) String zipcode) {
 
@@ -176,7 +176,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "{id}", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getRefugeeSummary(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> search(@PathVariable int id, @RequestHeader String accessKey) {
 
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
@@ -239,7 +239,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<Void> deleteRefugee(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<Void> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Refugee> _r = objectStore.getById(Refugee.class, id);
 		if(!_r.isPresent()){
 			return ResponseEntity.notFound().build();
@@ -340,9 +340,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 	}
 	
-	@RequestMapping (path="/{rId}/metting-requests/{mId}/messages", method = RequestMethod.GET)
+	@RequestMapping (path="/{rId}/meeting-requests/{mId}/messages", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getMessages (@PathVariable int rId, @PathVariable int mId, @RequestHeader String accessKey){
+	public ResponseEntity<?> getMeetingRequestMessages (@PathVariable int rId, @PathVariable int mId, @RequestHeader String accessKey){
 		Optional<Refugee> _r = objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){
 			return ResponseEntity.notFound().build();
@@ -362,7 +362,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping (path="/{rId}/metting-requests/{mId}/messages", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> postMessage (@PathVariable int rId, @PathVariable int mId, @RequestHeader String accessKey, @RequestBody @Valid MessageSummary input){
+	public ResponseEntity<?> postMeetingRequestMessage (@PathVariable int rId, @PathVariable int mId, @RequestHeader String accessKey, @RequestBody @Valid MessageSummary input){
 		Date now = new Date();
 		Optional<Refugee> _r = objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){

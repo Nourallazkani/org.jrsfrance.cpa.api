@@ -37,7 +37,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 
 		@Bean
 		public EntityManagerFactory emf(){
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory("abcd");
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("hib-mysql");
 			
 			EntityManager em = emf.createEntityManager();
 			

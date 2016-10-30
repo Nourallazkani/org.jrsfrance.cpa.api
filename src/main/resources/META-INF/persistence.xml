@@ -4,16 +4,18 @@
              http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
 	version="2.1">
 
-	<persistence-unit name="abcd" transaction-type="RESOURCE_LOCAL">
+	<persistence-unit name="hib-mysql" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 		<properties>
-		 
+
+			<!-- pour utiliser le driver mysql, la dépendance vers mysqlconnector-java est nécessaire (voir pom.xml) -->		 
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
 			<property name="javax.persistence.jdbc.user" value="${db.username}" />
 			<property name="javax.persistence.jdbc.password" value="${db.password}" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://${db.server}/cpa" />
-		
+
+			<!-- pour utiliser c3p0, la dépendance vers hibernate-c3p0 est nécessaire (voir pom.xml) -->
 			<property name="hibernate.c3p0.min_size" value="5"/>
 			<property name="hibernate.c3p0.max_size" value="20"/>
 			<property name="hibernate.c3p0.timeout" value="1800"/>
@@ -21,6 +23,8 @@
 			
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
 			<property name="hibernate.show_sql" value="false" />
+
+			<!-- pour utiliser ehcache, la dépendance vers hibernate-ehcache est nécessaire (voir pom.xml) -->
 			<property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
 			<property name="hibernate.cache.use_second_level_cache" value="true" />
 			
@@ -30,4 +34,30 @@
 
 		</properties>
 	</persistence-unit>
+	
+	<persistence-unit name="hib-postgres" transaction-type="RESOURCE_LOCAL">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+		<properties>
+
+			<!-- pour utiliser le driver mysql, la dépendance vers postgresql est nécessaire (voir pom.xml) -->		 
+			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
+			<property name="javax.persistence.jdbc.user" value="postgres" />
+			<property name="javax.persistence.jdbc.password" value="postgres" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://${db.server}/cpa" />
+
+			<!-- pour utiliser c3p0, la dépendance vers hibernate-c3p0 est nécessaire (voir pom.xml) -->
+			<property name="hibernate.c3p0.min_size" value="5"/>
+			<property name="hibernate.c3p0.max_size" value="20"/>
+			<property name="hibernate.c3p0.timeout" value="1800"/>
+			<property name="hibernate.c3p0.max_statements" value="50"/>
+			
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL95Dialect" />
+			<property name="hibernate.show_sql" value="false" />
+
+			<!-- pour utiliser ehcache, la dépendance vers hibernate-ehcache est nécessaire (voir pom.xml) -->
+			<property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory" />
+			<property name="hibernate.cache.use_second_level_cache" value="true" />
+		</properties>
+	</persistence-unit>	
 </persistence>

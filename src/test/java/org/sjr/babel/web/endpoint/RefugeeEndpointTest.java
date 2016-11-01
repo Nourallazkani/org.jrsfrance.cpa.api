@@ -41,7 +41,7 @@ public class RefugeeEndpointTest {
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
 	}
-	
+	/*
 	@Test
 	public void testGetRefugeeMeetingRequestMessagesOk(){
 		ResponseEntity<?> x = endpoint.getMeetingRequestMessages(1, 1, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
@@ -60,4 +60,5 @@ public class RefugeeEndpointTest {
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
 	}
+	*/
 }

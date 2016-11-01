@@ -24,14 +24,20 @@ public class MeetingRequest extends AbstractEntity {
 	public enum Reason {
 		SUPPORT_IN_STUDIES, INTERPRETING, CONVERSATION
 	}
+	public enum Direction {
+		VOLUNTEER_TO_REFUGEE, REFUGEE_TO_VOLUNTEER
+	}
 
 	private String dateConstraint;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date postDate, acceptedDate;
+	private Date postDate, acceptationDate, confimationDate;
 
 	@Enumerated(EnumType.STRING)
 	private Reason reason;
+	
+	@Enumerated(EnumType.STRING)
+	private Direction firstContact;
 
 	private String additionalInformations;
 
@@ -66,12 +72,12 @@ public class MeetingRequest extends AbstractEntity {
 		this.postDate = postDate;
 	}
 
-	public Date getAcceptedDate() {
-		return acceptedDate;
+	public Date getAcceptationDate() {
+		return acceptationDate;
 	}
 
-	public void setAcceptedDate(Date acceptedDate) {
-		this.acceptedDate = acceptedDate;
+	public void setAcceptationDate(Date acceptedDate) {
+		this.acceptationDate = acceptedDate;
 	}
 
 	public Reason getReason() {
@@ -123,13 +129,30 @@ public class MeetingRequest extends AbstractEntity {
 	public void setMatches(Set<Volunteer> matches) {
 		this.matches = matches;
 	}
-
+/*
 	public List<Message> getMessages() {
 		return messages;
 	}
 
 	public void setMessages(List<Message> messages) {
 		this.messages = messages;
+	}
+*/
+
+	public Date getConfimationDate() {
+		return confimationDate;
+	}
+
+	public void setConfimationDate(Date confimationDate) {
+		this.confimationDate = confimationDate;
+	}
+
+	public Direction getFirstContact() {
+		return firstContact;
+	}
+
+	public void setFirstContact(Direction firstContact) {
+		this.firstContact = firstContact;
 	}
 	
 	

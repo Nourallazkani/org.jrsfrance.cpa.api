@@ -342,9 +342,9 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		}
 	}
 	
-	@RequestMapping(path = "/volunteers/{id}/meeting-requests/{meetingRequestId}", method = RequestMethod.POST)
+	@RequestMapping(path = "/volunteers/{id}/meeting-requests/{mId}", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> acceptMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId, @RequestHeader String accessKey) {
+	public ResponseEntity<?> acceptMeetingRequest(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -352,7 +352,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		
-		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, meetingRequestId);
+		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, mId);
 		if (!meeting.isPresent()) {
 			return ResponseEntity.notFound().build();
 		} else {
@@ -362,7 +362,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			}
 			
 			meetingRequest.setVolunteer(v.get());
-			meetingRequest.setAcceptedDate(new Date());
+			meetingRequest.setAcceptationDate(new Date());
 			objectStore.save(meetingRequest);
 			
 			System.out.println("send mail to "+meetingRequest.getRefugee().getMailAddress());
@@ -370,9 +370,9 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		}
 	}
 	
-	@RequestMapping(path = "/volunteers/{id}/meeting-requests/{meetingRequestId}", method = RequestMethod.DELETE)
+	@RequestMapping(path = "/volunteers/{id}/meeting-requests/{mId}", method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<?> cancelMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId, @RequestHeader String accessKey) {
+	public ResponseEntity<?> cancelMeetingRequest(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -380,7 +380,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		}
 		
-		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, meetingRequestId);
+		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, mId);
 		if (!meeting.isPresent()) {
 			return ResponseEntity.notFound().build();
 		} else {
@@ -388,6 +388,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			if(meetingRequest.getVolunteer()!=null && meetingRequest.getVolunteer().getId().equals(id)){
 				// send email to refugee.
 				meetingRequest.setVolunteer(null);
+				meetingRequest.setAcceptationDate(null);
 			}
 			else{
 				meetingRequest.getMatches().removeIf(x -> x.getId().equals(id));
@@ -398,6 +399,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		}
 	}
 	
+	/*
 	@RequestMapping (path="volunteers/{vId}/meeting-requests/{mId}/messages", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> getMeetingRequestMessages (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey){
@@ -446,4 +448,5 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		input.postedDate = now;
 		return created(null, input);
 	}	
+	*/
 }

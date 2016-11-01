@@ -257,7 +257,7 @@ public abstract class AbstractEndpoint {
 				this.volunteer.phoneNumber = entity.getVolunteer().getPhoneNumber();	
 			}
 			this.postDate = entity.getPostDate();
-			this.acceptedDate = entity.getAcceptedDate();
+			this.acceptedDate = entity.getAcceptationDate();
 		}
 	}
 	

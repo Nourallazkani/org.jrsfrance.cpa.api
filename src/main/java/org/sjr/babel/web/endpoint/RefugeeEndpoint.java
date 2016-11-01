@@ -16,13 +16,12 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.sjr.babel.model.component.Account;
-import org.sjr.babel.model.component.Message;
 import org.sjr.babel.model.component.Message.Direction;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.MeetingRequest;
+import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
-import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
@@ -267,8 +266,17 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		if (!hasAccess(accessKey, refugee)) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		} else {
-			List<MeetingRequest> meetings = refugee.getMeetingRequests();
-			return ResponseEntity.ok(meetings.stream().map(MeetingRequestSummary::new).collect(Collectors.toList()));
+
+			List<MeetingRequestSummary> responseBody = refugee.getMeetingRequests().stream().map(x -> {
+				MeetingRequestSummary summary = new MeetingRequestSummary(x);
+				if (summary.volunteer != null && Direction.VOLUNTEER_TO_REFUGEE.equals(x.getFirstContact())){
+					summary.volunteer.phoneNumber = null;
+					summary.volunteer.mailAddress = null;
+				}
+				return summary;
+			}).collect(Collectors.toList());
+
+			return ResponseEntity.ok(responseBody);
 		}
 	}
 
@@ -340,6 +348,31 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 	}
 	
+	@RequestMapping(path = "/{id}/meeting-requests/{mId}", method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> xx(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey, boolean confirmed) {
+		Optional<MeetingRequest> _mr = objectStore.getById(MeetingRequest.class, mId);
+		if (!_mr.isPresent()) {
+			return notFound();
+		} else {
+			MeetingRequest mr = _mr.get();
+			Refugee refugee = mr.getRefugee();
+			if (!hasAccess(accessKey, refugee)) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			if (confirmed){
+				mr.setConfimationDate(new Date());
+			}
+			else {
+				mr.setVolunteer(null);
+				mr.setAcceptationDate(null);
+			}
+			return ResponseEntity.noContent().build();
+		}
+	}
+	
+	/*
+	
 	@RequestMapping (path="/{rId}/meeting-requests/{mId}/messages", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> getMeetingRequestMessages (@PathVariable int rId, @PathVariable int mId, @RequestHeader String accessKey){
@@ -371,7 +404,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		Refugee r = _r.get();
 		if (!hasAccess(accessKey, r)){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-			/* return forbidden(); */
+			// return forbidden();
 		}
 		Optional<MeetingRequest> _mr = r.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findAny();
 		if (!_mr.isPresent()){
@@ -391,5 +424,5 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		input.from = r.getFullName();
 		input.postedDate = now;
 		return created(null, input);
-	}
+	} */
 }

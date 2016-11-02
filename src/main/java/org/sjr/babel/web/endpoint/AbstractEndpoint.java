@@ -17,13 +17,11 @@ import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
-import org.sjr.babel.model.component.Message;
-import org.sjr.babel.model.component.Message.Direction;
 import org.sjr.babel.model.entity.AbstractEntity;
 import org.sjr.babel.model.entity.MeetingRequest;
+import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.Volunteer;
-import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.persistence.ObjectStore;
 import org.sjr.babel.web.helper.MailHelper;
@@ -37,14 +35,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 public abstract class AbstractEndpoint {
 
@@ -132,6 +130,11 @@ public abstract class AbstractEndpoint {
 		return this.objectStore.findOne(Volunteer.class, "select v from Volunteer v where v.account.accessKey=:accessKey", args);
 	}
 	
+	@InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.initDirectFieldAccess();
+    }
+	
 	@JsonIgnoreProperties("formatted_address")
 	protected static class AddressSummary {
 		public String street1, street2;
@@ -189,7 +192,7 @@ public abstract class AbstractEndpoint {
 			return c;
 		}
 	}
-	
+	/*
 	protected static class MessageSummary {
 		@NotNull @Size(min = 1)
 		public String text ;
@@ -212,7 +215,7 @@ public abstract class AbstractEndpoint {
 				this.to = msg.getVolunteer().getFullName();
 			}
 		}
-	}
+	}*/
 	
 	protected static class MeetingRequestSummary{
 		
@@ -229,7 +232,7 @@ public abstract class AbstractEndpoint {
 		public @JsonInclude(JsonInclude.Include.NON_NULL) String fieldOfStudy;
 		public @JsonInclude(JsonInclude.Include.NON_EMPTY) List<String> languages;
 		
-		public Date postDate,acceptedDate;
+		public Date postDate, acceptationDate, confirmationDate;
 	
 		public MeetingRequestSummary() {}
 		
@@ -257,7 +260,8 @@ public abstract class AbstractEndpoint {
 				this.volunteer.phoneNumber = entity.getVolunteer().getPhoneNumber();	
 			}
 			this.postDate = entity.getPostDate();
-			this.acceptedDate = entity.getAcceptationDate();
+			this.acceptationDate = entity.getAcceptationDate();
+			this.confirmationDate = entity.getConfirmationDate();
 		}
 	}
 	

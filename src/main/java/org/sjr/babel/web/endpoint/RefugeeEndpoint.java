@@ -367,7 +367,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 				mr.setVolunteer(null);
 				mr.setAcceptationDate(null);
 			}
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.ok(new MeetingRequestSummary(mr));
 		}
 	}
 	

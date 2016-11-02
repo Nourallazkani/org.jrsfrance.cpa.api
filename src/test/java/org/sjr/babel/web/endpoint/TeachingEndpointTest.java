@@ -31,7 +31,7 @@ public class TeachingEndpointTest {
 	
 	@Test
 	public void testGetOK(){
-		ResponseEntity<?> x = endpoint.getOne(2);
+		ResponseEntity<?> x = endpoint.getOne(3);
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
 	}

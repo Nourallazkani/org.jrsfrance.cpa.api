@@ -31,7 +31,7 @@ public class MeetingRequest extends AbstractEntity {
 	private String dateConstraint;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date postDate, acceptationDate, confimationDate;
+	private Date postDate, acceptationDate, confirmationDate;
 
 	@Enumerated(EnumType.STRING)
 	private Reason reason;
@@ -139,12 +139,12 @@ public class MeetingRequest extends AbstractEntity {
 	}
 */
 
-	public Date getConfimationDate() {
-		return confimationDate;
+	public Date getConfirmationDate() {
+		return confirmationDate;
 	}
 
-	public void setConfimationDate(Date confimationDate) {
-		this.confimationDate = confimationDate;
+	public void setConfirmationDate(Date confimationDate) {
+		this.confirmationDate = confimationDate;
 	}
 
 	public Direction getFirstContact() {

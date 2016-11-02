@@ -18,10 +18,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Account;
-import org.sjr.babel.model.component.Message;
-import org.sjr.babel.model.component.Message.Direction;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.MeetingRequest;
+import org.sjr.babel.model.entity.MeetingRequest.Direction;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
@@ -320,7 +319,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/volunteers/{id}/meeting-requests", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestParam(required=false) boolean accepted, @RequestHeader String accessKey) {
+	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestParam(required = false) boolean accepted, @RequestHeader String accessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -332,7 +331,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			Set<MeetingRequest> meetings;
 			if(!accepted){
-				meetings = volunteer.getMeetingRequests().stream().filter(x -> x.getVolunteer()==null).collect(Collectors.toSet());
+				meetings = volunteer.getMeetingRequests().stream().filter(x -> x.getVolunteer() == null).collect(Collectors.toSet());
 			}
 			else{
 				meetings = volunteer.getAcceptedMeetingRequests();
@@ -344,7 +343,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/volunteers/{id}/meeting-requests/{mId}", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> acceptMeetingRequest(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey) {
+	public ResponseEntity<?> acceptMeetingRequest(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey, @RequestParam Direction firstContact) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -357,10 +356,10 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		} else {
 			MeetingRequest meetingRequest = meeting.get();
-			if(meetingRequest.getVolunteer()!=null){
+			if(meetingRequest.getVolunteer() != null){
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			}
-			
+			meetingRequest.setFirstContact(firstContact);
 			meetingRequest.setVolunteer(v.get());
 			meetingRequest.setAcceptationDate(new Date());
 			objectStore.save(meetingRequest);
@@ -385,7 +384,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		} else {
 			MeetingRequest meetingRequest = meeting.get();
-			if(meetingRequest.getVolunteer()!=null && meetingRequest.getVolunteer().getId().equals(id)){
+			if(meetingRequest.getVolunteer() != null && meetingRequest.getVolunteer().getId().equals(id)){
 				// send email to refugee.
 				meetingRequest.setVolunteer(null);
 				meetingRequest.setAcceptationDate(null);

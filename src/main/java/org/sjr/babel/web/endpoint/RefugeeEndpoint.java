@@ -16,9 +16,9 @@ import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.sjr.babel.model.component.Account;
-import org.sjr.babel.model.component.Message.Direction;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.MeetingRequest;
+import org.sjr.babel.model.entity.MeetingRequest.Direction;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
@@ -361,7 +361,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			}
 			if (confirmed){
-				mr.setConfimationDate(new Date());
+				mr.setConfirmationDate(new Date());
 			}
 			else {
 				mr.setVolunteer(null);

@@ -57,8 +57,8 @@ create table Organisation(
 
 create table Teaching (
 	id serial primary key,
-	licence bit,
-	master bit,
+	licence boolean,
+	master boolean,
 	link varchar(255),
 	contact varchar(512),
     registrationOpeningDate date,

@@ -1,9 +1,9 @@
 insert into Level(name,next_id,previous_id,description) values ('A1',2,null,' Debutant ');
 insert into Level(name,next_id,previous_id,description) values ('A2',3,1,'moyen');
 insert into Level(name,next_id,previous_id,description) values ('B1',4,2,'moyen');
-insert into Level(name,next_id,previous_id,description) values ('B2',5,3,'expaire');
-insert into Level(name,next_id,previous_id,description) values ('C1',6,4,'expaire');
-insert into Level(name,next_id,previous_id,description) values ('C2',null,5,'expaire');
+insert into Level(name,next_id,previous_id,description) values ('B2',5,3,'expert');
+insert into Level(name,next_id,previous_id,description) values ('C1',6,4,'expert');
+insert into Level(name,next_id,previous_id,description) values ('C2',null,5,'expert');
 
 
 insert into EventType (name, stereotype) values ('atelier socio linguistique', 'WORKSHOP');

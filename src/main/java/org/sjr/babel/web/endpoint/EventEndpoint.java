@@ -56,9 +56,9 @@ public class EventEndpoint extends AbstractEndpoint {
 		
 		public EventSummary(AbstractEvent entity, String language) {
 			this.id = entity.getId();
-			this.subject = entity.getSubject().getText(language, true);
-			this.description = entity.getDescription().getText(language, true);
-			this.audience = entity.getAudience().name();
+			this.subject = safeTransform(entity.getSubject(), x -> x.getText(language, true));
+			this.description = safeTransform(entity.getDescription(), x -> x.getText(language, true));
+			this.audience = safeTransform(entity.getAudience(), x  -> x.name());
 			this.address = safeTransform(entity.getAddress(), x -> new AddressSummary(x));
 			this.startDate =entity.getStartDate();
 			this.endDate = entity.getEndDate();

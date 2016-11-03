@@ -40,7 +40,7 @@
 		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 		<properties>
 
-			<!-- pour utiliser le driver mysql, la dépendance vers postgresql est nécessaire (voir pom.xml) -->		 
+			<!-- pour utiliser le driver postgresql, la dépendance vers postgresql est nécessaire (voir pom.xml) -->		 
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
 			<property name="javax.persistence.jdbc.user" value="postgres" />
 			<property name="javax.persistence.jdbc.password" value="postgres" />

@@ -285,7 +285,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			OrganisationEvent _event = new OrganisationEvent();
 			Optional<Organisation> _o = getOrganisationByAccessKey(accessKey);
 			if(!_o.isPresent()){
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+				return forbidden();
 			}
 			_event.setOrganisation(_o.get());
 			event = _event;
@@ -294,13 +294,13 @@ public class EventEndpoint extends AbstractEndpoint {
 			VolunteerEvent _event = new VolunteerEvent();
 			Optional<Volunteer> _v = getVolunteerByAccessKey(accessKey);
 			if(!_v.isPresent()){
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+				return forbidden();
 			}
 			_event.setVolunteer(_v.get());
 			event = _event;
 		}
 		else{
-			return ResponseEntity.badRequest().build();
+			return forbidden();
 		}
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
@@ -309,7 +309,7 @@ public class EventEndpoint extends AbstractEndpoint {
 			errors.put("startDate", "_");
 			errors.put("endDate", "_");
 		}
-		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+		if(input.registrationClosingDate != null && input.registrationOpeningDate != null && input.registrationClosingDate.before(input.registrationOpeningDate)){
 			errors.put("registrationOpeningDate", "_");
 			errors.put("registrationClosingDate", "_");
 		}

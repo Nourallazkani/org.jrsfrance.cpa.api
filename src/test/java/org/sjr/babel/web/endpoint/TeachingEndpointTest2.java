@@ -13,6 +13,7 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -30,11 +31,11 @@ public class TeachingEndpointTest2 {
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 	}
-	
-	
+		
 	@Test
 	public void testGetTeachings() throws Exception{
-		mockMvc.perform(get("/teachings")).andExpect(status().isOk());
+		MvcResult result = mockMvc.perform(get("/teachings")).andExpect(status().isOk()).andReturn();
+		System.out.println(result);
 	}
 	
 	@Test

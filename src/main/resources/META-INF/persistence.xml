@@ -35,16 +35,16 @@
 		</properties>
 	</persistence-unit>
 	
-	<persistence-unit name="hib-postgres" transaction-type="RESOURCE_LOCAL">
+	<persistence-unit name="hib-postgresql" transaction-type="RESOURCE_LOCAL">
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 		<properties>
 
 			<!-- pour utiliser le driver postgresql, la dépendance vers postgresql est nécessaire (voir pom.xml) -->		 
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-			<property name="javax.persistence.jdbc.user" value="postgres" />
-			<property name="javax.persistence.jdbc.password" value="postgres" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://${db.server}/cpa" />
+			<property name="javax.persistence.jdbc.user" value="${db.username}" />
+			<property name="javax.persistence.jdbc.password" value="${db.password}" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://${db.server}:5432/cpa_rec" />
 
 			<!-- pour utiliser c3p0, la dépendance vers hibernate-c3p0 est nécessaire (voir pom.xml) -->
 			<property name="hibernate.c3p0.min_size" value="5"/>

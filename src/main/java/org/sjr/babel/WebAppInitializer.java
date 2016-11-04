@@ -1,5 +1,6 @@
 package org.sjr.babel;
 
+import java.sql.SQLException;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -25,6 +27,8 @@ import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import com.mysql.jdbc.Connection;
 
 public class WebAppInitializer implements WebApplicationInitializer
 {
@@ -37,7 +41,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 
 		@Bean
 		public EntityManagerFactory emf(){
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory("hib-mysql");
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("hib-postgresql");
 			
 			EntityManager em = emf.createEntityManager();
 			
@@ -70,6 +74,11 @@ public class WebAppInitializer implements WebApplicationInitializer
 		}
 	}
 	
+	
+	public static void main(String[] args) throws SQLException {
+		new DriverManagerDataSource("jdbc:mysql://cpa.c0patx0njnp3.eu-west-1.rds.amazonaws.com/cpa", "cpa", "montaigoual").getConnection().close();
+		new DriverManagerDataSource("jdbc:postgresql://cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com/cpa", "cpa", "montaigoual").getConnection().close();
+	}
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		

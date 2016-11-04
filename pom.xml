@@ -184,7 +184,7 @@
 			<properties>
 				<db.username>cpa</db.username>
 				<db.password>montaigoual</db.password>
-				<db.server>cpa.c0patx0njnp3.eu-west-1.rds.amazonaws.com:3306</db.server>
+				<db.server>cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com</db.server>
 			</properties>
 		</profile>
 	</profiles>

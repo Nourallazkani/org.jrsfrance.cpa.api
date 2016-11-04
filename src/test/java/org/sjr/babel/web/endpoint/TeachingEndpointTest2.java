@@ -35,7 +35,7 @@ public class TeachingEndpointTest2 {
 	@Test
 	public void testGetTeachings() throws Exception{
 		MvcResult result = mockMvc.perform(get("/teachings")).andExpect(status().isOk()).andReturn();
-		System.out.println(result);
+		
 	}
 	
 	@Test

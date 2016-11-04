@@ -305,7 +305,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
 		
-		if(input.startDate !=null && input.endDate!=null && input.endDate.before(input.startDate)){
+		if(input.startDate != null && input.endDate != null && input.endDate.before(input.startDate)){
 			errors.put("startDate", "_");
 			errors.put("endDate", "_");
 		}

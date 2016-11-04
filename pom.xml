@@ -9,8 +9,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
 		
-		<db.username>root</db.username>
-		<db.password>root</db.password>
+		<db.username>postgres</db.username>
+		<db.password>postgres</db.password>
 		<db.server>localhost</db.server>
 		<smtp.username>AKIAJCQS4ZMC2SUBODMQ</smtp.username>
 		<smtp.password>AipV1kf46I6H7TkGHYil7TKBmSKNjfs2hS6nC+WOLsw9</smtp.password>

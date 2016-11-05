@@ -73,12 +73,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 				.allowedOrigins("*");
 		}
 	}
-	
-	
-	public static void main(String[] args) throws SQLException {
-		new DriverManagerDataSource("jdbc:mysql://cpa.c0patx0njnp3.eu-west-1.rds.amazonaws.com/cpa", "cpa", "montaigoual").getConnection().close();
-		new DriverManagerDataSource("jdbc:postgresql://cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com/cpa", "cpa", "montaigoual").getConnection().close();
-	}
+
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		

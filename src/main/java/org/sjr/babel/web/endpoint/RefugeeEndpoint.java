@@ -257,7 +257,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}/meeting-requests", method = RequestMethod.GET)
 	@Transactional
-	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestParam Boolean accepted, @RequestHeader String accessKey) {
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
 			return ResponseEntity.notFound().build();
@@ -267,14 +267,20 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		} else {
 
-			List<MeetingRequestSummary> responseBody = refugee.getMeetingRequests().stream().map(x -> {
-				MeetingRequestSummary summary = new MeetingRequestSummary(x);
-				if (summary.volunteer != null && Direction.VOLUNTEER_TO_REFUGEE.equals(x.getFirstContact())){
-					summary.volunteer.phoneNumber = null;
-					summary.volunteer.mailAddress = null;
-				}
-				return summary;
-			}).collect(Collectors.toList());
+			List<MeetingRequestSummary> responseBody = refugee.getMeetingRequests()
+					.stream()
+					.filter(x -> accepted == null || (accepted && x.getVolunteer() != null) || (!accepted && x.getVolunteer() == null))
+					.map(x -> {
+						MeetingRequestSummary summary = new MeetingRequestSummary(x);
+						
+						if (summary.volunteer != null && Direction.VOLUNTEER_TO_REFUGEE.equals(x.getFirstContact())){
+							summary.volunteer.phoneNumber = null;
+							summary.volunteer.mailAddress = null;
+						}
+						return summary;
+						}
+					)
+					.collect(Collectors.toList());
 
 			return ResponseEntity.ok(responseBody);
 		}

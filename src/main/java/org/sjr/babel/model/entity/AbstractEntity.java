@@ -24,6 +24,10 @@ public abstract class AbstractEntity {
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface CacheOnStartup{
 		int order();
-		
 	}
+	/*
+	@Override
+	public boolean equals(Object obj) {
+		return obj.getClass().equals(this.getClass()) && ((AbstractEntity)obj).getId().equals(this.getId());
+	}*/
 }

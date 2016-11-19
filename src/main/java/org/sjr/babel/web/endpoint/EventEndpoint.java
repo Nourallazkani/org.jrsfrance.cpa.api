@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -17,13 +18,15 @@ import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.MultiLanguageText;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.AbstractEvent;
-import org.sjr.babel.model.entity.Administrator;
-import org.sjr.babel.model.entity.Organisation;
-import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.AbstractEvent.Audience;
 import org.sjr.babel.model.entity.AbstractEvent.OrganisationEvent;
 import org.sjr.babel.model.entity.AbstractEvent.VolunteerEvent;
+import org.sjr.babel.model.entity.Administrator;
+import org.sjr.babel.model.entity.Organisation;
+import org.sjr.babel.model.entity.Refugee;
+import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.EventType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +43,8 @@ import org.springframework.web.servlet.HandlerMapping;
 @RestController
 public class EventEndpoint extends AbstractEndpoint {
 
+	
+	
 	public static class EventSummary {
 		public Integer id;
 		@NotNull @Size(min = 1)
@@ -353,5 +358,79 @@ public class EventEndpoint extends AbstractEndpoint {
 		input.id = event.getId();
 		URI uri = isWorkshop ? getUri("/workshops/"+event.getId()) : getUri("/events/"+event.getId());
 		return ResponseEntity.created(uri).body(input);
+	}
+	
+	@RequestMapping(path = {"events/{id}/registrations", "workshops/{id}/registrations"}, method = RequestMethod.GET)
+	@Transactional
+	@RolesAllowed({ "ORGANISATION" ,"ADMIN"})
+	public ResponseEntity<?> getInscriptions (@PathVariable int id, @RequestHeader String accessKey ){
+		Optional<AbstractEvent> _ae = objectStore.getById(AbstractEvent.class, id);
+		if (!_ae.isPresent()){
+			return notFound();
+		}
+		if (!hasAccess(accessKey, _ae.get())){
+			return forbidden();
+		}
+		List<Registration> registrations = _ae.get().getRegistrations();
+		List<RegistrationSummary> registrationsSummary = registrations.stream().map(x-> new RegistrationSummary(x)).collect(Collectors.toList());
+		return ResponseEntity.ok(registrationsSummary);
+	}
+	
+	
+	@RequestMapping(path={"events/{id}/registrations" ,"workshops/{id}/registrations"}, method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> addRegistration (@PathVariable int id, @RequestHeader("accessKey") String refugeeAccessKey) {
+		Date now = new Date();
+		Optional<AbstractEvent> _ae = objectStore.getById(AbstractEvent.class, id);
+		if (!_ae.isPresent()){
+			return notFound();
+		}
+		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
+		if (!_r.isPresent()){
+			return forbidden();
+		}
+		Refugee r = _r.get();
+		List<Registration> registrations = _ae.get().getRegistrations();
+		for (Registration reg : registrations){
+			if( r.equals(reg.getRefugee())){
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+		}
+		Registration reg = new Registration();
+		reg.setAccepted(null);
+		reg.setRefugee(r);
+		reg.setRegistrationDate(now);
+		registrations.add(reg);
+		RegistrationSummary regSum = new RegistrationSummary(reg);
+		return created(null,regSum);
+	}
+	
+	@RequestMapping(path = {"events/{id}/registrations/{rId}", "workshops/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
+	@Transactional
+	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestBody AcceptOrRefuseRegistrationCommand input,  @RequestHeader String accessKey) {
+		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
+		if(!_event.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		AbstractEvent event = _event.get();
+		if(!hasAccess(accessKey, event))
+		{
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
+		if (!_r.isPresent()){
+			return notFound();
+		}
+		Refugee r = _r.get();
+		Optional<Registration> _reg = event.getRegistrations().stream()
+				.filter(x -> x.getRefugee().getId().equals(r.getId()))
+				.findFirst(); // à voir car s'est une fausse function
+		if (!_reg.isPresent()){
+			return notFound();
+		}
+		// verification si il y a de changement? (acceptation ou pas)
+		Registration reg = _reg.get();
+		reg.setAccepted(input.accepted);
+		return ResponseEntity.noContent().build();
 	}
 }

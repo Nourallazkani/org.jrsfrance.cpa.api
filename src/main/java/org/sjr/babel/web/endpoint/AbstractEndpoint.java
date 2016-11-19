@@ -17,13 +17,16 @@ import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.AbstractEntity;
 import org.sjr.babel.model.entity.MeetingRequest;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Organisation;
+import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.persistence.ObjectStore;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.ContactSummary;
 import org.sjr.babel.web.helper.MailHelper;
 import org.sjr.babel.web.helper.ReferenceDataHelper;
 import org.slf4j.Logger;
@@ -192,6 +195,37 @@ public abstract class AbstractEndpoint {
 			return c;
 		}
 	}
+	
+	static class RegistrationSummary{
+		public ContactSummary refugeeContact;
+		public Date acceptationDate;
+		public Boolean accepted;
+		
+		public RegistrationSummary() {}
+		
+		public RegistrationSummary(Registration r) {
+			Contact contact = new Contact();
+			contact.setMailAddress(r.getRefugee().getMailAddress());
+			contact.setName(r.getRefugee().getFullName());
+			contact.setPhoneNumber(r.getRefugee().getPhoneNumber());
+			this.refugeeContact = new ContactSummary(contact);
+			this.acceptationDate = r.getRegistrationDate();
+			this.accepted = r.getAccepted();
+		}
+		
+	}
+	
+	protected Optional<Refugee> getRefugeeByAccesskey (String accessKey ){
+		Map<String,Object> args = new HashMap<>();
+		args.put("accessKey", accessKey);
+		String hql = "select r from Refugee r where r.account.accessKey like :accessKey";
+		return objectStore.findOne(Refugee.class, hql, args);
+	}
+	
+	static class AcceptOrRefuseRegistrationCommand {
+		boolean accepted;
+	}
+
 	/*
 	protected static class MessageSummary {
 		@NotNull @Size(min = 1)

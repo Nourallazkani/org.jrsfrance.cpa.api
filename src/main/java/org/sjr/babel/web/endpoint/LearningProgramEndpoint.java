@@ -14,11 +14,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.AbstractLearningProgram;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.LanguageLearningProgram;
 import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.ProfessionalLearningProgram;
+import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.reference.LanguageLearningProgramType;
 import org.sjr.babel.model.entity.reference.Level;
 import org.sjr.babel.model.entity.reference.ProfessionalLearningProgramDomain;
@@ -42,6 +44,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 @RestController @RequestMapping(path = "learnings")
 public class LearningProgramEndpoint extends AbstractEndpoint {
+	
 
 	static class LearningProgramSummary {
 		public Integer id;
@@ -271,7 +274,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
 		if(input.id!=null){
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		}
 		
 		Optional<Organisation> o = getOrganisationByAccessKey(accessKey);
@@ -330,4 +333,78 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		return ResponseEntity.created(getUri("/language-programs/" + entity.getId())).body(input);
 	}
+	
+	@RequestMapping(path = {"language-programs/{id}/registrations", "professional-programs/{id}/registrations"}, method = RequestMethod.GET)
+	@Transactional
+	@RolesAllowed({ "ORGANISATION" ,"ADMIN"})
+	public ResponseEntity<?> getInscriptions (@PathVariable int id, @RequestHeader String accessKey ){
+		Optional<AbstractLearningProgram> alp = objectStore.getById(AbstractLearningProgram.class, id);
+		if (!alp.isPresent()){
+			return notFound();
+		}
+		if (!hasAccess(accessKey, alp.get())){
+			return forbidden();
+		}
+		List<Registration> registrations = alp.get().getRegistrations();
+		List<RegistrationSummary> registrationsSummary = registrations.stream().map(x-> new RegistrationSummary(x)).collect(Collectors.toList());
+		return ResponseEntity.ok(registrationsSummary);
+	}
+	
+	@RequestMapping(path={"language-programs/{id}/registrations" ,"professional-programs/{id}/registrations"}, method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> addRegistration (@PathVariable int id, @RequestHeader("accessKey") String refugeeAccessKey) {
+		Date now = new Date();
+		Optional<AbstractLearningProgram> _lp = objectStore.getById(AbstractLearningProgram.class, id);
+		if (!_lp.isPresent()){
+			return notFound();
+		}
+		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
+		if (!_r.isPresent()){
+			return forbidden();
+		}
+		Refugee r = _r.get();
+		List<Registration> registrations = _lp.get().getRegistrations();
+		for (Registration reg : registrations){
+			if( r.equals(reg.getRefugee())){
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+		}
+		Registration reg = new Registration();
+		reg.setAccepted(null);
+		reg.setRefugee(r);
+		reg.setRegistrationDate(now);
+		registrations.add(reg);
+		RegistrationSummary regSum = new RegistrationSummary(reg);
+		return created(null,regSum);
+	}
+	
+	@RequestMapping(path = {"language-programs/{id}/registrations/{rId}", "professional-programs/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
+	@Transactional
+	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestBody AcceptOrRefuseRegistrationCommand input,  @RequestHeader String accessKey) {
+		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);
+		if(!_learningProgram.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		AbstractLearningProgram learningProgram = _learningProgram.get();
+		if(!hasAccess(accessKey, learningProgram))
+		{
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
+		if (!_r.isPresent()){
+			return notFound();
+		}
+		Refugee r = _r.get();
+		Optional<Registration> _reg = learningProgram.getRegistrations().stream()
+				.filter(x -> x.getRefugee().getId().equals(r.getId()))
+				.findFirst(); // à voir car s'est une fausse function
+		if (!_reg.isPresent()){
+			return notFound();
+		}
+		// verification si il y a de changement? (acceptation ou pas)
+		Registration reg = _reg.get();
+		reg.setAccepted(input.accepted);
+		return ResponseEntity.noContent().build();
+	}
+	
 }

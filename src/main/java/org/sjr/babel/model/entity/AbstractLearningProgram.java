@@ -1,8 +1,10 @@
 package org.sjr.babel.model.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -15,6 +17,7 @@ import javax.persistence.TemporalType;
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.Contact.ContactConverter;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.reference.Level;
 
 @Entity
@@ -39,6 +42,10 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	@Embedded
 	private Address address;
+	
+	@ElementCollection
+	private List<Registration> registrations;
+	
 
 	@ManyToOne
 	private Level level;
@@ -121,6 +128,13 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+	public List<Registration> getRegistrations() {
+		return registrations;
+	}
+
+	public void setRegistrations(List<Registration> registrations) {
+		this.registrations = registrations;
 	}
 
 	public Level getLevel() {

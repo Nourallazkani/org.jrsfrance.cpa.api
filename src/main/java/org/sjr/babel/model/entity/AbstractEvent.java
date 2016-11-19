@@ -1,12 +1,14 @@
 package org.sjr.babel.model.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorValue;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,6 +23,7 @@ import javax.persistence.TemporalType;
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.MultiLanguageText;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.component.Contact.ContactConverter;
 import org.sjr.babel.model.entity.reference.EventType;
 
@@ -66,7 +69,10 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	@Embedded
 	private Address address;
-
+	
+	@ElementCollection
+	private List<Registration> registrations;
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	private EventType type;
 
@@ -124,6 +130,13 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	public void setAddress(Address address) {
 		this.address = address;
+	}
+	public List<Registration> getRegistrations() {
+		return registrations;
+	}
+
+	public void setRegistrations(List<Registration> registratios) {
+		this.registrations = registratios;
 	}
 
 	public Date getStartDate() {

@@ -358,24 +358,30 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		if (!_lp.isPresent()){
 			return notFound();
 		}
+		AbstractLearningProgram lp = _lp.get();
 		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
 		if (!_r.isPresent()){
 			return forbidden();
 		}
 		Refugee r = _r.get();
+		
+		if(lp.getRegistrations().stream().anyMatch(x -> x.getRefugee().getId().equals(r.getId()))){
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+		}
+		
+		/*
 		List<Registration> registrations = _lp.get().getRegistrations();
 		for (Registration reg : registrations){
 			if( r.equals(reg.getRefugee())){
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
 			}
-		}
+		}*/
 		Registration reg = new Registration();
 		reg.setAccepted(null);
 		reg.setRefugee(r);
 		reg.setRegistrationDate(now);
-		registrations.add(reg);
-		RegistrationSummary regSum = new RegistrationSummary(reg);
-		return created(null,regSum);
+		lp.getRegistrations().add(reg);
+		return created(null,new RegistrationSummary(reg));
 	}
 	
 	@RequestMapping(path = {"language-programs/{id}/registrations/{rId}", "professional-programs/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})

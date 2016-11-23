@@ -53,7 +53,7 @@ public class Refugee extends AbstractEntity {
 	private List<Language> languages;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	private Level hostCountryLunguageLevel ;
+	private Level hostCountryLanguageLevel ;
 	
 
 
@@ -145,12 +145,12 @@ public class Refugee extends AbstractEntity {
 		this.languages = languages;
 	}
 	
-	public Level getHostCountryLunguageLevel() {
-		return hostCountryLunguageLevel;
+	public Level getHostCountryLanguageLevel() {
+		return hostCountryLanguageLevel;
 	}
 
-	public void setHostCountryLunguageLevel(Level hostCountryLunguageLevel) {
-		this.hostCountryLunguageLevel = hostCountryLunguageLevel;
+	public void setHostCountryLanguageLevel(Level hostCountryLanguageLevel) {
+		this.hostCountryLanguageLevel = hostCountryLanguageLevel;
 	}
 
 	public List<MeetingRequest> getMeetingRequests() {

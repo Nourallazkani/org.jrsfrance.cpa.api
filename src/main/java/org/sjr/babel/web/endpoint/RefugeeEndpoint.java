@@ -25,6 +25,7 @@ import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
+import org.sjr.babel.model.entity.reference.Level;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,6 +53,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		public int id;
 		public String nationality;
 		public String mailAddress;
+		public String hostCountryLanguageLevel;
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
 		public String civility, firstName, lastName, phoneNumber;
 		public AddressSummary address;
@@ -65,6 +67,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			this.id = entity.getId();
 			this.civility = safeTransform(entity.getCivility(), x -> x.getName());
 			this.nationality = safeTransform(entity.getNationality(), x -> x.getName());
+			this.hostCountryLanguageLevel = safeTransform(entity.getHostCountryLanguageLevel(), x->x.getName());
 			this.firstName = entity.getFirstName();
 			this.lastName = entity.getLastName();
 			this.mailAddress = entity.getMailAddress();
@@ -117,6 +120,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		refugee.setAccount(account);
 		refugee.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 		refugee.setPhoneNumber(input.phoneNumber);
+		refugee.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x-> this.refDataProvider.resolve(Level.class, x)));
 		refugee.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
 		if(input.languages!=null){
 			List<Language> languages = input.languages.stream()
@@ -218,6 +222,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			r.setMailAddress(input.mailAddress);
 			r.setPhoneNumber(input.phoneNumber);
 			r.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+			r.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
 			if(StringUtils.hasText(input.password)){
 				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 				this.mailHelper.send(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, "fr", r.getMailAddress(), r.getMailAddress(), input.password);

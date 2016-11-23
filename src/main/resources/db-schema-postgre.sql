@@ -224,13 +224,14 @@ create table Refugee(
     street2 varchar(255),
     postalCode varchar(255),
     locality varchar(255),
-    lat decimal(10, 8) null, 
+    lat decimal(10, 8) null,
     lng DECIMAL(11, 8) null,
     googleMapId varchar(255) null,
     country_id int,
     level_id int,
     
     firstLanguage_id int null,
+    hostCountryLanguageLevel_id int null,
     fieldOfStudy_id int null,
     civility_id int,
 	nationality_id int,
@@ -290,18 +291,18 @@ create table MeetingRequest_messages (
 );
 create table AbstractLearningProgram_registrations(
 	AbstractLearningProgram_id int not null,
-   		Refugee_id int not null,
-    	AcceptationDate timestamp default now(),
- 		Accepted BOOLEAN NULL,
-    	foreign key (Refugee_id) references Refugee(id),
-    	foreign key (AbstractLearningProgram_id) references AbstractLearningProgram(id)
+   	refugee_id int not null,
+    acceptationDate timestamp default now(),
+ 	accepted BOOLEAN NULL,
+    foreign key (refugee_id) references Refugee(id),
+    foreign key (AbstractLearningProgram_id) references AbstractLearningProgram(id)
 );
 
 create table AbstractEvent_registrations(
 	AbstractEvent_id int not null,
-    	Refugee_id int not null,
-    	AcceptationDate timestamp default now(),
-    	Accepted BOOLEAN NULL,
-    	foreign key (Refugee_id) references Refugee(id),
-    	foreign key (AbstractEvent_id) references AbstractEvent(id)
+    refugee_id int not null,
+    acceptationDate timestamp default now(),
+    accepted BOOLEAN NULL,
+    foreign key (refugee_id) references Refugee(id),
+    foreign key (AbstractEvent_id) references AbstractEvent(id)
 );

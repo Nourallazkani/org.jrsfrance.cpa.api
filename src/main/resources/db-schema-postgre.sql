@@ -228,8 +228,7 @@ create table Refugee(
     lng DECIMAL(11, 8) null,
     googleMapId varchar(255) null,
     country_id int,
-    level_id int,
-    
+   
     firstLanguage_id int null,
     hostCountryLanguageLevel_id int null,
     fieldOfStudy_id int null,
@@ -239,7 +238,7 @@ create table Refugee(
     foreign key (country_id) references Country(id),
     foreign key (civility_id) references Civility (id),
 	foreign key (nationality_id) references Country (id),
-	foreign key (level_id) references Level(id)
+	foreign key (hostCountryLanguageLevel_id) references Level(id)
 );
 
 create table Refugee_Language(

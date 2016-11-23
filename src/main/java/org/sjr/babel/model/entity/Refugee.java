@@ -20,6 +20,7 @@ import org.sjr.babel.model.entity.reference.Civility;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
+import org.sjr.babel.model.entity.reference.Level;
 
 @Entity
 public class Refugee extends AbstractEntity {
@@ -50,6 +51,10 @@ public class Refugee extends AbstractEntity {
 	@ManyToMany
 	@JoinTable(name = "Refugee_Language", joinColumns = @JoinColumn(name = "Refugee_id"), inverseJoinColumns = @JoinColumn(name = "Language_id"))
 	private List<Language> languages;
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Level hostCountryLunguageLevel ;
+	
 
 
 	public String getFirstName() {
@@ -138,6 +143,14 @@ public class Refugee extends AbstractEntity {
 
 	public void setLanguages(List<Language> languages) {
 		this.languages = languages;
+	}
+	
+	public Level getHostCountryLunguageLevel() {
+		return hostCountryLunguageLevel;
+	}
+
+	public void setHostCountryLunguageLevel(Level hostCountryLunguageLevel) {
+		this.hostCountryLunguageLevel = hostCountryLunguageLevel;
 	}
 
 	public List<MeetingRequest> getMeetingRequests() {

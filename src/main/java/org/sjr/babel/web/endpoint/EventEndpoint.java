@@ -433,4 +433,32 @@ public class EventEndpoint extends AbstractEndpoint {
 		reg.setAccepted(input.accepted);
 		return ResponseEntity.noContent().build();
 	}
+	
+	@RequestMapping(path = {"events/{id}/registrations/{rId}", "workshops/{id}/registrations/{rId}"}, method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<?> cancelRegistration (@PathVariable int id, @PathVariable int rId,  @RequestHeader String accessKey) {
+		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
+		if(!_event.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		AbstractEvent event = _event.get();
+		if(!hasAccess(accessKey, event))
+		{
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
+		if (!_r.isPresent()){
+			return notFound();
+		}
+		Refugee r = _r.get();
+		Optional<Registration> _reg = event.getRegistrations().stream()
+				.filter(x -> x.getRefugee().getId().equals(r.getId()))
+				.findFirst();
+		if (!_reg.isPresent()){
+			return notFound();
+		}
+		Registration reg = _reg.get();
+		event.getRegistrations().remove(event.getRegistrations().indexOf(reg));
+		return ResponseEntity.noContent().build();
+	}
 }

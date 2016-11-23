@@ -228,6 +228,7 @@ create table Refugee(
     lng DECIMAL(11, 8) null,
     googleMapId varchar(255) null,
     country_id int,
+    level_id int,
     
     firstLanguage_id int null,
     fieldOfStudy_id int null,
@@ -235,8 +236,9 @@ create table Refugee(
 	nationality_id int,
     foreign key (firstLanguage_id) references Language(id),
     foreign key (country_id) references Country(id),
-	foreign key (civility_id) references Civility (id),
-	foreign key (nationality_id) references Country (id)
+    foreign key (civility_id) references Civility (id),
+	foreign key (nationality_id) references Country (id),
+	foreign key (level_id) references Level(id)
 );
 
 create table Refugee_Language(
@@ -285,4 +287,21 @@ create table MeetingRequest_messages (
 	readDate timestamp,
 	foreign key (volunteer_id) references Volunteer(id),
 	foreign key (MeetingRequest_id) references MeetingRequest(id)
+);
+create table AbstractLearningProgram_registrations(
+	AbstractLearningProgram_id int not null,
+   		Refugee_id int not null,
+    	AcceptationDate timestamp default now(),
+ 		Accepted BOOLEAN NULL,
+    	foreign key (Refugee_id) references Refugee(id),
+    	foreign key (AbstractLearningProgram_id) references AbstractLearningProgram(id)
+);
+
+create table AbstractEvent_registrations(
+	AbstractEvent_id int not null,
+    	Refugee_id int not null,
+    	AcceptationDate timestamp default now(),
+    	Accepted BOOLEAN NULL,
+    	foreign key (Refugee_id) references Refugee(id),
+    	foreign key (AbstractEvent_id) references AbstractEvent(id)
 );

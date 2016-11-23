@@ -413,4 +413,32 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		return ResponseEntity.noContent().build();
 	}
 	
+	@RequestMapping(path = {"language-programs/{id}/registrations/{rId}", "professional-programs/{id}/registrations/{rId}"}, method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestHeader String accessKey) {
+		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);
+		if(!_learningProgram.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		AbstractLearningProgram learningProgram = _learningProgram.get();
+		if(!hasAccess(accessKey, learningProgram))
+		{
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
+		if (!_r.isPresent()){
+			return notFound();
+		}
+		Refugee r = _r.get();
+		Optional<Registration> _reg = learningProgram.getRegistrations().stream()
+				.filter(x -> x.getRefugee().getId().equals(r.getId()))
+				.findFirst();
+		if (!_reg.isPresent()){
+			return notFound();
+		}
+		Registration reg = _reg.get();
+		learningProgram.getRegistrations().remove(learningProgram.getRegistrations().indexOf(reg));
+		return ResponseEntity.noContent().build();
+	}
+	
 }

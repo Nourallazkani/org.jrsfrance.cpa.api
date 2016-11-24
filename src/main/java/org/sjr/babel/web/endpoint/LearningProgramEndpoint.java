@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
@@ -430,15 +431,11 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			return notFound();
 		}
 		Refugee r = _r.get();
-		Optional<Registration> _reg = learningProgram.getRegistrations().stream()
-				.filter(x -> x.getRefugee().getId().equals(r.getId()))
-				.findFirst();
-		if (!_reg.isPresent()){
-			return notFound();
-		}
-		Registration reg = _reg.get();
-		learningProgram.getRegistrations().remove(learningProgram.getRegistrations().indexOf(reg));
-		return ResponseEntity.noContent().build();
+		Predicate<Registration> registrationPredicate = x-> x.getRefugee().getId().equals(r.getId());
+		if(!learningProgram.getRegistrations().removeIf(registrationPredicate)){
+			return badRequest();
+		};
+		return noContent();
 	}
 	
 }

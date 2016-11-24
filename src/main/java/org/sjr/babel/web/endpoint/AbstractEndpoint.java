@@ -104,6 +104,9 @@ public abstract class AbstractEndpoint {
 	protected <T> ResponseEntity<T> forbidden(T body){
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
 	}
+	protected ResponseEntity<Void> noContent(){
+		return ResponseEntity.noContent().build();
+	} 
 	
 	@Autowired
 	private HttpServletRequest currentRequest;

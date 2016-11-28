@@ -1,14 +1,17 @@
 package org.sjr.babel.model.entity;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Convert;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Contact;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.component.Contact.ContactConverter;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
@@ -34,6 +37,9 @@ public class Teaching extends AbstractEntity {
 
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
+	
+	@ElementCollection
+	private List<Registration> registrations;
 
 
 	public Date getRegistrationOpeningDate() {
@@ -107,4 +113,13 @@ public class Teaching extends AbstractEntity {
 	public void setContact(Contact contact) {
 		this.contact = contact;
 	}
+
+	public List<Registration> getRegistrations() {
+		return registrations;
+	}
+
+	public void setRegistrations(List<Registration> registrations) {
+		this.registrations = registrations;
+	}
+	
 }

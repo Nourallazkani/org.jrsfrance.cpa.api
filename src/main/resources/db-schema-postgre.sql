@@ -291,7 +291,7 @@ create table MeetingRequest_messages (
 create table AbstractLearningProgram_registrations(
 	AbstractLearningProgram_id int not null,
    	refugee_id int not null,
-    acceptationDate timestamp default now(),
+    registrationDate timestamp default now(),
  	accepted BOOLEAN NULL,
     foreign key (refugee_id) references Refugee(id),
     foreign key (AbstractLearningProgram_id) references AbstractLearningProgram(id)
@@ -300,7 +300,7 @@ create table AbstractLearningProgram_registrations(
 create table AbstractEvent_registrations(
 	AbstractEvent_id int not null,
     refugee_id int not null,
-    acceptationDate timestamp default now(),
+    registrationDate timestamp default now(),
     accepted BOOLEAN NULL,
     foreign key (refugee_id) references Refugee(id),
     foreign key (AbstractEvent_id) references AbstractEvent(id)

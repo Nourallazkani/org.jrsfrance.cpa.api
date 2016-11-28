@@ -226,7 +226,7 @@ public abstract class AbstractEndpoint {
 	}
 	
 	static class AcceptOrRefuseRegistrationCommand {
-		boolean accepted;
+		public boolean accepted;
 	}
 
 	/*

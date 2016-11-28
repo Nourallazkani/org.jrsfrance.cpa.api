@@ -5,18 +5,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.component.Registration;
+import org.sjr.babel.model.entity.AbstractEvent;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
+import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.AcceptOrRefuseRegistrationCommand;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.RegistrationSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -237,4 +244,104 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		input.organisation = teaching.getOrganisation().getName();
 		return ResponseEntity.created(getUri("/teachings/" + teaching.getId())).body(input);
 	}
+	
+	
+	@RequestMapping(path = {"/{id}/registrations"}, method = RequestMethod.GET)
+	@Transactional
+	@RolesAllowed({ "ORGANISATION" ,"ADMIN"})
+	public ResponseEntity<?> getInscriptions (@PathVariable int id, @RequestHeader String accessKey ){
+		Optional<Teaching> _T = objectStore.getById(Teaching.class, id);
+		if (!_T.isPresent()){
+			return notFound();
+		}
+		if (!hasAccess(accessKey, _T.get())){
+			return forbidden();
+		}
+		List<Registration> registrations = _T.get().getRegistrations();
+		List<RegistrationSummary> registrationsSummary = registrations.stream().map(x-> new RegistrationSummary(x)).collect(Collectors.toList());
+		return ResponseEntity.ok(registrationsSummary);
+	}
+	
+	
+	@RequestMapping(path={"/{id}/registrations"}, method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> addRegistration (@PathVariable int id, @RequestHeader("accessKey") String refugeeAccessKey) {
+		Date now = new Date();
+		Optional<Teaching> _T = objectStore.getById(Teaching.class, id);
+		if (!_T.isPresent()){
+			return notFound();
+		}
+		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
+		if (!_r.isPresent()){
+			return forbidden();
+		}
+		Refugee r = _r.get();
+		List<Registration> registrations = _T.get().getRegistrations();
+		for (Registration reg : registrations){
+			if( r.equals(reg.getRefugee())){
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+		}
+		Registration reg = new Registration();
+		reg.setAccepted(null);
+		reg.setRefugee(r);
+		reg.setRegistrationDate(now);
+		registrations.add(reg);
+		RegistrationSummary regSum = new RegistrationSummary(reg);
+		return created(null,regSum);
+	}
+	
+	@RequestMapping(path = {"/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
+	@Transactional
+	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestBody AcceptOrRefuseRegistrationCommand input,  @RequestHeader String accessKey) {
+		Optional<Teaching> _T = this.objectStore.getById(Teaching.class, id);
+		if(!_T.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		Teaching teaching = _T.get();
+		if(!hasAccess(accessKey, teaching))
+		{
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
+		if (!_r.isPresent()){
+			return notFound();
+		}
+		Refugee r = _r.get();
+		Optional<Registration> _reg = teaching.getRegistrations().stream()
+				.filter(x -> x.getRefugee().getId().equals(r.getId()))
+				.findFirst(); // à voir car s'est une fausse function
+		if (!_reg.isPresent()){
+			return notFound();
+		}
+		// verification si il y a de changement? (acceptation ou pas)
+		Registration reg = _reg.get();
+		reg.setAccepted(input.accepted);
+		return ResponseEntity.noContent().build();
+	}
+	
+	@RequestMapping(path = {"/{id}/registrations/{rId}"}, method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<?> cancelRegistration (@PathVariable int id, @PathVariable int rId,  @RequestHeader String accessKey) {
+		Optional<Teaching> _T = this.objectStore.getById(Teaching.class, id);
+		if(!_T.isPresent()){
+			return ResponseEntity.notFound().build();
+		}
+		Teaching teaching = _T.get();
+		if(!hasAccess(accessKey, teaching))
+		{
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
+		if (!_r.isPresent()){
+			return notFound();
+		}
+		Refugee r = _r.get();
+		Predicate<Registration> registrationPredicate = x-> x.getRefugee().getId().equals(r.getId());
+		if(!teaching.getRegistrations().removeIf(registrationPredicate)){
+			return badRequest();
+		};
+		return noContent();
+	}
+	
 }

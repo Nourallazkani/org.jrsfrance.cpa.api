@@ -61,6 +61,13 @@ insert into Organisation(name, street1, postalCode, locality, lat, lng, googleMa
 	values ('Pole emploi', '10 rue Brancion', '75015', 'Paris', 48.8357559, 2.3035182, 'ChIJgT3BP9Zx5kcRGTe9PIEMNHM', 1, '{"name":"Nour","phoneNumber":"00337651234","mailAddress":"nour@gmail.com"}', 2);
 
 update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e4', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='o@o.o' where id=1;
+update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e2', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='sorbonne@cpafrance.fr' where id=2;
+update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e3', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='upec@cpafrance.fr' where id=3;
+update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e5', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='alliance@cpafrance.fr' where id=4;
+update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e6', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='singa@cpafrance.fr' where id=5;
+update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e7', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='jrs@cpafrance.fr' where id=6;
+update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e8', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='pole.emploi@cpafrance.fr' where id=7;
+
 update Organisation set additionalInformations='{"Horaires d''ouverture":"Du lundi au vendredi de 9h00 à 19h00"}' where category_id =2;
 
 

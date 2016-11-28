@@ -305,3 +305,12 @@ create table AbstractEvent_registrations(
     foreign key (refugee_id) references Refugee(id),
     foreign key (AbstractEvent_id) references AbstractEvent(id)
 );
+
+create table Teaching_registrations(
+	Teaching_id int not null,
+    refugee_id int not null,
+    registrationDate timestamp default now(),
+    accepted BOOLEAN NULL,
+    foreign key (refugee_id) references Refugee(id),
+    foreign key (Teaching_id) references Teaching(id)
+);

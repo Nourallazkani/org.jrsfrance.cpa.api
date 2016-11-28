@@ -200,7 +200,7 @@ public abstract class AbstractEndpoint {
 	}
 	
 	static class RegistrationSummary{
-		public ContactSummary refugeeContact;
+		public ContactSummary refugee;
 		public Date acceptationDate;
 		public Boolean accepted;
 		
@@ -211,7 +211,7 @@ public abstract class AbstractEndpoint {
 			contact.setMailAddress(r.getRefugee().getMailAddress());
 			contact.setName(r.getRefugee().getFullName());
 			contact.setPhoneNumber(r.getRefugee().getPhoneNumber());
-			this.refugeeContact = new ContactSummary(contact);
+			this.refugee = new ContactSummary(contact);
 			this.acceptationDate = r.getRegistrationDate();
 			this.accepted = r.getAccepted();
 		}

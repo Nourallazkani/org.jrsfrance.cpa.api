@@ -188,4 +188,5 @@ insert into MeetingRequest ( dateConstraint, reason, additionalInformations, pos
 insert into MeetingRequest_messages (MeetingRequest_id,volunteer_id,text,direction,postedDate,readDate) 
 	values (1,1,'bonjour','VOLUNTEER_TO_REFUGEE', now(), null);
 
+insert into AbstractLearningProgram_registrations( refugee_id, AbstractLearningProgram_id) values (1,5);
 

@@ -248,16 +248,15 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"/{id}/registrations"}, method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({ "ORGANISATION" ,"ADMIN"})
 	public ResponseEntity<?> getInscriptions (@PathVariable int id, @RequestHeader String accessKey ){
-		Optional<Teaching> _T = objectStore.getById(Teaching.class, id);
-		if (!_T.isPresent()){
+		Optional<Teaching> _teaching = objectStore.getById(Teaching.class, id);
+		if (!_teaching.isPresent()){
 			return notFound();
 		}
-		if (!hasAccess(accessKey, _T.get())){
+		if (!hasAccess(accessKey, _teaching.get())){
 			return forbidden();
 		}
-		List<Registration> registrations = _T.get().getRegistrations();
+		List<Registration> registrations = _teaching.get().getRegistrations();
 		List<RegistrationSummary> registrationsSummary = registrations.stream().map(x-> new RegistrationSummary(x)).collect(Collectors.toList());
 		return ResponseEntity.ok(registrationsSummary);
 	}
@@ -267,8 +266,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> addRegistration (@PathVariable int id, @RequestHeader("accessKey") String refugeeAccessKey) {
 		Date now = new Date();
-		Optional<Teaching> _T = objectStore.getById(Teaching.class, id);
-		if (!_T.isPresent()){
+		Optional<Teaching> _teaching = objectStore.getById(Teaching.class, id);
+		if (!_teaching.isPresent()){
 			return notFound();
 		}
 		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
@@ -276,7 +275,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			return forbidden();
 		}
 		Refugee r = _r.get();
-		List<Registration> registrations = _T.get().getRegistrations();
+		List<Registration> registrations = _teaching.get().getRegistrations();
 		for (Registration reg : registrations){
 			if( r.equals(reg.getRefugee())){
 				return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -294,11 +293,11 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
 	@Transactional
 	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestBody AcceptOrRefuseRegistrationCommand input,  @RequestHeader String accessKey) {
-		Optional<Teaching> _T = this.objectStore.getById(Teaching.class, id);
-		if(!_T.isPresent()){
+		Optional<Teaching> _teaching = this.objectStore.getById(Teaching.class, id);
+		if(!_teaching.isPresent()){
 			return ResponseEntity.notFound().build();
 		}
-		Teaching teaching = _T.get();
+		Teaching teaching = _teaching.get();
 		if(!hasAccess(accessKey, teaching))
 		{
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -323,11 +322,11 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"/{id}/registrations/{rId}"}, method = RequestMethod.DELETE)
 	@Transactional
 	public ResponseEntity<?> cancelRegistration (@PathVariable int id, @PathVariable int rId,  @RequestHeader String accessKey) {
-		Optional<Teaching> _T = this.objectStore.getById(Teaching.class, id);
-		if(!_T.isPresent()){
+		Optional<Teaching> _teaching = this.objectStore.getById(Teaching.class, id);
+		if(!_teaching.isPresent()){
 			return ResponseEntity.notFound().build();
 		}
-		Teaching teaching = _T.get();
+		Teaching teaching = _teaching.get();
 		if(!hasAccess(accessKey, teaching))
 		{
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -337,8 +336,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			return notFound();
 		}
 		Refugee r = _r.get();
-		Predicate<Registration> registrationPredicate = x-> x.getRefugee().getId().equals(r.getId());
-		if(!teaching.getRegistrations().removeIf(registrationPredicate)){
+		if(!teaching.getRegistrations().removeIf(x-> x.getRefugee().getId().equals(r.getId()))){
 			return badRequest();
 		};
 		return noContent();

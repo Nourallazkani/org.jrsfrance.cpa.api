@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
@@ -44,7 +43,9 @@ import org.springframework.web.servlet.HandlerMapping;
 @RestController
 public class EventEndpoint extends AbstractEndpoint {
 
-	
+	public EventEndpoint() {
+		System.out.println("inside constructor");
+	}
 	
 	public static class EventSummary {
 		public Integer id;
@@ -386,24 +387,24 @@ public class EventEndpoint extends AbstractEndpoint {
 		if (!_ae.isPresent()){
 			return notFound();
 		}
+		AbstractEvent abstractEvent = _ae.get();
+
 		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
 		if (!_r.isPresent()){
 			return forbidden();
 		}
 		Refugee r = _r.get();
-		List<Registration> registrations = _ae.get().getRegistrations();
-		for (Registration reg : registrations){
-			if( r.equals(reg.getRefugee())){
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-			}
+
+		if(abstractEvent.getRegistrations().stream().anyMatch(x-> x.getRefugee().getId().equals(r.getId()))){
+			return ResponseEntity.status(HttpStatus.CONFLICT).build();
 		}
+		
 		Registration reg = new Registration();
 		reg.setAccepted(null);
 		reg.setRefugee(r);
 		reg.setRegistrationDate(now);
-		registrations.add(reg);
-		RegistrationSummary regSum = new RegistrationSummary(reg);
-		return created(null,regSum);
+		abstractEvent.getRegistrations().add(reg);
+		return created(null, new RegistrationSummary(reg));
 	}
 	
 	@RequestMapping(path = {"events/{id}/registrations/{rId}", "workshops/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
@@ -416,7 +417,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		AbstractEvent event = _event.get();
 		if(!hasAccess(accessKey, event))
 		{
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){
@@ -440,22 +441,23 @@ public class EventEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> cancelRegistration (@PathVariable int id, @PathVariable int rId,  @RequestHeader String accessKey) {
 		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
 		if(!_event.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		AbstractEvent event = _event.get();
 		if(!hasAccess(accessKey, event))
 		{
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){
 			return notFound();
 		}
 		Refugee r = _r.get();
-		Predicate<Registration> registrationPredicate = x-> x.getRefugee().getId().equals(r.getId());
-		if(!event.getRegistrations().removeIf(registrationPredicate)){
+		
+		if(!event.getRegistrations().removeIf(x -> x.getRefugee().getId().equals(r.getId()))){
 			return badRequest();
-		};
+		}
+	
 		return noContent();
-	}
+	}	
 }

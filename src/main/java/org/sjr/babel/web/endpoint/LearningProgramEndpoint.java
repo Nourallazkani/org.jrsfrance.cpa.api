@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

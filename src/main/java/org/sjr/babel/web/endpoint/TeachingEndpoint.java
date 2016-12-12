@@ -5,25 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Registration;
-import org.sjr.babel.model.entity.AbstractEvent;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.AcceptOrRefuseRegistrationCommand;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.RegistrationSummary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;

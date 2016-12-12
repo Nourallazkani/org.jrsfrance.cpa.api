@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.reference.OrganisationCategory;
@@ -122,6 +124,48 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		}
 
 		return ResponseEntity.ok(new OrganisationSummary(organisation));
+	}
+	
+	@RequestMapping(path = "organisations", method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> create(@RequestBody @Valid OrganisationSummary input, @RequestHeader(required = false) String accessKey) {
+		
+		String query = "select o from Organisation o where o.mailAddress = :mailAddress";
+		Map<String, Object> args= new HashMap<>();
+		args.put("mailAddress", input.mailAddress);
+		Optional<Organisation> _conflict = this.objectStore.findOne(Organisation.class, query, args);
+		if(_conflict.isPresent()){
+			return conflict();
+		}
+		
+		Account account = new Account();
+		if(StringUtils.hasText(input.password)){
+			account.setPassword(EncryptionUtil.sha256(input.password));
+		}
+		else if (StringUtils.hasText(accessKey)) {
+			Optional<Administrator> _admin = getAdministratorByAccessKey(accessKey);
+			if(_admin.isPresent()){
+				return forbidden();
+			}
+			
+			account.setAccessKey("O-" + UUID.randomUUID().toString());
+			account.setPassword(EncryptionUtil.sha256(UUID.randomUUID().toString().substring(0, 8)));
+		}
+		
+		
+		Organisation organisation = new Organisation();
+		
+		organisation.setName(input.name);
+		organisation.setAddress(safeTransform(input.address, a -> a.toAddress(this.refDataProvider)));
+		organisation.setContact(safeTransform(input.contact, c -> c.toContact()));
+		organisation.setMailAddress(input.mailAddress);
+		
+		organisation.setAccount(account);
+		
+		organisation.setAdditionalInformations(input.additionalInformations);
+		objectStore.save(organisation);
+		input.id = organisation.getId();
+		return created(getUri("organisations/"+input.id), input);
 	}
 	
 	@RequestMapping(path = "organisations/{id}", method = RequestMethod.PUT)

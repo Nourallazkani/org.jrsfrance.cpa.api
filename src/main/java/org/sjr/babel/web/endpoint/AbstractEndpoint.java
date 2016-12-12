@@ -19,6 +19,7 @@ import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.AbstractEntity;
+import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.MeetingRequest;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Organisation;
@@ -26,7 +27,6 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.persistence.ObjectStore;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.ContactSummary;
 import org.sjr.babel.web.helper.MailHelper;
 import org.sjr.babel.web.helper.ReferenceDataHelper;
 import org.slf4j.Logger;
@@ -84,6 +84,10 @@ public abstract class AbstractEndpoint {
 			return ResponseEntity.created(newResourceUri).body(newResource);
 		} 
 	}
+
+	protected ResponseEntity<Void> noContent(){
+		return ResponseEntity.noContent().build();
+	} 
 	
 	protected ResponseEntity<Void> badRequest(){
 		return badRequest(null);
@@ -104,9 +108,10 @@ public abstract class AbstractEndpoint {
 	protected <T> ResponseEntity<T> forbidden(T body){
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
 	}
-	protected ResponseEntity<Void> noContent(){
-		return ResponseEntity.noContent().build();
-	} 
+
+	protected ResponseEntity<Void> conflict(){
+		return ResponseEntity.status(HttpStatus.CONFLICT).build();
+	}
 	
 	@Autowired
 	private HttpServletRequest currentRequest;
@@ -128,6 +133,12 @@ public abstract class AbstractEndpoint {
 		Map<String, Object> args= new HashMap<>();
 		args.put("accessKey", accessKey);
 		return this.objectStore.findOne(Organisation.class, "select o from Organisation o where o.account.accessKey=:accessKey", args);
+	}
+	
+	protected Optional<Administrator> getAdministratorByAccessKey(String accessKey){
+		Map<String, Object> args= new HashMap<>();
+		args.put("accessKey", accessKey);
+		return this.objectStore.findOne(Administrator.class, "select a from Administrator a where a.account.accessKey=:accessKey", args);
 	}
 	
 	protected Optional<Volunteer> getVolunteerByAccessKey(String accessKey){

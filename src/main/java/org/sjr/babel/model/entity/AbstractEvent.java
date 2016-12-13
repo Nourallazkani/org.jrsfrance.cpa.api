@@ -3,9 +3,6 @@ package org.sjr.babel.model.entity;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.ElementCollection;
@@ -22,9 +19,10 @@ import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
-import org.sjr.babel.model.component.MultiLanguageText;
-import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.component.Contact.ContactConverter;
+import org.sjr.babel.model.component.MultiLanguageText;
+import org.sjr.babel.model.component.MultiLanguageText.MultiLanguageTextConverter;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.reference.EventType;
 
 @Entity
@@ -38,26 +36,11 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@Enumerated(EnumType.STRING)
 	private Audience audience;
 
-	@Embedded()
-	@AttributeOverrides({
-		@AttributeOverride(name="defaultText", column=@Column(name="subject_defaultText")),
-		@AttributeOverride(name="textAr", column=@Column(name="subject_textAr")),
-		@AttributeOverride(name="textEn", column=@Column(name="subject_textEn")),
-		@AttributeOverride(name="textPrs", column=@Column(name="subject_textPrs"))
-	})
-	private MultiLanguageText subject;
+	private String subject, description, link;
 	
-	@Embedded()
-	@AttributeOverrides({
-		@AttributeOverride(name="defaultText", column=@Column(name="description_defaultText")),
-		@AttributeOverride(name="textAr", column=@Column(name="description_textAr")),
-		@AttributeOverride(name="textEn", column=@Column(name="description_textEn")),
-		@AttributeOverride(name="textPrs", column=@Column(name="description_textPrs"))
-	})
-	private MultiLanguageText description;
-	
-	private String link;
-
+	@Convert(converter = MultiLanguageTextConverter.class)
+	private MultiLanguageText subjectI18n, descriptionI18n;
+		
 	@Temporal(TemporalType.DATE)
 	private Date registrationOpeningDate, registrationClosingDate;
 
@@ -84,20 +67,36 @@ public abstract class AbstractEvent extends AbstractEntity {
 		this.audience = audience;
 	}
 
-	public MultiLanguageText getDescription() {
+	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(MultiLanguageText description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
-	public MultiLanguageText getSubject() {
+	public String getSubject() {
 		return subject;
 	}
 
-	public void setSubject(MultiLanguageText subject) {
+	public void setSubject(String subject) {
 		this.subject = subject;
+	}
+	
+	public MultiLanguageText getSubjectI18n() {
+		return subjectI18n;
+	}
+
+	public void setSubjectI18n(MultiLanguageText subjectI18n) {
+		this.subjectI18n = subjectI18n;
+	}
+
+	public MultiLanguageText getDescriptionI18n() {
+		return descriptionI18n;
+	}
+
+	public void setDescriptionI18n(MultiLanguageText descriptionI18n) {
+		this.descriptionI18n = descriptionI18n;
 	}
 
 	public String getLink() {

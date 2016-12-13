@@ -1,19 +1,43 @@
 package org.sjr.babel.model.component;
 
-import javax.persistence.Embeddable;
+import java.io.IOException;
+import java.io.Serializable;
 
-@Embeddable
-public class MultiLanguageText {
+import javax.persistence.Converter;
 
-	private String defaultText, textEn, textPrs, textAr;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-	public String getDefaultText() {
-		return defaultText;
+//@Embeddable
+public class MultiLanguageText implements Serializable {
+
+	private static final long serialVersionUID = 2003082058174806956L;
+
+	@Converter()
+	public static class MultiLanguageTextConverter implements javax.persistence.AttributeConverter<MultiLanguageText, String>{
+
+		private static ObjectMapper jackson = new ObjectMapper();
+
+		@Override
+		public String convertToDatabaseColumn(MultiLanguageText attribute) {
+			try {
+				return attribute==null ? null : jackson.writeValueAsString(attribute);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+
+		@Override
+		public MultiLanguageText convertToEntityAttribute(String dbData) {
+			try {
+				return dbData==null ? null : jackson.readValue(dbData, MultiLanguageText.class);
+			} catch (IOException e) {
+				return null;
+			}
+		}
+		
 	}
-
-	public void setDefaultText(String defaultText) {
-		this.defaultText = defaultText;
-	}
+	
+	private String textEn, textPrs, textAr;
 
 	public String getTextEn() {
 		return textEn;
@@ -39,12 +63,9 @@ public class MultiLanguageText {
 		this.textAr = textAr;
 	}
 
-	public String getText(String language, boolean fallbackTodefaultText) {
+	public String getText(String language) {
 		String text = null;
-		if("fr".equals(language)){
-			text = this.defaultText;
-		}
-		else if("en".equals(language)){
+		if("en".equals(language)){
 			text = this.textEn;
 		}
 		else if("ar".equals(language)){
@@ -54,6 +75,6 @@ public class MultiLanguageText {
 			text = this.textPrs;
 		}
 		
-		return text != null || fallbackTodefaultText == false ? text : this.defaultText;
+		return text;
 	}
 }

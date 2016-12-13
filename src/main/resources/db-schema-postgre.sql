@@ -1,22 +1,26 @@
 create table Country (
     id serial primary KEY,
     name varchar(50),
+    name_i18n jsonb null,
     isoCode varchar(3)
 );
 
 create table Language (
 	id serial primary KEY,
-    name varchar(50)
+    name varchar(50),
+	name_i18n jsonb null,
 );
 
 create table Civility (
 	id serial primary key,
-    name varchar (50)
+    name varchar (50),
+    name_i18n jsonb null
 );
 
 create table Level (
     id serial primary KEY,
     name varchar(50),
+	name_i18n jsonb null,
     next_id int,
     previous_id int,
     description varchar(100)
@@ -24,12 +28,14 @@ create table Level (
 
 create table FieldOfStudy (
 	id serial primary key,
-	name varchar(50)
+	name varchar(50),
+	name_i18n jsonb null
 );
 
 create table OrganisationCategory(
 	id serial primary key ,
 	name varchar(50),
+	name_i18n jsonb null,
 	stereotype varchar(25),
 	additionalInformations varchar(255)
 );
@@ -73,17 +79,19 @@ create table Teaching (
 
 create table ProfessionalLearningProgramDomain(
 	id serial primary key,
-	name varchar(250) NULL
+	name varchar(250) null,
+	name_i18n jsonb null
 );
 
 create table LanguageLearningProgramType(
 	id serial primary key,
-	name varchar(250) NULL
+	name varchar(250) null,
+	name_i18n jsonb null
 );
 
 create table AbstractLearningProgram (
     id serial primary key,
-    name varchar(250) NULL,
+    name varchar(250) null,
     street1 varchar(50),
     street2 varchar(50),
     postalCode varchar(50),
@@ -103,7 +111,7 @@ create table AbstractLearningProgram (
     groupSize int,
 	domain_id int,	/* only if DTYPE = P (ProfessionalLearningProgram)  */
 	type_id int,	/* only if DTYPE = L (LanguageLearningProgram) */
-	DTYPE varchar(1) not NULL,
+	DTYPE varchar(1) not null,
     foreign key (country_id) references Country (id),
     foreign key (organisation_id) references Organisation(id),
     foreign key (level_id) references Level (id),
@@ -171,6 +179,7 @@ create table Administrator (
 create table EventType (
 	id serial primary key,
 	name varchar(50),
+	name_i18n jsonb null,
 	stereotype varchar(25)
 );
 
@@ -190,15 +199,11 @@ create table AbstractEvent (
     registrationOpeningDate date,
     registrationClosingDate date,
     registrationStartDate date,
-	subject_defaultText varchar(255) null,
-	subject_textEn varchar(255) null,
-	subject_textAr varchar(255) null,
-	subject_textPrs varchar(255) null,
+    subject varchar(255) null,
+	subjectI18n json null,	
 	link varchar(255) null,
-	description_defaultText text null,
-	description_textEn text null,
-	description_textAr text null,
-	description_textPrs text null,
+    description varchar(255) null,
+	descriptionI18n json null,
     country_id int /*not*/ null,
     type_id int null,
     organisation_id int null,
@@ -283,16 +288,17 @@ create table MeetingRequest_messages (
     volunteer_id int,
 	text varchar(500),
     direction varchar(25),
-	postedDate timestamp NOT NULL DEFAULT NOW(),
+	postedDate timestamp NOT null DEFAULT NOW(),
 	readDate timestamp,
 	foreign key (volunteer_id) references Volunteer(id),
 	foreign key (MeetingRequest_id) references MeetingRequest(id)
 );
+
 create table AbstractLearningProgram_registrations(
 	AbstractLearningProgram_id int not null,
    	refugee_id int not null,
     registrationDate timestamp default now(),
- 	accepted BOOLEAN NULL,
+ 	accepted boolean null,
     foreign key (refugee_id) references Refugee(id),
     foreign key (AbstractLearningProgram_id) references AbstractLearningProgram(id)
 );
@@ -301,7 +307,7 @@ create table AbstractEvent_registrations(
 	AbstractEvent_id int not null,
     refugee_id int not null,
     registrationDate timestamp default now(),
-    accepted BOOLEAN NULL,
+    accepted boolean null,
     foreign key (refugee_id) references Refugee(id),
     foreign key (AbstractEvent_id) references AbstractEvent(id)
 );
@@ -310,7 +316,7 @@ create table Teaching_registrations(
 	Teaching_id int not null,
     refugee_id int not null,
     registrationDate timestamp default now(),
-    accepted BOOLEAN NULL,
+    accepted boolean null,
     foreign key (refugee_id) references Refugee(id),
     foreign key (Teaching_id) references Teaching(id)
 );

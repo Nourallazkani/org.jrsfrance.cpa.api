@@ -40,6 +40,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		@NotNull @Size(min = 1)
 		public String name, mailAddress;
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
+		@NotNull @Size(min = 1)
 		public String category;
 		@NotNull @Valid
 		public AddressSummary address;

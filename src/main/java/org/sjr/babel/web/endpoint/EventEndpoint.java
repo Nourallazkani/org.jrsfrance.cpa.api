@@ -42,10 +42,6 @@ import org.springframework.web.servlet.HandlerMapping;
 
 @RestController
 public class EventEndpoint extends AbstractEndpoint {
-
-	public EventEndpoint() {
-		System.out.println("inside constructor");
-	}
 	
 	public static class EventSummary {
 		public Integer id;
@@ -63,8 +59,10 @@ public class EventEndpoint extends AbstractEndpoint {
 		
 		public EventSummary(AbstractEvent entity, String language) {
 			this.id = entity.getId();
-			this.subject = safeTransform(entity.getSubject(), x -> x.getText(language, true));
-			this.description = safeTransform(entity.getDescription(), x -> x.getText(language, true));
+			
+			this.subject = safeTransform(entity.getSubjectI18n(), x -> x.getText(language), entity.getSubject());
+			this.description = safeTransform(entity.getDescriptionI18n(), x -> x.getText(language), entity.getDescription());
+			
 			this.audience = safeTransform(entity.getAudience(), x  -> x.name());
 			this.address = safeTransform(entity.getAddress(), x -> new AddressSummary(x));
 			this.startDate =entity.getStartDate();
@@ -227,7 +225,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		AbstractEvent event = _event.get();
 		if(!hasAccess(accessKey, event))
 		{
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
@@ -250,21 +248,13 @@ public class EventEndpoint extends AbstractEndpoint {
 		
 		event.setAudience(Audience.valueOf(input.audience));
 		
-		if(!input.subject.equals(event.getSubject().getDefaultText())){
-			MultiLanguageText newSubject = new MultiLanguageText();
-			newSubject.setDefaultText(input.subject);
-			newSubject.setTextAr(null);
-			newSubject.setTextPrs(null);
-			newSubject.setTextEn(null);
-			event.setSubject(newSubject);	
+		if(!input.subject.equals(event.getSubject())){
+			event.setSubject(input.subject);
+			event.setSubjectI18n(new MultiLanguageText());
 		}
-		if(!input.description.equals(event.getDescription().getDefaultText())){
-			MultiLanguageText newDescription = new MultiLanguageText();
-			newDescription.setDefaultText(input.description);
-			newDescription.setTextAr(null);
-			newDescription.setTextPrs(null);
-			newDescription.setTextEn(null);
-			event.setDescription(newDescription);
+		if(!input.description.equals(event.getDescription())){
+			event.setDescription(input.description);
+			event.setDescriptionI18n(new MultiLanguageText());
 		}
 
 		event.setStartDate(input.startDate);
@@ -341,14 +331,10 @@ public class EventEndpoint extends AbstractEndpoint {
 		
 		
 		event.setAudience(Audience.valueOf(input.audience));
-		
-		MultiLanguageText description = new MultiLanguageText();
-		description.setDefaultText(input.description);
-		event.setDescription(description);
-		
-		MultiLanguageText subject = new MultiLanguageText();
-		description.setDefaultText(input.subject);
-		event.setSubject(subject);
+		event.setSubject(input.subject);
+		event.setDescription(input.description);
+		event.setSubjectI18n(new MultiLanguageText());
+		event.setDescriptionI18n(new MultiLanguageText());
 		
 		event.setLink(input.link);
 		event.setRegistrationClosingDate(input.registrationClosingDate);

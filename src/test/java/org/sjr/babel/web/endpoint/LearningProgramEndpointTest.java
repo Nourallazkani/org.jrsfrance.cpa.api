@@ -30,28 +30,28 @@ public class LearningProgramEndpointTest {
 	
 	@Test
 	@Transactional
-	public void RegistrationPostTestOk(){
+	public void addRegistrationTestOk(){
 		ResponseEntity<?> x = endpoint.addRegistration(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.CREATED, http);
 	}
 	
 	@Test
-	public void RegistrationPostTestConflict(){
+	public void addRegistrationTestConflict(){
 		ResponseEntity<?> x = endpoint.addRegistration(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.CONFLICT, http);
 	}
 	
 	@Test
-	public void RegistrationPostTestnotFound(){
+	public void addRegistrationTestNotFound(){
 		ResponseEntity<?> x = endpoint.addRegistration(100000, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
 	}
 	
 	@Test
-	public void RegistrationPostTestForbidden(){
+	public void addRegistrationTestForbidden(){
 		ResponseEntity<?> x = endpoint.addRegistration(5, "R-unknown");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
@@ -60,21 +60,21 @@ public class LearningProgramEndpointTest {
 	// Get Registrations test 
 	
 	@Test
-	public void RegistrationGetTestOk(){
+	public void getInscriptionsOk(){
 		ResponseEntity<?> x = endpoint.getInscriptions(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
 	}
 	
 	@Test
-	public void RegistrationGetTestNotFound(){
+	public void getInscriptionsTestNotFound(){
 		ResponseEntity<?> x = endpoint.getInscriptions(10000, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
 	}
 	
 	@Test
-	public void RegistrationGetTestForbidden(){
+	public void getInscriptionsTestForbidden(){
 		ResponseEntity<?> x = endpoint.getInscriptions(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b528");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
@@ -83,7 +83,7 @@ public class LearningProgramEndpointTest {
 	// Accept or refuse  Registration test
 	
 	@Test
-	public void RegistrationAcceptTestok(){
+	public void acceptOrRefuseTestOk(){
 		AcceptOrRefuseRegistrationCommand acceptOrRefuseCommand = new AcceptOrRefuseRegistrationCommand() ;
 		acceptOrRefuseCommand.accepted = true;
 		ResponseEntity<?> x = endpoint.acceptOrRefuse(5, 1, acceptOrRefuseCommand, "O-unknown");
@@ -96,7 +96,7 @@ public class LearningProgramEndpointTest {
 	
 	@Test
 	@Transactional
-	public void RegistrationDeleteTest(){
+	public void deleteTestOk(){
 		ResponseEntity<?> x = endpoint.delete(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NO_CONTENT, http);

@@ -320,7 +320,13 @@ public abstract class AbstractEndpoint {
 	}
 	
 	protected static <T, R> R  safeTransform(T input, Function<T, R> transformer, R defaultValue){
-		return input!=null ? transformer.apply(input) : defaultValue;
+		if(input == null){
+			return defaultValue;
+		}
+		else{
+			R ret = transformer.apply(input);
+			return ret != null ? ret : defaultValue;
+		}
 	}
 	
 	public static class Error {

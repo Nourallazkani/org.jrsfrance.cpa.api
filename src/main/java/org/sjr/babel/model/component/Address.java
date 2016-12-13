@@ -1,5 +1,6 @@
 package org.sjr.babel.model.component;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -13,6 +14,7 @@ public class Address {
 	@ManyToOne(fetch=FetchType.EAGER)
 	private Country country;
 	
+	@Column(columnDefinition="numeric")
 	private Double lat, lng;
 	
 	private String googleMapId;

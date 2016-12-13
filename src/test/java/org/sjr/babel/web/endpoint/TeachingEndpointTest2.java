@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sjr.babel.JpaConfig4Tests;
 import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,7 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration()
-@ContextHierarchy(@ContextConfiguration(classes = RestConfiguration.class))
+@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 public class TeachingEndpointTest2 {
 	
 	@Autowired
@@ -31,11 +32,11 @@ public class TeachingEndpointTest2 {
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
 	}
-		
+
 	@Test
 	public void testGetTeachings() throws Exception{
 		MvcResult result = mockMvc.perform(get("/teachings")).andExpect(status().isOk()).andReturn();
-		
+		System.out.println(result);
 	}
 	
 	@Test

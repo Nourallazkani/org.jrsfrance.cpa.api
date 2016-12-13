@@ -313,10 +313,8 @@ create table AbstractEvent_registrations(
 );
 
 create table Teaching_registrations(
-	Teaching_id int not null,
-    refugee_id int not null,
+	Teaching_id int not null references Teaching(id),
+    refugee_id int not null references Refugee(id),
     registrationDate timestamp default now(),
-    accepted boolean null,
-    foreign key (refugee_id) references Refugee(id),
-    foreign key (Teaching_id) references Teaching(id)
+    accepted boolean null
 );

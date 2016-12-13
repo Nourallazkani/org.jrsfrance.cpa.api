@@ -191,7 +191,6 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed({ "ADMIN", "ORGANISATION" })
 	public ResponseEntity<?> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<AbstractLearningProgram> _lp = objectStore.getById(AbstractLearningProgram.class, id);
 		if (!_lp.isPresent()) {

@@ -1,6 +1,5 @@
 package org.sjr.babel;
 
-import java.sql.SQLException;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -17,7 +16,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -28,20 +26,24 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import com.mysql.jdbc.Connection;
-
 public class WebAppInitializer implements WebApplicationInitializer
 {
+	
 	@Configuration 
 	@EnableWebMvc 
 	@EnableTransactionManagement
 	@PropertySource("classpath:conf.properties")
 	@ComponentScan
 	public static class RestConfiguration extends WebMvcConfigurerAdapter{
-
+		
+		public RestConfiguration() {
+			System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
+			System.setProperty("com.mchange.v2.log.MLog", "com.mchange.v2.log.FallbackMLog");
+		}
+		
 		@Bean
 		public EntityManagerFactory emf(){
-			EntityManagerFactory emf = Persistence.createEntityManagerFactory("hib-postgresql");
+			EntityManagerFactory emf = Persistence.createEntityManagerFactory("default");
 			
 			EntityManager em = emf.createEntityManager();
 			
@@ -76,7 +78,7 @@ public class WebAppInitializer implements WebApplicationInitializer
 
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
-		
+		   
 		AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
 		ctx.register(RestConfiguration.class);
 		ctx.setServletContext(servletContext);

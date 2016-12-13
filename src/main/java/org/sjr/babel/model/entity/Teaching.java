@@ -11,8 +11,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Contact;
-import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.component.Contact.ContactConverter;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
 

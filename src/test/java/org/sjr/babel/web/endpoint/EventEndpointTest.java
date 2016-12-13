@@ -1,12 +1,11 @@
 package org.sjr.babel.web.endpoint;
 
-import static org.junit.Assert.*;
-
 import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sjr.babel.JpaConfig4Tests;
 import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.sjr.babel.web.endpoint.EventEndpoint.EventSummary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextHierarchy(@ContextConfiguration(classes = RestConfiguration.class))
+@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 public class EventEndpointTest {
 
 	@Autowired

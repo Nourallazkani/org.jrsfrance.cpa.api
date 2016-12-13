@@ -3,8 +3,10 @@ package org.sjr.babel.web.endpoint;
 import javax.transaction.Transactional;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sjr.babel.JpaConfig4Tests;
 import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.AcceptOrRefuseRegistrationCommand;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,22 +18,19 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import net.sf.ehcache.transaction.xa.commands.Command;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextHierarchy(@ContextConfiguration(classes = RestConfiguration.class))
+@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 public class LearningProgramEndpointTest {
 
 	@Autowired 
-	LearningProgramEndpoint endpoint;
-	
-	// add Registration (Post) Test.
+	private LearningProgramEndpoint endpoint;
 	
 	@Test
-	@Transactional
+	@Transactional @Rollback
 	public void addRegistrationTestOk(){
-		ResponseEntity<?> x = endpoint.addRegistration(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		String refugeeAccessKey = "R-3b743606-928a-4086-852a-9efd72f83d01";
+		ResponseEntity<?> x = endpoint.addRegistration(5, refugeeAccessKey);
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.CREATED, http);
 	}
@@ -61,7 +60,7 @@ public class LearningProgramEndpointTest {
 	
 	@Test
 	public void getInscriptionsOk(){
-		ResponseEntity<?> x = endpoint.getInscriptions(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.getInscriptions(5, "O-d6daffe2-01ed-4e40-bf1e-b2b102c873e6");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.OK, http);
 	}
@@ -95,9 +94,9 @@ public class LearningProgramEndpointTest {
 	// delete Registration  test 
 	
 	@Test
-	@Transactional
+	@Transactional @Rollback
 	public void deleteTestOk(){
-		ResponseEntity<?> x = endpoint.delete(5, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.delete(5, "O-d6daffe2-01ed-4e40-bf1e-b2b102c873e6");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NO_CONTENT, http);
 	}

@@ -12,6 +12,8 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.component.Address;
@@ -24,12 +26,14 @@ public class Volunteer extends AbstractEntity {
 
 	private String firstName;
 	private String lastName;
-	private Date birthDate;
 	private String mailAddress;
 	private String phoneNumber;
 	private Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
 	private String activities;
 
+	@Temporal(TemporalType.DATE)
+	private Date birthDate;
+	
 	@Embedded
 	private Address address;
 

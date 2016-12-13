@@ -2,8 +2,10 @@ package org.sjr.babel.web.endpoint;
 
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sjr.babel.JpaConfig4Tests;
 import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +17,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextHierarchy(@ContextConfiguration(classes = RestConfiguration.class))
+@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 public class RefugeeEndpointTest {
 	
 	@Autowired
@@ -30,14 +32,14 @@ public class RefugeeEndpointTest {
 	
 	@Test
 	public void testGetRefugeeSummaryNotFound(){
-		ResponseEntity<?> x = endpoint.search(2, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.search(3, "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
 	}
 	
 	@Test
 	public void testGetRefugeeSummaryForbidden(){
-		ResponseEntity<?> x = endpoint.search(1, "R-a171ce00-e7d2-497e-8a4e-d272b8b5b520");
+		ResponseEntity<?> x = endpoint.search(1, "xxx");
 		HttpStatus http = x.getStatusCode();
 		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
 	}

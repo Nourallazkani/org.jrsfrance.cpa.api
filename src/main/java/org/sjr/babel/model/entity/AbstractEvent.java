@@ -3,6 +3,7 @@ package org.sjr.babel.model.entity;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.ElementCollection;
@@ -38,7 +39,7 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	private String subject, description, link;
 	
-	@Convert(converter = MultiLanguageTextConverter.class)
+	@Convert(converter = MultiLanguageTextConverter.class) @Column(columnDefinition="json")
 	private MultiLanguageText subjectI18n, descriptionI18n;
 		
 	@Temporal(TemporalType.DATE)

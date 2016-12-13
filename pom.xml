@@ -15,7 +15,7 @@
 		<smtp.username>AKIAJCQS4ZMC2SUBODMQ</smtp.username>
 		<smtp.password>AipV1kf46I6H7TkGHYil7TKBmSKNjfs2hS6nC+WOLsw9</smtp.password>
 		
-		<spring.version>4.3.3.RELEASE</spring.version>
+		<spring.version>4.3.4.RELEASE</spring.version>
 		<jackson.version>2.8.2</jackson.version>
 		<hibernate.version>5.2.2.Final</hibernate.version>
 	</properties>

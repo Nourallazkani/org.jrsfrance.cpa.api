@@ -1,5 +1,6 @@
 package org.sjr.babel.model.entity.reference;
 
+import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
 
@@ -12,7 +13,7 @@ public abstract class AbstractReferenceEntity extends AbstractEntity {
 
 	private String name;
 	
-	@Convert(converter = MultiLanguageTextConverter.class)
+	@Convert(converter = MultiLanguageTextConverter.class) @Column(columnDefinition="jsonb", insertable=false)
 	private MultiLanguageText nameI18n;
 
 	public String getName() {

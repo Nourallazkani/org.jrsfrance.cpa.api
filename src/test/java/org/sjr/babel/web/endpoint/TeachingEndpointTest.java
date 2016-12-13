@@ -1,10 +1,13 @@
 package org.sjr.babel.web.endpoint;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sjr.babel.JpaConfig4Tests;
 import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.sjr.babel.web.endpoint.TeachingEndpoint.TeachingSummary;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +20,16 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextHierarchy(@ContextConfiguration(classes = RestConfiguration.class))
+@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 public class TeachingEndpointTest {
 	
 	@Autowired
 	private TeachingEndpoint endpoint;
 	
+	public static void main(String[] args) {
+		System.out.println("A-"+UUID.randomUUID().toString());
+		System.out.println("A-"+UUID.randomUUID().toString());
+	}
 	@Test
 	public void testList() {
 		List<TeachingSummary> result = endpoint.search(null, null, null, null, null);

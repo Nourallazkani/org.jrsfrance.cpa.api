@@ -1,0 +1,92 @@
+{
+	"org.sjr.babel.model.entity.reference.Level": [
+		{"name": "A1"},
+		{"name": "A2"},
+		{"name": "B1"},
+		{"name": "C1"},
+		{"name": "C2"}
+	],
+	"org.sjr.babel.model.entity.reference.EventType": [
+		{"name": "atelier socio linguistique", "stereotype":"WORKSHOP"}, 
+		{"name": "visite de musée"}
+	],
+	"org.sjr.babel.model.entity.reference.FieldOfStudy": [
+		{"name": "Informatique"},{"name": "Commerce"},
+		{"name": "Droit"},{"name": "Economie"},
+		{"name": "Mathématiques"},
+		{"name": "Physique et chimie"}
+	],
+	"org.sjr.babel.model.entity.reference.ProfessionalLearningProgramDomain": [
+		{"name": "Electricité"},
+		{"name": "Plomberie"},
+		{"name": "Mécanique"}
+	],
+	"org.sjr.babel.model.entity.reference.OrganisationCategory": [
+		{"name": "Université", "stereotype":"UNIVERSITY"},
+		{"name": "Bibliothèque", "stereotype":"LIBRARY"},
+		{"name": "Association", "stereotype":"NGO"}
+	],
+	"org.sjr.babel.model.entity.reference.LanguageLearningProgramType": [
+		{"name": "Francais pour reprendre des études"},
+		{"name": "Francais pour suivre une formation"}
+	],
+	"org.sjr.babel.model.entity.reference.Civility": [
+		{"name": "Mr"},
+		{"name": "Mrs"}
+	],
+	"org.sjr.babel.model.entity.reference.Country": [
+		{"name": "France"},
+		{"name": "Syrie"},
+		{"name": "Afganistan"},
+		{"name": "Allemagne"},{"name": "Iraque"}
+	],
+	"org.sjr.babel.model.entity.reference.Language": [
+		{"name": "Anglais"},
+		{"name": "Arabe"},
+		{"name": "Dari"}
+	],
+	"org.sjr.babel.model.entity.Organisation":[
+		{
+		  "name" : "Science Po",
+		  "mailAddress" : "o@o.o",
+		  "contact" : {
+		    "name" : "Elyse",
+		    "phoneNumber" : "00331234567",
+		    "mailAddress" : "Elyse@gmail.com"
+		  },
+		  "address" : {
+		    "street1" : "27 rue Saint Guillaume",
+		    "street2" : null,
+		    "postalCode" : "75006",
+		    "locality" : "Paris",
+		    "country" : {"id" : 1},
+		    "lat" : 48.8540952,
+		    "lng" : 2.3261858,
+		    "googleMapId" : "ChIJgT3BP9Zx5kcRGTe9PIEMNHM"
+		  },
+		  "account" : {
+		    "accessKey" : "O-d6daffe2-01ed-4e40-bf1e-b2b102c873e4"
+		  },
+		  "category" : {"id" : 1},
+		  "additionalInformations" : null
+		}	
+	],
+	"org.sjr.babel.model.entity.Teaching":[
+		{
+		  "master" : false,
+		  "licence" : true,
+		  "link" : "http://jrsfrance.org",
+		  "registrationOpeningDate" : "2016-10-03",
+		  "registrationClosingDate" : "2016-11-10",
+		  "fieldOfStudy" : {"id" : 1},
+		  "languageLevelRequired" : {"id" : 2},
+		  "organisation" : {"id" : 1},
+		  "contact" : {
+		    "name" : "Elyse",
+		    "phoneNumber" : "00331234567",
+		    "mailAddress" : "Elyse@gmail.com"
+		  },
+		  "registrations" : [ ]
+		}	
+	]
+}

@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Tue Dec 13 16:36:51 CET 2016:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.13.1.1 - (1765088): instance a816c00e-0158-f8d4-47c0-000008f88668 
+on database directory memory:/home/alaric/Dev/projects/org.jrsfrance.cpa.api/sampleDB with class loader sun.misc.Launcher$AppClassLoader@72ea2f77 
+Loaded from file:/home/alaric/.m2/repository/org/apache/derby/derby/10.13.1.1/derby-10.13.1.1.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_74-b02
+user.dir=/home/alaric/Dev/projects/org.jrsfrance.cpa.api
+os.name=Linux
+os.arch=amd64
+os.version=4.2.0-16-generic
+derby.system.home=null
+Database Class Loader started - derby.database.classpath=''

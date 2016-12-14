@@ -90,3 +90,4 @@ update AbstractEvent set endDate = startDate + interval '2 hour', link='http://w
 update AbstractEvent set descriptionI18n = json_build_object('textEn', 'xx', 'textAr', 'بـ', 'textPrs', '');
 
 insert into MeetingRequest ( dateConstraint, reason, additionalInformations, postDate, acceptationDate, street1, street2, postalCode, locality, lat, lng, googleMapId, refugee_id, volunteer_id, country_id) values('Lundi 24 octobre', 'SUPPORT_IN_STUDIES', 'Malheureusement, mon portable (ne marche pas)! ', '2016-10-17 07:06:45', '2016-10-17 07:37:19', NULL, NULL, '75001', 'Paris', 48.86404930, 2.33105260, NULL, 1, 1, 1);
+

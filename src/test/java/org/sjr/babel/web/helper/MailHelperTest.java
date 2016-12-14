@@ -5,7 +5,7 @@ import org.junit.runner.RunWith;
 import org.sjr.babel.JpaConfig4Tests;
 import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.sjr.babel.web.helper.MailHelper.MailType;
-import org.sjr.babel.web.helper.MailHelper.SendMailResponse;
+import org.sjr.babel.web.helper.MailHelper.SendMailOutcome;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -23,7 +23,7 @@ public class MailHelperTest {
 	
 	@Test
 	public void testSend() {
-		SendMailResponse resp = helper.send(MailType.REFUGEE_SIGN_UP_CONFIRMATION, "fr", "a@x.fr", "x", "y");
+		SendMailOutcome resp = helper.send(MailType.REFUGEE_SIGN_UP_CONFIRMATION, "fr", "a@x.fr", "x", "y");
 		assertEquals("Bienvenue sur le site CPA", resp.subject);
 	}
 

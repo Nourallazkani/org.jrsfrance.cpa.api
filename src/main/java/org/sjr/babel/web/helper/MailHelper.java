@@ -52,12 +52,12 @@ public class MailHelper {
 		this.templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 	}
 	
-	public static class SendMailResponse{
+	public static class SendMailOutcome{
 		public String body,subject;
 		public boolean sent;
 	}
 	
-	public SendMailResponse send(MailType mailType, String language, String to, Object... args){
+	public SendMailOutcome send(MailType mailType, String language, String to, Object... args){
 
 		try {
 			JsonNode template = templates.get(mailType.name().toLowerCase().replace("_", "-"));
@@ -96,7 +96,7 @@ public class MailHelper {
 			helper.setText(body, true);
 			helper.setSubject(subject);
 			helper.setFrom(from);
-			SendMailResponse response = new SendMailResponse();
+			SendMailOutcome response = new SendMailOutcome();
 			
 			response.body = body;
 			response.subject = subject;

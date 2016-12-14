@@ -164,6 +164,13 @@ public abstract class AbstractEndpoint {
 		return this.objectStore.findOne(Volunteer.class, "select v from Volunteer v where v.account.accessKey=:accessKey", args);
 	}
 	
+	protected Optional<Refugee> getRefugeeByAccesskey (String accessKey ){
+		Map<String,Object> args = new HashMap<>();
+		args.put("accessKey", accessKey);
+		String hql = "select r from Refugee r where r.account.accessKey like :accessKey";
+		return objectStore.findOne(Refugee.class, hql, args);
+	}
+	
 	@InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.initDirectFieldAccess();
@@ -258,15 +265,7 @@ public abstract class AbstractEndpoint {
 			this.refugee = new ContactSummary(contact);
 			this.acceptationDate = r.getRegistrationDate();
 			this.accepted = r.getAccepted();
-		}
-		
-	}
-	
-	protected Optional<Refugee> getRefugeeByAccesskey (String accessKey ){
-		Map<String,Object> args = new HashMap<>();
-		args.put("accessKey", accessKey);
-		String hql = "select r from Refugee r where r.account.accessKey like :accessKey";
-		return objectStore.findOne(Refugee.class, hql, args);
+		}	
 	}
 	
 	static class AcceptOrRefuseRegistrationCommand {

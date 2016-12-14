@@ -2,8 +2,6 @@ package org.sjr.babel;
 
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.persistence.Cacheable;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;

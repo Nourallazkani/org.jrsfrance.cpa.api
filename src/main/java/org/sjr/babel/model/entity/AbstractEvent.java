@@ -175,7 +175,7 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@DiscriminatorValue("O-E")
 	public static class OrganisationEvent extends AbstractEvent {
 
-		@ManyToOne(optional = false)
+		@ManyToOne
 		private Organisation organisation;
 
 		public Organisation getOrganisation() {
@@ -192,7 +192,7 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@DiscriminatorValue("V-E")
 	public static class VolunteerEvent extends AbstractEvent {
 
-		@ManyToOne(optional = false)
+		@ManyToOne
 		private Volunteer volunteer;
 
 		public Volunteer getVolunteer() {

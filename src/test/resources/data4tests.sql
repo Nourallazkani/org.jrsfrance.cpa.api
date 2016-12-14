@@ -86,5 +86,7 @@ insert into AbstractEvent(audience, subject, startDate,organisation_id ,type_id 
 insert into AbstractEvent(audience, subject, startDate,organisation_id ,type_id ,DTYPE) values ('REFUGEE', 'Visite du musée du Louvre',now() + INTERVAL '45 DAY',5,2,'O-E');
 insert into AbstractEvent(audience, subject, startDate,organisation_id ,type_id ,DTYPE) values ('VOLUNTEER', 'Initiation FLE', now() + INTERVAL '60 DAY',5,2,'O-E');
 update AbstractEvent set contact=o.contact, street1=o.street1, street2=o.street2, locality=o.locality, postalCode=o.postalCode, country_id=o.country_id, lat=o.lat, lng=o.lng, googleMapId=o.googleMapId from AbstractEvent a join Organisation o on a.organisation_id=o.id;
+update AbstractEvent set endDate = startDate + interval '2 hour', link='http://www.jrsfrance.org/', registrationOpeningDate=startDate + interval '-40 day',  registrationClosingDate=startDate + interval '-5 day', 
+update AbstractEvent set descriptionI18n = json_build_object('textEn', 'xx', 'textAr', 'yy', 'textPrs', 'zz');
 
 insert into MeetingRequest ( dateConstraint, reason, additionalInformations, postDate, acceptationDate, street1, street2, postalCode, locality, lat, lng, googleMapId, refugee_id, volunteer_id, country_id) values('Lundi 24 octobre', 'SUPPORT_IN_STUDIES', 'Malheureusement, mon portable (ne marche pas)! ', '2016-10-17 07:06:45', '2016-10-17 07:37:19', NULL, NULL, '75001', 'Paris', 48.86404930, 2.33105260, NULL, 1, 1, 1);

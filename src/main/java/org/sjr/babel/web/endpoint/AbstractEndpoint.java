@@ -117,11 +117,15 @@ public abstract class AbstractEndpoint {
 	private HttpServletRequest currentRequest;
 	
 	protected boolean requestedPathEquals(String path){
-		String p = (String)currentRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+		String p = getPath();
 		if(p.startsWith("/")){
 			p = p.substring(1);
 		}
 		return p.equals(path);
+	}
+	
+	protected String getPath(){
+		return (String) this.currentRequest.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
 	}
 	
 	protected URI getUri(String path){
@@ -162,6 +166,15 @@ public abstract class AbstractEndpoint {
 		
 		public AddressSummary(){}
 		
+		public AddressSummary(String street1, String street2, String postalCode, String locality, String country) {
+			super();
+			this.street1 = street1;
+			this.street2 = street2;
+			this.postalCode = postalCode;
+			this.locality = locality;
+			this.country = country;
+		}
+
 		public AddressSummary(Address a) {
 			
 			this.street1 = a.getStreet1();
@@ -195,6 +208,13 @@ public abstract class AbstractEndpoint {
 
 		public ContactSummary(){}
 		
+		public ContactSummary(String name, String mailAddress, String phoneNumber) {
+			super();
+			this.name = name;
+			this.mailAddress = mailAddress;
+			this.phoneNumber = phoneNumber;
+		}
+
 		public ContactSummary(Contact contact) {
 			this.name = contact.getName();
 			this.phoneNumber = contact.getPhoneNumber();

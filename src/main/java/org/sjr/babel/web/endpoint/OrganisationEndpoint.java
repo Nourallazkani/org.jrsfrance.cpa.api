@@ -134,8 +134,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		String query = "select o from Organisation o where o.mailAddress = :mailAddress";
 		Map<String, Object> args= new HashMap<>();
 		args.put("mailAddress", input.mailAddress);
-		Optional<Organisation> _conflict = this.objectStore.findOne(Organisation.class, query, args);
-		if(_conflict.isPresent()){
+		if(this.objectStore.findOne(Organisation.class, query, args).isPresent()){
 			return conflict();
 		}
 		
@@ -144,8 +143,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			account.setPassword(EncryptionUtil.sha256(input.password));
 		}
 		else if (StringUtils.hasText(accessKey)) {
-			Optional<Administrator> _admin = getAdministratorByAccessKey(accessKey);
-			if(_admin.isPresent()){
+			if(!getAdministratorByAccessKey(accessKey).isPresent()){
 				return forbidden();
 			}
 			
@@ -157,8 +155,8 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		Organisation organisation = new Organisation();
 		
 		organisation.setName(input.name);
-		organisation.setAddress(safeTransform(input.address, a -> a.toAddress(this.refDataProvider)));
-		organisation.setContact(safeTransform(input.contact, c -> c.toContact()));
+		organisation.setAddress(input.address.toAddress(this.refDataProvider));
+		organisation.setContact(input.contact.toContact());
 		organisation.setMailAddress(input.mailAddress);
 		
 		organisation.setAccount(account);
@@ -186,8 +184,8 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		}
 		
 		organisation.setName(input.name);
-		organisation.setAddress(safeTransform(input.address, a -> a.toAddress(this.refDataProvider)));
-		organisation.setContact(safeTransform(input.contact, c -> c.toContact()));
+		organisation.setAddress(input.address.toAddress(this.refDataProvider));
+		organisation.setContact(input.contact.toContact());
 		
 		organisation.setMailAddress(input.mailAddress);
 		if (StringUtils.hasText(input.password)) {
@@ -197,4 +195,19 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		objectStore.save(organisation);
 		return ResponseEntity.noContent().build();
 	}
+	
+	@RequestMapping(path = "organisations/{id}", method = RequestMethod.DELETE)
+	@Transactional
+	public ResponseEntity<Void> delete(@PathVariable int id, @RequestHeader String accessKey) {
+
+		Optional<Organisation> o = this.objectStore.getById(Organisation.class, id);
+		if (!o.isPresent()) {
+			return notFound();
+		}
+		if(!getAdministratorByAccessKey(accessKey).isPresent()){
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		objectStore.delete(o.get());
+		return notFound();
+	}	
 }

@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.security.RolesAllowed;
-import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.HandlerMapping;
 
 @RestController
 public class EventEndpoint extends AbstractEndpoint {
@@ -269,13 +267,12 @@ public class EventEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"events", "workshops"}, method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> create(@RequestBody @Valid EventSummary input, BindingResult binding, @RequestHeader String accessKey, HttpServletRequest req){
+	public ResponseEntity<?> create(@RequestBody @Valid EventSummary input, BindingResult binding, @RequestHeader String accessKey){
 		if (input.id != null) {
 			return ResponseEntity.badRequest().build();
 		}
 		
-		String path = (String) req.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-		boolean isWorkshop = path.contains("workshop");
+		boolean isWorkshop = getPath().contains("workshop");
 		
 		AbstractEvent event;
 		if(accessKey.startsWith("O-")){
@@ -301,7 +298,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		}
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
-		
+		System.out.println(errors.size());
 		if(input.startDate != null && input.endDate != null && input.endDate.before(input.startDate)){
 			errors.put("startDate", "_");
 			errors.put("endDate", "_");

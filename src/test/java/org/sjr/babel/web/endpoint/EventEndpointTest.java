@@ -55,15 +55,9 @@ public class EventEndpointTest {
 	@Test
 	public void testPostCreated() throws JsonProcessingException, Exception{
 		EventSummary input = new EventSummary();
-		input.address = new AddressSummary();
-		input.address.postalCode="75007";
-		input.address.locality="Paris";
-		
-		
-		input.audience=Audience.VOLUNTEER.name();
-		input.contact = new ContactSummary();
-		input.contact.mailAddress="x@x.x";
-		input.contact.name="John Doe";
+		input.audience = Audience.VOLUNTEER.name();
+		input.address = new AddressSummary("1 rue de Rivoli", null, "75007", "Paris", "France");
+		input.contact = new ContactSummary("John Doe", "x@x.x", null);
 		
 		input.startDate = new Date();
 		input.endDate = new Date();

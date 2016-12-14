@@ -62,8 +62,13 @@ public abstract class AbstractEndpoint {
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
+	
 	protected ResponseEntity<?> okOrNotFound (Optional<?> o){
 		return o.isPresent() ? ResponseEntity.ok(o.get()): ResponseEntity.notFound().build() ;
+	} 
+	
+	protected <T> ResponseEntity<T> ok(T body){
+		return ResponseEntity.ok(body) ;
 	} 
 	
 	protected <T extends AbstractEntity> ResponseEntity<Void> deleteIfExists (Class<T> clazz, int id){
@@ -97,8 +102,8 @@ public abstract class AbstractEndpoint {
 		return ResponseEntity.badRequest().body(body);
 	}
 	
-	protected ResponseEntity<Void> notFound(){
-		return ResponseEntity.notFound().build();
+	protected ResponseEntity<Void> unauthorized(){
+		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 	
 	protected ResponseEntity<Void> forbidden(){
@@ -108,9 +113,17 @@ public abstract class AbstractEndpoint {
 	protected <T> ResponseEntity<T> forbidden(T body){
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
 	}
-
+	
+	protected ResponseEntity<Void> notFound(){
+		return ResponseEntity.notFound().build();
+	}
+	
 	protected ResponseEntity<Void> conflict(){
 		return ResponseEntity.status(HttpStatus.CONFLICT).build();
+	}
+	
+	protected <T> ResponseEntity<T> conflict(T body){
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
 	}
 	
 	@Autowired

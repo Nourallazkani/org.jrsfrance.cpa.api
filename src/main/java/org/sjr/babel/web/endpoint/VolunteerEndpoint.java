@@ -18,7 +18,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Account;
-import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.MeetingRequest;
 import org.sjr.babel.model.entity.MeetingRequest.Direction;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
@@ -26,8 +25,9 @@ import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
 import org.sjr.babel.web.helper.MailHelper.MailType;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -90,11 +90,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 
 	private boolean hasAccess(String accessKey, Volunteer v) {
 		if (accessKey.startsWith("A-")) {
-			Map<String, Object> args = new HashMap<>();
-			args.put("ak", accessKey);
-			return objectStore
-					.findOne(Administrator.class, "select a from Administrator a where a.account.accessKey = :ak", args)
-					.isPresent();
+			return getAdministratorByAccessKey(accessKey).isPresent();
 		} else {
 			return v.getAccount().getAccessKey().equals(accessKey);
 		}
@@ -106,7 +102,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		responseBody.put("profile", "V");
 		responseBody.put("accessKey", volunteer.getAccount().getAccessKey());
 		responseBody.put("id", volunteer.getId());
-		return ResponseEntity.ok(responseBody);
+		return ok(responseBody);
 	}
 	
 	@RequestMapping(path = "volunteers", method = RequestMethod.POST)
@@ -129,7 +125,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		args.put("mailAddress", input.mailAddress);
 		long n = objectStore.count(Volunteer.class, query, args);
 		if (n > 0) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+			return conflict(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 		}
 		
 		Account account = new Account();
@@ -145,7 +141,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		volunteer.setPhoneNumber(input.phoneNumber);
 		if(input.fieldsOfStudy!=null){
 			List<FieldOfStudy> fieldsOfStudy = input.fieldsOfStudy.stream()
-					.map(x->this.refDataProvider.resolve(FieldOfStudy.class, x))
+					.map(x -> this.refDataProvider.resolve(FieldOfStudy.class, x))
 					.collect(Collectors.toList()); 
 			volunteer.setFieldsOfStudy(fieldsOfStudy);
 		}
@@ -158,7 +154,12 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		volunteer.setAccount(account);
 		this.objectStore.save(volunteer);
 		
-		this.mailHelper.send(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, "fr", volunteer.getMailAddress(), volunteer.getMailAddress(), input.password);
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
+			@Override
+			public void afterCommit() {
+				mailHelper.send(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, "fr", volunteer.getMailAddress(), volunteer.getMailAddress(), input.password);
+			}
+		});
 		
 		return successSignUp(volunteer);
 	}
@@ -170,11 +171,11 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		if (_v.isPresent()) {
 			Volunteer v = _v.get();
 			if (!hasAccess(accessKey, v)) {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+				return forbidden();
 			}
-			return ResponseEntity.ok(new VolunteerSummary(v));
+			return ok(new VolunteerSummary(v));
 		} else {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 
 	}
@@ -194,15 +195,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, /*BindingResult binding, */@RequestHeader String accessKey) {
 		if (input.id!=id) {
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		} else {
 			Optional<Volunteer> _v = this.objectStore.getById(Volunteer.class, id);
 			if (!_v.isPresent()) {
-				return ResponseEntity.notFound().build();
+				return notFound();
 			} 
 			Volunteer v = _v.get();
 			if (!hasAccess(accessKey, v)) {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+				return forbidden();
 			}
 
 			String query = "select count(x) from Volunteer x where x.mailAddress = :mailAddress and x.id != :id";
@@ -211,7 +212,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			args.put("id", id);
 			long n = objectStore.count(Volunteer.class, query, args);
 			if (n > 0) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+				return conflict(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
 			
 			v.setFirstName(input.firstName);
@@ -222,15 +223,20 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			if(StringUtils.hasText(input.password)){
 				v.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				this.mailHelper.send(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, "fr", v.getMailAddress(), v.getMailAddress(), input.password);
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
+					@Override
+					public void afterCommit() {
+						mailHelper.send(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, "fr", v.getMailAddress(), v.getMailAddress(), input.password);
+					}
+				});
 			}
 			
 			Date date = Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
 			if(input.availableForConversation !=null &&  input.availableForConversation.booleanValue()){
-				boolean addMeetingReqquests = (v.getAvailableForConversation() == null || !v.getAvailableForConversation());
+				boolean wasNotAvailableForConversationBefore = (v.getAvailableForConversation() == null || !v.getAvailableForConversation());
 				
 				v.setAvailableForConversation(true);
-				if(addMeetingReqquests){
+				if(wasNotAvailableForConversationBefore){
 					String q = "select x from MeetingRequest x where x.postDate > :date and x.volunteer is null and x.reason=:reason";
 					Map<String, Object> qArs = new HashMap<>();
 					qArs.put("date", date);
@@ -246,7 +252,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			if(input.availableForInterpreting !=null &&  input.availableForInterpreting.booleanValue() && input.languages != null && !input.languages.isEmpty())
 			{
-				boolean addMeetingReqquests = (v.getAvailableForInterpreting() == null || !v.getAvailableForInterpreting());
+				boolean wasNotAvailableForInterpretingBefore = (v.getAvailableForInterpreting() == null || !v.getAvailableForInterpreting());
 				v.setAvailableForInterpreting(true);
 				List<Language> languages = input.languages.stream()
 						.filter(StringUtils::hasText)
@@ -254,7 +260,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 						.collect(Collectors.toList());
 				v.setLanguages(languages);
 
-				if(addMeetingReqquests){
+				if(wasNotAvailableForInterpretingBefore){
 					String q = "select x from MeetingRequest x join x.refugee r join r.languages l where x.postDate> :date and x.volunteer is null and x.reason=:reason and l in :languages";
 					Map<String, Object> qArs = new HashMap<>();
 					qArs.put("date", date);
@@ -271,7 +277,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			if(input.availableForSupportInStudies !=null &&  input.availableForSupportInStudies.booleanValue() && input.fieldsOfStudy != null && !input.fieldsOfStudy.isEmpty())
 			{
-				boolean addMeetingReqquests = (v.getAvailableForSupportInStudies() == null || !v.getAvailableForSupportInStudies());
+				boolean wasNotAvailableForSupportInStudies = (v.getAvailableForSupportInStudies() == null || !v.getAvailableForSupportInStudies());
 				v.setAvailableForSupportInStudies(true);
 				List<FieldOfStudy> fieldsOfStudy = input.fieldsOfStudy.stream()
 						.filter(StringUtils::hasText)
@@ -279,7 +285,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 						.collect(Collectors.toList());
 				v.setFieldsOfStudy(fieldsOfStudy);
 								
-				if(addMeetingReqquests){
+				if(wasNotAvailableForSupportInStudies){
 					String q = "select x from MeetingRequest x join x.refugee r join r.fieldOfStudy f where x.postDate > :date and x.volunteer is null and x.reason=:reason and f in :fieldsOfStudy ";
 					Map<String, Object> qArs = new HashMap<>();
 					qArs.put("date", date);
@@ -298,7 +304,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			this.objectStore.save(v);
 			
-			return ResponseEntity.noContent().build();
+			return noContent();
 		}
 	}
 	
@@ -306,15 +312,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<Void> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, id);
-		if (_v.isPresent()) {
-			Volunteer v = _v.get();
-			if (!hasAccess(accessKey, v)) {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-			}
-			this.objectStore.delete(v);
-			return ResponseEntity.noContent().build();
+		if (!_v.isPresent()) {
+			return notFound();
 		}
-		return ResponseEntity.notFound().build();
+		Volunteer v = _v.get();
+		if (!hasAccess(accessKey, v)) {
+			return forbidden();
+		}
+		this.objectStore.delete(v);
+		return noContent();
 	}
 
 	@RequestMapping(path = "/volunteers/{id}/meeting-requests", method = RequestMethod.GET)
@@ -322,11 +328,11 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestParam(required = false) boolean accepted, @RequestHeader String accessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Volunteer volunteer = v.get();
 		if (!hasAccess(accessKey, volunteer)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		} else {
 			
 			Set<MeetingRequest> meetings;
@@ -337,7 +343,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 				meetings = volunteer.getAcceptedMeetingRequests();
 			}
 			
-			return ResponseEntity.ok(meetings.stream().map(MeetingRequestSummary::new).collect(Collectors.toList()));
+			return ok(meetings.stream().map(MeetingRequestSummary::new).collect(Collectors.toList()));
 		}
 	}
 	
@@ -346,18 +352,18 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> acceptMeetingRequest(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey, @RequestParam Direction firstContact) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		} else if (!hasAccess(accessKey, v.get())) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, mId);
 		if (!meeting.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		} else {
 			MeetingRequest meetingRequest = meeting.get();
 			if(meetingRequest.getVolunteer() != null){
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+				return conflict();
 			}
 			meetingRequest.setFirstContact(firstContact);
 			meetingRequest.setVolunteer(v.get());
@@ -365,7 +371,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			objectStore.save(meetingRequest);
 			
 			System.out.println("send mail to "+meetingRequest.getRefugee().getMailAddress());
-			return ResponseEntity.ok().build();
+			return noContent();
 		}
 	}
 	
@@ -374,18 +380,18 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> cancelMeetingRequest(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey) {
 		Optional<Volunteer> v = objectStore.getById(Volunteer.class, id);
 		if (!v.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		} else if (!hasAccess(accessKey, v.get())) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 		Optional<MeetingRequest> meeting = objectStore.getById(MeetingRequest.class, mId);
 		if (!meeting.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		} else {
 			MeetingRequest meetingRequest = meeting.get();
 			if(meetingRequest.getVolunteer() != null && meetingRequest.getVolunteer().getId().equals(id)){
-				// send email to refugee.
+				// send email to volunteer.
 				meetingRequest.setVolunteer(null);
 				meetingRequest.setAcceptationDate(null);
 			}
@@ -394,7 +400,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			}
 			
 			objectStore.save(meetingRequest);
-			return ResponseEntity.noContent().build();
+			return noContent();
 		}
 	}
 	
@@ -404,19 +410,19 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> getMeetingRequestMessages (@PathVariable int vId, @PathVariable int mId, @RequestHeader String accessKey){
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, vId);
 		if (!_v.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Volunteer v = _v.get();
 		if (!hasAccess(accessKey, v)){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return status(HttpStatus.FORBIDDEN);
 		}
 		Optional<MeetingRequest> _mr = v.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findFirst();
 		if (!_mr.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		MeetingRequest mr = _mr.get();
 		List<Message> msgs = mr.getMessages();
-		return ResponseEntity.ok(msgs.stream().map(x -> new MessageSummary(mr,x)).collect(Collectors.toList()));
+		return ok(msgs.stream().map(x -> new MessageSummary(mr,x)).collect(Collectors.toList()));
 	}
 	
 	@RequestMapping (path="volunteers/{vId}/meeting-requests/{mId}/messages", method = RequestMethod.POST)
@@ -425,15 +431,15 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		Date now = new Date();
 		Optional<Volunteer> _v = objectStore.getById(Volunteer.class, vId);
 		if (!_v.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Volunteer v = _v.get();
 		if (!hasAccess(accessKey, v)){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return status(HttpStatus.FORBIDDEN);
 		}
 		Optional<MeetingRequest> _mr = v.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findAny();
 		if (!_mr.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		MeetingRequest mr = _mr.get();
 		Message m = new Message();

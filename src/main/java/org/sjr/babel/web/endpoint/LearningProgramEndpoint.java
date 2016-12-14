@@ -25,7 +25,6 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.reference.LanguageLearningProgramType;
 import org.sjr.babel.model.entity.reference.Level;
 import org.sjr.babel.model.entity.reference.ProfessionalLearningProgramDomain;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -184,9 +183,9 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
 		Optional<AbstractLearningProgram> c = objectStore.getById(AbstractLearningProgram.class, id);
 		if (c.isPresent()) {
-			return ResponseEntity.ok().body(new LearningProgramSummary(c.get()));
+			return ok(new LearningProgramSummary(c.get()));
 		}
-		return ResponseEntity.notFound().build();
+		return notFound();
 	}
 
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.DELETE)
@@ -194,15 +193,15 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<AbstractLearningProgram> _lp = objectStore.getById(AbstractLearningProgram.class, id);
 		if (!_lp.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		AbstractLearningProgram lp = _lp.get();
 		if (!hasAccess(accessKey, lp)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 
 		objectStore.delete(lp);
-		return ResponseEntity.noContent().build();
+		return noContent();
 
 	}
 
@@ -217,12 +216,12 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);
 		if(!_learningProgram.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		
 		AbstractLearningProgram entity = _learningProgram.get();
 		if (!hasAccess(accessKey, entity)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
@@ -265,7 +264,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		entity.setLevel(this.refDataProvider.resolve(Level.class, input.level));
 		
 		objectStore.save(entity);
-		return ResponseEntity.noContent().build();
+		return noContent();
 
 	}
 	
@@ -279,7 +278,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		Optional<Organisation> o = getOrganisationByAccessKey(accessKey);
 		if(!o.isPresent()){
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			return unauthorized();
 		}
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
@@ -331,7 +330,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		objectStore.save(entity);
 		input.id = entity.getId();
 		
-		return ResponseEntity.created(getUri("/language-programs/" + entity.getId())).body(input);
+		return created(getUri("/language-programs/" + entity.getId()), input);
 	}
 	
 	@RequestMapping(path = {"language-programs/{id}/registrations", "professional-programs/{id}/registrations"}, method = RequestMethod.GET)
@@ -347,7 +346,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		}
 		List<Registration> registrations = alp.get().getRegistrations();
 		List<RegistrationSummary> registrationsSummary = registrations.stream().map(x-> new RegistrationSummary(x)).collect(Collectors.toList());
-		return ResponseEntity.ok(registrationsSummary);
+		return ok(registrationsSummary);
 	}
 	
 	@RequestMapping(path={"language-programs/{id}/registrations" ,"professional-programs/{id}/registrations"}, method = RequestMethod.POST)
@@ -366,14 +365,14 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		Refugee r = _r.get();
 		
 		if(lp.getRegistrations().stream().anyMatch(x -> x.getRefugee().getId().equals(r.getId()))){
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			return conflict();
 		}
 		
 		/*
 		List<Registration> registrations = _lp.get().getRegistrations();
 		for (Registration reg : registrations){
 			if( r.equals(reg.getRefugee())){
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+				return status(HttpStatus.CONFLICT).build();
 			}
 		}*/
 		Registration reg = new Registration();
@@ -381,7 +380,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		reg.setRefugee(r);
 		reg.setRegistrationDate(now);
 		lp.getRegistrations().add(reg);
-		return created(null,new RegistrationSummary(reg));
+		return created(getUri(getPath()+"/"+r.getId()),new RegistrationSummary(reg));
 	}
 	
 	@RequestMapping(path = {"language-programs/{id}/registrations/{rId}", "professional-programs/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
@@ -389,12 +388,12 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestBody AcceptOrRefuseRegistrationCommand input,  @RequestHeader String accessKey) {
 		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);
 		if(!_learningProgram.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		AbstractLearningProgram learningProgram = _learningProgram.get();
 		if(!hasAccess(accessKey, learningProgram))
 		{
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){
@@ -410,7 +409,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		// verification si il y a de changement? (acceptation ou pas)
 		Registration reg = _reg.get();
 		reg.setAccepted(input.accepted);
-		return ResponseEntity.noContent().build();
+		return noContent();
 	}
 	
 	@RequestMapping(path = {"language-programs/{id}/registrations/{rId}", "professional-programs/{id}/registrations/{rId}"}, method = RequestMethod.DELETE)
@@ -418,12 +417,12 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestHeader String accessKey) {
 		Optional<AbstractLearningProgram> _learningProgram = this.objectStore.getById(AbstractLearningProgram.class, id);
 		if(!_learningProgram.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		AbstractLearningProgram learningProgram = _learningProgram.get();
 		if(!hasAccess(accessKey, learningProgram))
 		{
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){

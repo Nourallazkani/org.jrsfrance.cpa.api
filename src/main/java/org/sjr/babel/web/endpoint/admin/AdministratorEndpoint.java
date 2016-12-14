@@ -60,7 +60,7 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> get(@PathVariable Integer id) {
 		Optional<Administrator> admin = objectStore.getById(Administrator.class, id);
 		if(!admin.isPresent()){
-			ResponseEntity.notFound().build();
+			notFound();
 		}
 		Optional<AdministratorSummary> adminSummary = admin.map(x -> new AdministratorSummary(x));
 		return okOrNotFound(adminSummary);
@@ -90,7 +90,7 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 		
 		objectStore.save(admin);
 		input.id = admin.getId();
-		return ResponseEntity.created(getUri("/administrators/" + admin.getId())).body(input);
+		return created(getUri("/administrators/" + admin.getId()), input);
 	}
 	
 	@RequestMapping(path = "/administrators/{id}", method = RequestMethod.PUT)
@@ -113,7 +113,7 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 		if(StringUtils.hasText(input.password)){
 			admin.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 		}
-		return ResponseEntity.noContent().build();
+		return noContent();
 		
 	}
 
@@ -126,6 +126,6 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 			return ResponseEntity.notFound().build();
 		}
 		objectStore.delete(admin.get());
-		return ResponseEntity.noContent().build();
+		return noContent();
 	}
 }

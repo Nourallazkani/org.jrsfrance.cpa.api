@@ -27,7 +27,6 @@ import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.EventType;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -188,9 +187,9 @@ public class EventEndpoint extends AbstractEndpoint {
 
 		Optional<EventSummary> w = objectStore.getById(AbstractEvent.class, id).map(ws -> new EventSummary(ws, language));
 		if (w.isPresent()) {
-			return ResponseEntity.ok(w.get());
+			return ok(w.get());
 		} else {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 	}
 
@@ -201,11 +200,11 @@ public class EventEndpoint extends AbstractEndpoint {
 		if (w.isPresent()) {
 			if (hasAccess(accessKey, w.get())) {
 				objectStore.delete(w.get());
-				return ResponseEntity.noContent().build();
+				return noContent();
 			}
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
-		return ResponseEntity.notFound().build();
+		return notFound();
 
 	}
 
@@ -213,11 +212,11 @@ public class EventEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> update(@RequestBody @Valid EventSummary input, BindingResult binding,  @PathVariable int id, @RequestHeader String accessKey) {
 		if (input.id == null || !input.id.equals(id)) {
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		}
 		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
 		if(!_event.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		
 		AbstractEvent event = _event.get();
@@ -261,7 +260,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		event.setRegistrationClosingDate(input.registrationClosingDate);
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
 		
-		return ResponseEntity.noContent().build();
+		return noContent();
 
 	}
 	
@@ -269,7 +268,7 @@ public class EventEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid EventSummary input, BindingResult binding, @RequestHeader String accessKey){
 		if (input.id != null) {
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		}
 		
 		boolean isWorkshop = getPath().contains("workshop");
@@ -342,7 +341,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		this.objectStore.save(event);
 		input.id = event.getId();
 		URI uri = isWorkshop ? getUri("/workshops/"+event.getId()) : getUri("/events/"+event.getId());
-		return ResponseEntity.created(uri).body(input);
+		return created(uri, input);
 	}
 	
 	@RequestMapping(path = {"events/{id}/registrations", "workshops/{id}/registrations"}, method = RequestMethod.GET)
@@ -358,7 +357,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		}
 		List<Registration> registrations = _ae.get().getRegistrations();
 		List<RegistrationSummary> registrationsSummary = registrations.stream().map(x-> new RegistrationSummary(x)).collect(Collectors.toList());
-		return ResponseEntity.ok(registrationsSummary);
+		return ok(registrationsSummary);
 	}
 	
 	
@@ -379,7 +378,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		Refugee r = _r.get();
 
 		if(abstractEvent.getRegistrations().stream().anyMatch(x-> x.getRefugee().getId().equals(r.getId()))){
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			return conflict();
 		}
 		
 		Registration reg = new Registration();
@@ -387,7 +386,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		reg.setRefugee(r);
 		reg.setRegistrationDate(now);
 		abstractEvent.getRegistrations().add(reg);
-		return created(null, new RegistrationSummary(reg));
+		return created(getUri(getPath()+"/"+r.getId()), new RegistrationSummary(reg));
 	}
 	
 	@RequestMapping(path = {"events/{id}/registrations/{rId}", "workshops/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
@@ -395,7 +394,7 @@ public class EventEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestBody AcceptOrRefuseRegistrationCommand input,  @RequestHeader String accessKey) {
 		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
 		if(!_event.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		AbstractEvent event = _event.get();
 		if(!hasAccess(accessKey, event))
@@ -416,12 +415,12 @@ public class EventEndpoint extends AbstractEndpoint {
 		// verification si il y a de changement? (acceptation ou pas)
 		Registration reg = _reg.get();
 		reg.setAccepted(input.accepted);
-		return ResponseEntity.noContent().build();
+		return noContent();
 	}
 	
 	@RequestMapping(path = {"events/{id}/registrations/{rId}", "workshops/{id}/registrations/{rId}"}, method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<?> cancelRegistration (@PathVariable int id, @PathVariable int rId,  @RequestHeader String accessKey) {
+	public ResponseEntity<?> cancelRegistration(@PathVariable int id, @PathVariable int rId,  @RequestHeader String accessKey) {
 		Optional<AbstractEvent> _event = this.objectStore.getById(AbstractEvent.class, id);
 		if(!_event.isPresent()){
 			return notFound();

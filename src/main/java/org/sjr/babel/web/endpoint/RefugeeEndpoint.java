@@ -27,8 +27,9 @@ import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
 import org.sjr.babel.model.entity.reference.Level;
 import org.sjr.babel.web.helper.MailHelper.MailType;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -85,7 +86,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		responseBody.put("profile", "R");
 		responseBody.put("accessKey", refugee.getAccount().getAccessKey());
 		responseBody.put("id", refugee.getId());
-		return ResponseEntity.ok(responseBody);
+		return ok(responseBody);
 	}
 	
 	@RequestMapping(method = RequestMethod.POST)
@@ -98,7 +99,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			errors.put("password",  "NotNull");
 		}
 		if(!errors.isEmpty()){
-			return ResponseEntity.badRequest().body(errors);
+			return badRequest(errors);
 		}
 		
 		String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress";
@@ -106,7 +107,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		args.put("mailAddress", input.mailAddress);
 		long n = objectStore.count(Volunteer.class, query, args);
 		if (n > 0) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+			return conflict(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 		}
 		
 		Account account = new Account();
@@ -131,8 +132,14 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			
 		this.objectStore.save(refugee);
 		
-		this.mailHelper.send(MailType.REFUGEE_SIGN_UP_CONFIRMATION, "fr", refugee.getMailAddress(), refugee.getMailAddress(), input.password);
-		return  successSignUp(refugee);
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
+			@Override
+			public void afterCommit() {
+				mailHelper.send(MailType.REFUGEE_SIGN_UP_CONFIRMATION, "fr", refugee.getMailAddress(), refugee.getMailAddress(), input.password);
+			}
+		});
+		
+		return successSignUp(refugee);
 		
 	}
 
@@ -183,13 +190,13 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+			return notFound();
 		}
 		else if (!hasAccess(accessKey, r.get())) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		else{
-			return ResponseEntity.ok(new RefugeeSummary(r.get()));
+			return ok(new RefugeeSummary(r.get()));
 		}
 	}
 	
@@ -197,15 +204,15 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid RefugeeSummary input, @RequestHeader String accessKey) {
 		if (input.id != id) {
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		} else {
 			Optional<Refugee> _r = this.objectStore.getById(Refugee.class, id);
 			if (!_r.isPresent()) {
-				return ResponseEntity.notFound().build();
+				return notFound();
 			} 
 			Refugee r = _r.get();
 			if (!hasAccess(accessKey, r)) {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+				return forbidden();
 			}
 			
 			String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress and x.id != :id";
@@ -214,7 +221,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			args.put("id", id);
 			long n = objectStore.count(Volunteer.class, query, args);
 			if (n > 0) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).body(Error.MAIL_ADDRESS_ALREADY_EXISTS);
+				return conflict(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
 			
 			r.setFirstName(input.firstName);
@@ -225,7 +232,12 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			r.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
 			if(StringUtils.hasText(input.password)){
 				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				this.mailHelper.send(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, "fr", r.getMailAddress(), r.getMailAddress(), input.password);
+				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
+					@Override
+					public void afterCommit() {
+						mailHelper.send(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, "fr", r.getMailAddress(), r.getMailAddress(), input.password);
+					}
+				});
 			}
 			
 			r.setNationality(safeTransform(input.nationality, x -> this.refDataProvider.resolve(Country.class, x)));
@@ -237,7 +249,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			
 			this.objectStore.save(r);
 			
-			return ResponseEntity.noContent().build();
+			return noContent();
 		}
 	}
 	
@@ -246,15 +258,15 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	public ResponseEntity<Void> delete(@PathVariable int id, @RequestHeader String accessKey) {
 		Optional<Refugee> _r = objectStore.getById(Refugee.class, id);
 		if(!_r.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Refugee r = _r.get();
 		if(!hasAccess(accessKey, r)){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 		objectStore.delete(r);
-		return ResponseEntity.noContent().build();
+		return noContent();
 	}
 
 	
@@ -265,11 +277,11 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> getMeetingRequests(@PathVariable int id, @RequestParam Boolean accepted, @RequestHeader String accessKey) {
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Refugee refugee = r.get();
 		if (!hasAccess(accessKey, refugee)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		} else {
 
 			List<MeetingRequestSummary> responseBody = refugee.getMeetingRequests()
@@ -287,7 +299,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 					)
 					.collect(Collectors.toList());
 
-			return ResponseEntity.ok(responseBody);
+			return ok(responseBody);
 		}
 	}
 
@@ -299,9 +311,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		Refugee refugee = r.get();
 		if (!r.isPresent()) {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		} else if (!hasAccess(accessKey, refugee)) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 
@@ -339,29 +351,12 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 				
 		URI uri = getUri("/refugees/" + refugee.getId() + "/meeting-requests/" + mr.getId());
-		return ResponseEntity.created(uri).body(new MeetingRequestSummary(mr));
+		return created(uri, new MeetingRequestSummary(mr));
 	}
 	
-	@RequestMapping(path = "/{id}/meeting-requests/{meetingRequestId}", method = RequestMethod.DELETE)
+	@RequestMapping(path = "/{id}/meeting-requests/{mId}", method = RequestMethod.DELETE)
 	@Transactional
-	public ResponseEntity<?> deleteMeetingRequest(@PathVariable int id, @PathVariable int meetingRequestId, @RequestHeader String accessKey) {
-		Optional<MeetingRequest> _mr = objectStore.getById(MeetingRequest.class, meetingRequestId);
-		if (!_mr.isPresent()) {
-			return notFound();
-		} else {
-			MeetingRequest mr = _mr.get();
-			Refugee refugee = mr.getRefugee();
-			if (!hasAccess(accessKey, refugee)) {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-			}
-			this.objectStore.delete(mr);
-			return ResponseEntity.noContent().build();
-		}
-	}
-	
-	@RequestMapping(path = "/{id}/meeting-requests/{mId}", method = RequestMethod.POST)
-	@Transactional
-	public ResponseEntity<?> xx(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey, boolean confirmed) {
+	public ResponseEntity<?> deleteMeetingRequest(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey) {
 		Optional<MeetingRequest> _mr = objectStore.getById(MeetingRequest.class, mId);
 		if (!_mr.isPresent()) {
 			return notFound();
@@ -369,7 +364,24 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			MeetingRequest mr = _mr.get();
 			Refugee refugee = mr.getRefugee();
 			if (!hasAccess(accessKey, refugee)) {
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+				return forbidden();
+			}
+			this.objectStore.delete(mr);
+			return noContent();
+		}
+	}
+	
+	@RequestMapping(path = "/{id}/meeting-requests/{mId}", method = RequestMethod.POST)
+	@Transactional
+	public ResponseEntity<?> updateMeetingRequestStatus(@PathVariable int id, @PathVariable int mId, @RequestHeader String accessKey, @RequestParam boolean confirmed) {
+		Optional<MeetingRequest> _mr = objectStore.getById(MeetingRequest.class, mId);
+		if (!_mr.isPresent()) {
+			return notFound();
+		} else {
+			MeetingRequest mr = _mr.get();
+			Refugee refugee = mr.getRefugee();
+			if (!hasAccess(accessKey, refugee)) {
+				return forbidden();
 			}
 			if (confirmed){
 				mr.setConfirmationDate(new Date());
@@ -378,7 +390,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 				mr.setVolunteer(null);
 				mr.setAcceptationDate(null);
 			}
-			return ResponseEntity.ok(new MeetingRequestSummary(mr));
+			return ok(new MeetingRequestSummary(mr));
 		}
 	}
 	
@@ -389,19 +401,19 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> getMeetingRequestMessages (@PathVariable int rId, @PathVariable int mId, @RequestHeader String accessKey){
 		Optional<Refugee> _r = objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Refugee r = _r.get();
 		if (!hasAccess(accessKey, r)){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return status(HttpStatus.FORBIDDEN);
 		}
 		Optional<MeetingRequest> _mr = r.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findAny();
 		if (!_mr.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		MeetingRequest mr = _mr.get();
 		List<Message> msgs = mr.getMessages();
-		return ResponseEntity.ok(msgs.stream().map(x -> new MessageSummary(mr,x)).collect(Collectors.toList()));
+		return ok(msgs.stream().map(x -> new MessageSummary(mr,x)).collect(Collectors.toList()));
 	}
 	
 	@RequestMapping (path="/{rId}/metting-requests/{mId}/messages", method = RequestMethod.POST)
@@ -414,7 +426,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 		Refugee r = _r.get();
 		if (!hasAccess(accessKey, r)){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return status(HttpStatus.FORBIDDEN);
 			// return forbidden();
 		}
 		Optional<MeetingRequest> _mr = r.getMeetingRequests().stream().filter(x -> x.getId().equals(mId)).findAny();

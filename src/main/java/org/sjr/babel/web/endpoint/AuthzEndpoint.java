@@ -15,7 +15,6 @@ import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.web.helper.MailHelper;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,7 +36,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		responseBody.put("profile", account.getAccessKey().substring(0, 1));
 		responseBody.put("accessKey", account.getAccessKey());
 		responseBody.put("id", id);
-		return ResponseEntity.ok(responseBody);
+		return ok(responseBody);
 	}
 
 
@@ -67,11 +66,18 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			input.realm = input.accessKey.substring(0, 1);
 		}
 		Map<String, Object> args = new HashMap<>();
-		args.put("mailAddress", input.mailAddress);
-		args.put("accessKey", input.accessKey);
-		String templateQuery = "select x from %s x where (:mailAddress is not null and x.mailAddress = :mailAddress) or (:accessKey is not null and x.account.accessKey = :accessKey)";
-		return objectStore.findOne(clazz, String.format(templateQuery, clazz.getSimpleName()), args);
 		
+		
+		String templateQuery;
+		if(StringUtils.hasText(input.accessKey)){
+			args.put("accessKey", input.accessKey);
+			templateQuery= "select x from %s x where x.account.accessKey = :accessKey";
+		}
+		else{
+			templateQuery= "select x from %s x where lower(x.mailAddress) = lower(:mailAddress)";
+			args.put("mailAddress", input.mailAddress);
+		}
+		return objectStore.findOne(clazz, String.format(templateQuery, clazz.getSimpleName()), args);
 	}
 	
 	@RequestMapping(path = "authz/passwordRecovery", method = RequestMethod.POST)
@@ -166,6 +172,6 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			}
 		}		
 		
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		return unauthorized();
 	}
 }

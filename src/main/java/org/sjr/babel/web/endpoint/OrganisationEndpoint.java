@@ -16,7 +16,6 @@ import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.reference.OrganisationCategory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -105,11 +104,11 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		
 		Optional<Organisation> _organisation = objectStore.getById(Organisation.class, id);
 		if(!_organisation.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Organisation organisation = _organisation.get();
 		if(!hasAccess(organisation, accessKey)){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 		if(organisation.getCategory().getAdditionalInformations()!=null && !organisation.getCategory().getAdditionalInformations().isEmpty()){
@@ -124,7 +123,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			}
 		}
 
-		return ResponseEntity.ok(new OrganisationSummary(organisation));
+		return ok(new OrganisationSummary(organisation));
 	}
 	
 	@RequestMapping(path = "organisations", method = RequestMethod.POST)
@@ -175,12 +174,12 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		}
 		Optional<Organisation> _organisation = this.objectStore.getById(Organisation.class, id);
 		if(!_organisation.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Organisation organisation = _organisation.get();
 		
 		if(!hasAccess(organisation, accessKey)){
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		
 		organisation.setName(input.name);
@@ -193,7 +192,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		}
 		organisation.setAdditionalInformations(input.additionalInformations);
 		objectStore.save(organisation);
-		return ResponseEntity.noContent().build();
+		return noContent();
 	}
 	
 	@RequestMapping(path = "organisations/{id}", method = RequestMethod.DELETE)
@@ -205,7 +204,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			return notFound();
 		}
 		if(!getAdministratorByAccessKey(accessKey).isPresent()){
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			return unauthorized();
 		}
 		objectStore.delete(o.get());
 		return notFound();

@@ -19,7 +19,6 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -129,9 +128,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 		Optional<TeachingSummary> t = objectStore.getById(Teaching.class, id).map(te -> new TeachingSummary(te));
 		if (t.isPresent()) {
-			return ResponseEntity.ok(t.get());
+			return ok(t.get());
 		} else {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 	}
 
@@ -143,9 +142,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		Optional<Teaching> t = objectStore.getById(Teaching.class, id);
 		if (t.isPresent()) {
 			objectStore.delete(t.get());
-			return ResponseEntity.noContent().build();
+			return noContent();
 		} else {
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 	}
 	
@@ -154,17 +153,17 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid TeachingSummary input, BindingResult binding, @RequestHeader("accessKey") String accessKey) {
 		if (input.id ==null || !input.id.equals((id))) {
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		} else {
 			Optional<Teaching> _teaching = this.objectStore.getById(Teaching.class, id);
 			if(!_teaching.isPresent()){
-				return ResponseEntity.notFound().build();
+				return notFound();
 			}
 			
 			Teaching teaching = _teaching.get();
 			
 			if(!hasAccess(accessKey, teaching)){
-				return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+				return unauthorized();
 			}
 
 			Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
@@ -190,7 +189,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			teaching.setFieldOfStudy(this.refDataProvider.resolve(FieldOfStudy.class, input.fieldOfStudy));
 
 			objectStore.save(teaching);
-			return ResponseEntity.noContent().build();
+			return noContent();
 		}
 
 	}
@@ -199,12 +198,12 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid TeachingSummary input, BindingResult binding, @RequestHeader("accessKey") String accessKey) {
 		if (input.id != null) {
-			return ResponseEntity.badRequest().build();
+			return badRequest();
 		}
 
 		Optional<Organisation> o = getOrganisationByAccessKey(accessKey);
 		if(!o.isPresent()){
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+			return unauthorized();
 		}		
 
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
@@ -237,7 +236,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		input.id = teaching.getId();
 		input.address = new AddressSummary(teaching.getOrganisation().getAddress());
 		input.organisation = teaching.getOrganisation().getName();
-		return ResponseEntity.created(getUri("/teachings/" + teaching.getId())).body(input);
+		return created(getUri("/teachings/" + teaching.getId()), input);
 	}
 	
 	
@@ -253,7 +252,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 		List<Registration> registrations = _teaching.get().getRegistrations();
 		List<RegistrationSummary> registrationsSummary = registrations.stream().map(x-> new RegistrationSummary(x)).collect(Collectors.toList());
-		return ResponseEntity.ok(registrationsSummary);
+		return ok(registrationsSummary);
 	}
 	
 	
@@ -265,6 +264,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		if (!_teaching.isPresent()){
 			return notFound();
 		}
+		
 		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
 		if (!_r.isPresent()){
 			return forbidden();
@@ -273,7 +273,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		List<Registration> registrations = _teaching.get().getRegistrations();
 		for (Registration reg : registrations){
 			if( r.equals(reg.getRefugee())){
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+				return conflict();
 			}
 		}
 		Registration reg = new Registration();
@@ -282,7 +282,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		reg.setRegistrationDate(now);
 		registrations.add(reg);
 		RegistrationSummary regSum = new RegistrationSummary(reg);
-		return created(null,regSum);
+		return created(null, regSum);
 	}
 	
 	@RequestMapping(path = {"/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
@@ -290,12 +290,12 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> acceptOrRefuse(@PathVariable int id, @PathVariable int rId, @RequestBody AcceptOrRefuseRegistrationCommand input,  @RequestHeader String accessKey) {
 		Optional<Teaching> _teaching = this.objectStore.getById(Teaching.class, id);
 		if(!_teaching.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Teaching teaching = _teaching.get();
 		if(!hasAccess(accessKey, teaching))
 		{
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){
@@ -304,14 +304,14 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		Refugee r = _r.get();
 		Optional<Registration> _reg = teaching.getRegistrations().stream()
 				.filter(x -> x.getRefugee().getId().equals(r.getId()))
-				.findFirst(); // à voir car s'est une fausse function
+				.findFirst();
 		if (!_reg.isPresent()){
 			return notFound();
 		}
 		// verification si il y a de changement? (acceptation ou pas)
 		Registration reg = _reg.get();
 		reg.setAccepted(input.accepted);
-		return ResponseEntity.noContent().build();
+		return noContent();
 	}
 	
 	@RequestMapping(path = {"/{id}/registrations/{rId}"}, method = RequestMethod.DELETE)
@@ -319,19 +319,19 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> cancelRegistration (@PathVariable int id, @PathVariable int rId,  @RequestHeader String accessKey) {
 		Optional<Teaching> _teaching = this.objectStore.getById(Teaching.class, id);
 		if(!_teaching.isPresent()){
-			return ResponseEntity.notFound().build();
+			return notFound();
 		}
 		Teaching teaching = _teaching.get();
 		if(!hasAccess(accessKey, teaching))
 		{
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			return forbidden();
 		}
 		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
 		if (!_r.isPresent()){
 			return notFound();
 		}
 		Refugee r = _r.get();
-		if(!teaching.getRegistrations().removeIf(x-> x.getRefugee().getId().equals(r.getId()))){
+		if(!teaching.getRegistrations().removeIf(x -> x.getRefugee().getId().equals(r.getId()))){
 			return badRequest();
 		};
 		return noContent();

@@ -19,7 +19,7 @@
     </logger>
 
 	<logger name="org.hibernate.tool.schema" additivity="true">
-		<level value="error" />
+		<level value="info" />
 	</logger>
     
     <logger name="org.sjr.babel" additivity="true">

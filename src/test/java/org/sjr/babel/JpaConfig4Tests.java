@@ -29,7 +29,6 @@ public class JpaConfig4Tests {
 			.filter(c -> c.isAnnotationPresent(Cacheable.class) && c.isAnnotationPresent(CacheOnStartup.class))
 			.sorted((c1, c2) -> c1.getAnnotation(CacheOnStartup.class).order() - c2.getAnnotation(CacheOnStartup.class).order())
 			.forEach((x)-> em.createQuery("select o from "+x.getName()+" o").getResultList());
-		
 		em.close();
 		return emf;
 	}

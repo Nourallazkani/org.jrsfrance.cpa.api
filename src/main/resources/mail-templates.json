@@ -1,0 +1,56 @@
+{
+	"refugee-sign-up-confirmation": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Bienvenue sur le site CPA"
+		},
+		"body": {
+			"fr": "Vos identifiants :<br/> %s / %s"
+		}
+	},
+	"refugee-reset-password": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Réinitialisation de votre compte sur le site CPA"
+		},
+		"body": {
+			"fr": "Veuillez vous connecter sur : http://localhost:9000/refugees/profile?ak=%s"
+		}
+	},	
+	"refugee-update-password-confirmation": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Mise à jour de votre mot de passe"
+		},
+		"body": {
+			"fr": "Vos identifiants :<br/> %s / %s"
+		}
+	},
+	"volunteer-reset-password": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Réinitialisation de votre compte sur le site CPA"
+		},
+		"body": {
+			"fr": "Veuillez vous connecter sur : http://localhost:9000/volunteers/profile?ak=%s"
+		}
+	},
+	"volunteer-sign-up-confirmation": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Bienvenue sur le site CPA"
+		},
+		"body": {
+			"fr": "Vos identifiants :<br/> %s / %s"
+		}
+	},
+	"volunteer-update-password-confirmation": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Mise à jour de votre mot de passe"
+		},
+		"body": {
+			"fr": "Vos identifiants :<br/> %s / %s"
+		}
+	}
+}

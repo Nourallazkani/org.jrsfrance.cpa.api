@@ -39,7 +39,8 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	private String subject, description, link;
 	
-	@Convert(converter = MultiLanguageTextConverter.class) @Column(columnDefinition="json")
+	
+	@Convert(converter = MultiLanguageTextConverter.class) @Column(columnDefinition = "json", insertable = false, updatable = false)
 	private MultiLanguageText subjectI18n, descriptionI18n;
 		
 	@Temporal(TemporalType.DATE)

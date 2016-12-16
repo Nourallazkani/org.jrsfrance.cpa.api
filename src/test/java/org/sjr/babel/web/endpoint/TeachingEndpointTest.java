@@ -3,6 +3,7 @@ package org.sjr.babel.web.endpoint;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sjr.babel.JpaConfig4Tests;
@@ -20,6 +21,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
 //@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 //@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
+@Ignore
 public class TeachingEndpointTest {
 	
 	@Autowired

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.Date;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sjr.babel.JpaConfig4Tests;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
 //@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 //@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
+@Ignore
 public class EventEndpointTest {
 
 	@Autowired

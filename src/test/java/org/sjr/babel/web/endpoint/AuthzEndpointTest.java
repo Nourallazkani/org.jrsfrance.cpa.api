@@ -122,16 +122,6 @@ public class AuthzEndpointTest {
 	}
 	
 	@Test
-	public void testOrganisationSignInByAccessKeyUnauthorized() throws JsonProcessingException, Exception {
-		SignInCommand input = new SignInCommand();
-		input.accessKey="xxx";
-		mockMvc.perform(post("/authentication")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(jackson.writeValueAsString(input)))
-		.andExpect(status().isUnauthorized());
-	}
-	
-	@Test
 	public void testRefugeeSignInByAccessKeyOk() throws JsonProcessingException, Exception {
 		SignInCommand input = new SignInCommand();
 		input.accessKey="R-a871ce00-e7d2-497e-8a4e-d272b8b5b520";
@@ -140,17 +130,7 @@ public class AuthzEndpointTest {
 				.content(jackson.writeValueAsString(input)))
 		.andExpect(status().isOk());
 	}
-	
-	@Test
-	public void testRefugeeSignInByAccessKeyUnauthorized() throws JsonProcessingException, Exception {
-		SignInCommand input = new SignInCommand();
-		input.accessKey="xxx";
-		mockMvc.perform(post("/authentication")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(jackson.writeValueAsString(input)))
-		.andExpect(status().isUnauthorized());
-	}
-	
+
 	@Test
 	public void testVolunteerSignInByAccessKeyOk() throws JsonProcessingException, Exception {
 		SignInCommand input = new SignInCommand();
@@ -160,15 +140,16 @@ public class AuthzEndpointTest {
 				.content(jackson.writeValueAsString(input)))
 		.andExpect(status().isOk());
 	}
-	
+
 	@Test
-	public void testVolunteerSignInByAccessKeyUnauthorized() throws JsonProcessingException, Exception {
+	public void testSignInByAccessKeyUnauthorized() throws JsonProcessingException, Exception {
 		SignInCommand input = new SignInCommand();
 		input.accessKey="xxx";
 		mockMvc.perform(post("/authentication")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(jackson.writeValueAsString(input)))
 		.andExpect(status().isUnauthorized());
-	}	
+	}
+	
 
 }

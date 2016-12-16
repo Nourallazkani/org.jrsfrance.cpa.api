@@ -19,6 +19,7 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.RegistrationSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -264,25 +265,29 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		if (!_teaching.isPresent()){
 			return notFound();
 		}
-		
+		Teaching teaching = _teaching.get();
 		Optional<Refugee> _r = getRefugeeByAccesskey(refugeeAccessKey);
 		if (!_r.isPresent()){
 			return forbidden();
 		}
 		Refugee r = _r.get();
+		if(teaching.getRegistrations().stream().anyMatch(x -> x.getRefugee().getId().equals(r.getId()))){
+			return conflict();
+		}
+		/*
 		List<Registration> registrations = _teaching.get().getRegistrations();
 		for (Registration reg : registrations){
 			if( r.equals(reg.getRefugee())){
 				return conflict();
 			}
 		}
+		*/
 		Registration reg = new Registration();
 		reg.setAccepted(null);
 		reg.setRefugee(r);
 		reg.setRegistrationDate(now);
-		registrations.add(reg);
-		RegistrationSummary regSum = new RegistrationSummary(reg);
-		return created(null, regSum);
+		teaching.getRegistrations().add(reg);
+		return created(getUri(getPath()+"/"+r.getId()), new RegistrationSummary(reg));
 	}
 	
 	@RequestMapping(path = {"/{id}/registrations/{rId}"}, method = {RequestMethod.POST,RequestMethod.PATCH})
@@ -308,7 +313,6 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		if (!_reg.isPresent()){
 			return notFound();
 		}
-		// verification si il y a de changement? (acceptation ou pas)
 		Registration reg = _reg.get();
 		reg.setAccepted(input.accepted);
 		return noContent();

@@ -1,6 +1,7 @@
 package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,7 +56,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		@NotNull @Valid
 		public AddressSummary address;
 		@NotNull
-		public Date startDate, endDate, registrationOpeningDate,registrationClosingDate;
+		public LocalDate startDate, endDate, registrationOpeningDate,registrationClosingDate;
 		public boolean openForRegistration;
 		@NotNull @Valid
 		public ContactSummary contact;
@@ -145,16 +146,16 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			args.put("domainId", domainId);
 			query.append("and c.domain.id = :domainId ");
 		}		
-		Date now = new Date();	
 		
+		LocalDate now = LocalDate.now(); // date without time
 		if(openForRegistration != null){
 			if(openForRegistration){
-				query.append("and (c.registrationClosingDate >= :d and c.registrationOpeningDate <= :d) ");	
+				query.append("and (c.registrationClosingDate >= :d and c.registrationOpeningDate <= :now) ");	
 			}
 			else{
-				query.append("and (c.registrationClosingDate < :d || c.registrationOpeningDate > :d) ");
+				query.append("and (c.registrationClosingDate < :d || c.registrationOpeningDate > :now) ");
 			}
-			args.put("d", now);
+			args.put("now", now);
 		}
 		
 		if(!includeFutureEvents){
@@ -226,11 +227,11 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
 		
-		if(input.startDate !=null && input.endDate!=null && input.endDate.before(input.startDate)){
+		if(input.startDate !=null && input.endDate!=null && input.endDate.isBefore(input.startDate)){
 			errors.put("startDate", "_");
 			errors.put("endDate", "_");
 		}
-		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.isBefore(input.registrationOpeningDate)){
 			errors.put("registrationOpeningDate", "_");
 			errors.put("registrationClosingDate", "_");
 		}
@@ -283,11 +284,11 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
 		
-		if(input.startDate !=null && input.endDate!=null && input.endDate.before(input.startDate)){
+		if(input.startDate !=null && input.endDate!=null && input.endDate.isBefore(input.startDate)){
 			errors.put("startDate", "_");
 			errors.put("endDate", "_");
 		}
-		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.isBefore(input.registrationOpeningDate)){
 			errors.put("registrationOpeningDate", "_");
 			errors.put("registrationClosingDate", "_");
 		}

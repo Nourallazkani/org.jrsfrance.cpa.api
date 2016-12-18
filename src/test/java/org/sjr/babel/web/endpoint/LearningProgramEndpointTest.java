@@ -1,12 +1,10 @@
 package org.sjr.babel.web.endpoint;
 
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,13 +18,17 @@ import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-
+//@Ignore
 public class LearningProgramEndpointTest extends AbstractEndpointTest{
 
 	
+	// events for refugees : including open for registration and not open yet for registrations
 	@Test
-	public void testGetMany() throws Exception{
-		List<LearningProgramSummary> results = em.createQuery("select lp from LanguageLearningProgram lp", AbstractLearningProgram.class)
+	public void testGetMany1() throws Exception{
+		
+		String checkQuery = "select lp from LanguageLearningProgram lp where lp.registrationClosingDate >= :d";
+		List<LearningProgramSummary> results = em.createQuery(checkQuery, AbstractLearningProgram.class)
+				.setParameter("d", LocalDate.now())
 				.getResultList()
 				.stream()
 				.map(LearningProgramSummary::new)
@@ -34,11 +36,48 @@ public class LearningProgramEndpointTest extends AbstractEndpointTest{
 		
 		String expectedJson = this.jackson.writeValueAsString(results);
 	
-		mockMvc.perform(get("/learnings/language-programs"))
+		mockMvc.perform(get("/learnings/language-programs").param("includePastEvents", "false").param("includeFutureEvents", "true"))
 				.andExpect(status().isOk())
 				.andExpect(content().json(expectedJson));
 	}
-
+	
+	// events for refugees 2 : only with open for registrations
+	@Test
+	public void testGetMany2() throws Exception{
+		
+		String checkQuery = "select lp from LanguageLearningProgram lp where lp.registrationClosingDate >= :d and lp.registrationOpeningDate <= :d";		
+		List<LearningProgramSummary> results = em.createQuery(checkQuery, AbstractLearningProgram.class)
+				.setParameter("d", LocalDate.now())
+				.getResultList()
+				.stream()
+				.map(LearningProgramSummary::new)
+				.collect(Collectors.toList());
+		
+		String expectedJson = this.jackson.writeValueAsString(results);
+	
+		mockMvc.perform(get("/learnings/language-programs").param("openForRegistration", "true"))
+				.andExpect(status().isOk())
+				.andExpect(content().json(expectedJson));
+	}
+	
+	@Test // events for an organisation : with future and past events
+	public void testGetMany3() throws Exception{
+		
+		String checkQuery = "select lp from LanguageLearningProgram lp where lp.organisation.id = :oId";		
+		List<LearningProgramSummary> results = em.createQuery(checkQuery, AbstractLearningProgram.class)
+				.setParameter("oId", 1)
+				.getResultList()
+				.stream()
+				.map(LearningProgramSummary::new)
+				.collect(Collectors.toList());
+		
+		String expectedJson = this.jackson.writeValueAsString(results);
+	
+		mockMvc.perform(get("/learnings/language-programs").param("includeFutureEvents", "true").param("includePastEvents", "true").param("organisationId", "1"))
+				.andExpect(status().isOk())
+				.andExpect(content().json(expectedJson));
+	}
+	
 	@Test
 	public void testGetOneOk() throws Exception{
 		String expectedJson = this.jackson.writeValueAsString(new LearningProgramSummary(em.find(LanguageLearningProgram.class, 1)));
@@ -56,12 +95,11 @@ public class LearningProgramEndpointTest extends AbstractEndpointTest{
 		input.level = "A2";
 		input.link = "https://www.google.fr/";
 		input.groupSize = 5;
-		input.domain = "";
-		input.type = "Francais pour reprendre des études";
-		input.startDate = new Date();
-		input.endDate = new Date();
-		input.registrationClosingDate = new Date();
-		input.registrationOpeningDate = new Date();
+		input.type = "Francais pour reprendre des etudes";
+		input.startDate = LocalDate.now().plusMonths(1);
+		input.endDate = LocalDate.now().plusMonths(2);
+		input.registrationOpeningDate = LocalDate.now();
+		input.registrationClosingDate = LocalDate.now().plusWeeks(3);
 		
 		mockMvc.perform(post("/learnings/language-programs")
 				.header("accessKey", "O-d6daffe2-01ed-4e40-bf1e-b2b102c873e4")

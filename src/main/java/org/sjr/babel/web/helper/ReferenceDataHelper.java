@@ -104,7 +104,7 @@ public class ReferenceDataHelper {
 		});
 		loaders.put("city", ()->{
 			Map<String, List<?>> cities = new HashMap<>();
-			cities.put("teaching", this.objectStore.find(String.class, "select distinct o.address.locality from Teaching t join t.organisation o"));
+			cities.put("teaching", this.objectStore.find(String.class, "select distinct o.address.locality from Teaching t join t.organisation o where t.registrationClosingDate >= now() and t.registrationOpeningDate <= now()"));
 			cities.put("languageLearningProgram", this.objectStore.find(String.class, "select distinct address.locality from LanguageLearningProgram"));
 			cities.put("professionalLearningProgram", this.objectStore.find(String.class, "select distinct address.locality from ProfessionalLearningProgram"));
 			cities.put("workshop", this.objectStore.find(String.class, "select distinct e.address.locality from AbstractEvent e join e.type t where t.stereotype='WORKSHOP'"));

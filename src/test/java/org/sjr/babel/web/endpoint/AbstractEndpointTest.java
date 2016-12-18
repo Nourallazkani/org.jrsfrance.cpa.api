@@ -16,23 +16,27 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration()
 @ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
 //@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 //@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
-public class AbstractEndpointTest {
+public abstract class AbstractEndpointTest {
 	
 	@Autowired
-	public WebApplicationContext context;
+	protected WebApplicationContext context;
 
-	public MockMvc mockMvc;
+	protected MockMvc mockMvc;
 
-	public ObjectMapper jackson = new ObjectMapper();
+	
+	protected ObjectMapper jackson = new ObjectMapper().registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+	
 	
 	@PersistenceContext
-	public EntityManager em;
+	protected EntityManager em;
 	
 	@Before
 	public void setup() {

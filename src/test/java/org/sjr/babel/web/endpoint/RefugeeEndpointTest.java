@@ -1,7 +1,8 @@
 package org.sjr.babel.web.endpoint;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.core.StringStartsWith.*;
 
 import java.util.Date;
 
@@ -11,6 +12,7 @@ import org.sjr.babel.web.endpoint.RefugeeEndpoint.RefugeeSummary;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class RefugeeEndpointTest extends AbstractEndpointTest{
 		
@@ -24,13 +26,21 @@ public class RefugeeEndpointTest extends AbstractEndpointTest{
 		input.lastName = "Allazkani";
 		input.fieldOfStudy = "Informatique";
 		input.mailAddress = "n@n.n";
-		input.password = "azerty";
+		
+	       
+        String jsonWithoutPassword = jackson.writeValueAsString(input); // n'incluera pas le json. A partir de là plus de lien avec la classe RefugeeSummary.
+        ObjectNode node = (ObjectNode) jackson.readTree(jsonWithoutPassword);
+        node.put("password", "azerty");
+
+        String jsonWithPassword = jackson.writeValueAsString(node);
 		
 		mockMvc.perform(post("/refugees")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.content(jackson.writeValueAsString(input)))
-		.andExpect(status().isOk());
+				.content(jsonWithPassword))
+		.andExpect(status().isOk())
+		.andExpect(jsonPath("$.accessKey").value(startsWith("R-")))
+		;
 	}
 	
 	@Test

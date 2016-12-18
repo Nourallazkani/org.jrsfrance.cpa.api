@@ -62,7 +62,6 @@ public abstract class AbstractEndpoint {
 	
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-	
 	protected ResponseEntity<?> okOrNotFound (Optional<?> o){
 		return o.isPresent() ? ResponseEntity.ok(o.get()): ResponseEntity.notFound().build() ;
 	} 

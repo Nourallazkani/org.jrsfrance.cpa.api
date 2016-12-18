@@ -1,5 +1,6 @@
 package org.sjr.babel;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -16,6 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -26,8 +29,13 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 public class WebAppInitializer implements WebApplicationInitializer
 {
+	
 	
 	@Configuration 
 	@EnableWebMvc 
@@ -39,6 +47,13 @@ public class WebAppInitializer implements WebApplicationInitializer
 		public RestConfiguration() {
 			System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
 			System.setProperty("com.mchange.v2.log.MLog", "com.mchange.v2.log.FallbackMLog");
+		}
+		
+		@Override
+		public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+			ObjectMapper jackson = new ObjectMapper().registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+			MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter(jackson);
+			converters.add(jsonConverter);
 		}
 		
 		@Bean

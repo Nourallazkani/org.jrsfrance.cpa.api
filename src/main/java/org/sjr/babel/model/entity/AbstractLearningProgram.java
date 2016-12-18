@@ -1,6 +1,6 @@
 package org.sjr.babel.model.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Convert;
@@ -11,8 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
@@ -28,11 +26,9 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	private Integer groupSize;
 	
-	@Temporal(TemporalType.DATE)
-	private Date registrationOpeningDate, registrationClosingDate;
+	private LocalDate registrationOpeningDate, registrationClosingDate;
 
-	@Temporal(TemporalType.DATE)
-	private Date startDate, endDate;
+	private LocalDate startDate, endDate;
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Organisation organisation;
@@ -74,35 +70,35 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 		this.groupSize = groupSize;
 	}
 
-	public Date getStartDate() {
+	public LocalDate getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(Date startDate) {
+	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
 
-	public Date getEndDate() {
+	public LocalDate getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(Date endDate) {
+	public void setEndDate(LocalDate endDate) {
 		this.endDate = endDate;
 	}
 
-	public Date getRegistrationOpeningDate() {
+	public LocalDate getRegistrationOpeningDate() {
 		return registrationOpeningDate;
 	}
 
-	public void setRegistrationOpeningDate(Date registrationOpeningDate) {
+	public void setRegistrationOpeningDate(LocalDate registrationOpeningDate) {
 		this.registrationOpeningDate = registrationOpeningDate;
 	}
 
-	public Date getRegistrationClosingDate() {
+	public LocalDate getRegistrationClosingDate() {
 		return registrationClosingDate;
 	}
 
-	public void setRegistrationClosingDate(Date registrationClosingDate) {
+	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
 		this.registrationClosingDate = registrationClosingDate;
 	}
 

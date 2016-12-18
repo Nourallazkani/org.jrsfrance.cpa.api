@@ -19,7 +19,6 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.RegistrationSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;

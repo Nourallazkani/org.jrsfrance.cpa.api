@@ -1,42 +1,18 @@
 package org.sjr.babel.web.endpoint;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.sjr.babel.JpaConfig4Tests;
-import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.sjr.babel.web.endpoint.AuthzEndpoint.SignInCommand;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
-public class AuthzEndpointTest {
 
-	@Autowired
-	private WebApplicationContext context;
+public class AuthzEndpointTest extends AbstractEndpointTest {
 
-	private MockMvc mockMvc;
-
-	private ObjectMapper jackson = new ObjectMapper();
-	
-	@Before
-	public void setup() {
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-	}
 	
 	@Test
 	public void testOrganisationSignInByMailAddressOk() throws JsonProcessingException, Exception {

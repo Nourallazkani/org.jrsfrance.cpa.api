@@ -38,7 +38,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		public Integer id;
 		@NotNull @Size(min = 1)
 		public String name, mailAddress;
-		public @JsonProperty(access = Access.WRITE_ONLY) String password;
+		public /*@JsonProperty(access = Access.WRITE_ONLY)*/ String password;
 		@NotNull @Size(min = 1)
 		public String category;
 		@NotNull @Valid
@@ -130,7 +130,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid OrganisationSummary input, @RequestHeader(required = false) String accessKey) {
 		
-		String query = "select o from Organisation o where o.mailAddress = :mailAddress";
+		String query = "select o from Organisation o where lower(o.mailAddress) = lower(:mailAddress)";
 		Map<String, Object> args= new HashMap<>();
 		args.put("mailAddress", input.mailAddress);
 		if(this.objectStore.findOne(Organisation.class, query, args).isPresent()){

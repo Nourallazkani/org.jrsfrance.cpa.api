@@ -1,51 +1,21 @@
 package org.sjr.babel.web.endpoint;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Date;
 
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.sjr.babel.JpaConfig4Tests;
-import org.sjr.babel.WebAppInitializer.RestConfiguration;
 import org.sjr.babel.model.entity.AbstractEvent.Audience;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.ContactSummary;
 import org.sjr.babel.web.endpoint.EventEndpoint.EventSummary;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
-//@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
-//@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
-@Ignore
-public class EventEndpointTest {
-
-	@Autowired
-	private WebApplicationContext context;
-
-	private MockMvc mockMvc;
-
-	private ObjectMapper jackson = new ObjectMapper();
-	
-	@Before
-	public void setup() {
-		this.mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-	}
+public class EventEndpointTest extends AbstractEndpointTest{
 	
 	@Test
 	public void testGetMany() throws JsonProcessingException, Exception{
@@ -74,5 +44,43 @@ public class EventEndpointTest {
 				.accept(MediaType.APPLICATION_JSON)
 				.content(jackson.writeValueAsString(input)))
 		.andExpect(status().isCreated());
+	}
+	
+	@Test
+	public void testPostEventRegistrationCreated() throws JsonProcessingException, Exception{
+
+		mockMvc.perform(post("/workshops/1/registrations")
+				.header("accessKey", "R-3b743606-928a-4086-852a-9efd72f83d01")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isCreated());
+	}
+	
+	@Test
+	public void testPostEventRegistrationConflict() throws JsonProcessingException, Exception{
+		mockMvc.perform(post("/workshops/1/registrations")
+				.header("accessKey", "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isConflict());
+	}
+	
+	@Test
+	public void testPostWorkshopRegistrationCreated() throws JsonProcessingException, Exception{
+
+		mockMvc.perform(post("/events/3/registrations")
+				.header("accessKey", "R-3b743606-928a-4086-852a-9efd72f83d01")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isCreated());
+	}
+	
+	@Test
+	public void testPostWorkshopRegistrationConflict() throws JsonProcessingException, Exception{
+		mockMvc.perform(post("/events/3/registrations")
+				.header("accessKey", "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+		.andExpect(status().isConflict());
 	}
 }

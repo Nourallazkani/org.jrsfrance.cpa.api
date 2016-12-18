@@ -69,6 +69,7 @@ insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,org
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (true,true,6,2,3, now() + interval '-1 MONTH');
 update Teaching set registrationClosingDate = now() + interval '7 DAY';
 update Teaching set contact=o.contact, link = 'http://jrsfrance.org' from Teaching t join Organisation o on t.organisation_id=o.id;
+insert into Teaching_registrations( refugee_id, Teaching_id) values (1,1);
 
 
 insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now() + interval '-60 day', 4,1,'L', 1);
@@ -79,6 +80,7 @@ insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, 
 insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, domain_id) values(now() + interval '90 day', 7,3,'P', 2);
 update AbstractLearningProgram set link='http://www.jrsfrance.org/', registrationOpeningDate=startDate + INTERVAL '-120 day', registrationClosingDate=startDate + INTERVAL '-30 day', endDate=startDate + INTERVAL '90 day';
 update AbstractLearningProgram	set street1=o.street1,street2=o.street2, locality=o.locality, postalCode=o.postalCode, country_id=o.country_id, lat=o.lat, lng=o.lng, googleMapId=o.googleMapId from AbstractLearningProgram a join Organisation o on a.organisation_id=o.id;
+insert into AbstractLearningProgram_registrations( refugee_id, AbstractLearningProgram_id) values (1,1);
 insert into AbstractLearningProgram_registrations( refugee_id, AbstractLearningProgram_id) values (1,5);
 
 insert into AbstractEvent(audience, subject, startDate,organisation_id ,type_id ,DTYPE) values ('REFUGEE', 'Comprendre les éléctions présidentielles', now() + INTERVAL '15 DAY', 2, 1, 'O-E');
@@ -88,6 +90,8 @@ insert into AbstractEvent(audience, subject, startDate,organisation_id ,type_id 
 update AbstractEvent set contact=o.contact, street1=o.street1, street2=o.street2, locality=o.locality, postalCode=o.postalCode, country_id=o.country_id, lat=o.lat, lng=o.lng, googleMapId=o.googleMapId from AbstractEvent a join Organisation o on a.organisation_id=o.id;
 update AbstractEvent set endDate = startDate + interval '2 hour', link='http://www.jrsfrance.org/', registrationOpeningDate=startDate + interval '-40 day',  registrationClosingDate=startDate + interval '-5 day';
 update AbstractEvent set descriptionI18n = json_build_object('textEn', 'xx', 'textAr', 'بـ', 'textPrs', '');
+insert into AbstractEvent_registrations( refugee_id, AbstractEvent_id) values (1,1);
+insert into AbstractEvent_registrations( refugee_id, AbstractEvent_id) values (1,3);
 
 insert into MeetingRequest ( dateConstraint, reason, additionalInformations, postDate, acceptationDate, street1, street2, postalCode, locality, lat, lng, googleMapId, refugee_id, volunteer_id, country_id) values('Lundi 24 octobre', 'SUPPORT_IN_STUDIES', 'Malheureusement, mon portable (ne marche pas)! ', '2016-10-17 07:06:45', '2016-10-17 07:37:19', NULL, NULL, '75001', 'Paris', 48.86404930, 2.33105260, NULL, 1, 1, 1);
 

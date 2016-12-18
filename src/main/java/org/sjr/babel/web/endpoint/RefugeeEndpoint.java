@@ -40,9 +40,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
-
 import util.EncryptionUtil;
 
 @RestController
@@ -55,13 +52,12 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		public String nationality;
 		public String mailAddress;
 		public String hostCountryLanguageLevel;
-		public @JsonProperty(access = Access.WRITE_ONLY) String password;
+		public /*@JsonProperty(access = Access.WRITE_ONLY)*/ String password;
 		public String civility, firstName, lastName, phoneNumber;
 		public AddressSummary address;
 		public List<String> languages;
 		public String fieldOfStudy;
 		public Date birthDate;
-		
 		RefugeeSummary() {}
 		
 		RefugeeSummary(Refugee entity) {
@@ -102,7 +98,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			return badRequest(errors);
 		}
 		
-		String query = "select count(x) from Refugee x where x.mailAddress = :mailAddress";
+		String query = "select count(x) from Refugee x where lower(x.mailAddress) = lower(:mailAddress)";
 		Map<String, Object> args = new HashMap<>();
 		args.put("mailAddress", input.mailAddress);
 		long n = objectStore.count(Volunteer.class, query, args);

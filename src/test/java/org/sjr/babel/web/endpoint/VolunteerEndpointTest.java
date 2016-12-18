@@ -1,54 +1,48 @@
 package org.sjr.babel.web.endpoint;
 
-import org.junit.Assert;
-import org.junit.Ignore;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.sjr.babel.JpaConfig4Tests;
-import org.sjr.babel.WebAppInitializer.RestConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
+import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
+import org.springframework.http.MediaType;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
-//@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
-//@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
-@Ignore
-public class VolunteerEndpointTest {
+import com.fasterxml.jackson.core.JsonProcessingException;
 
-	@Autowired
-	private VolunteerEndpoint endpoint;
-
+public class VolunteerEndpointTest extends AbstractEndpointTest {
+	
 	@Test
-	public void testGetVolunteerSummaryOk() {
-		ResponseEntity<?> x = endpoint.getOne(1, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
-		HttpStatus http = x.getStatusCode();
-		Assert.assertEquals(HttpStatus.OK, http);
+	public void testPostConflict() throws JsonProcessingException, Exception{
+		VolunteerSummary input = new VolunteerSummary();
+		input.address = new AddressSummary("19 rue Raspail", null, "94200", "Ivry sur seine", "France");
+		input.firstName = "Nour";
+		input.lastName = "Allazkani";
+		input.mailAddress = "v@V.v";
+		input.password = "azerty";
+		
+		
+		mockMvc.perform(post("/volunteers")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.content(jackson.writeValueAsString(input)))
+		.andExpect(status().isConflict());
 	}
+	
 	@Test
-	public void testGetVolunteerSummaryNotFound() {
-		ResponseEntity<?> x = endpoint.getOne(2000, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
-		HttpStatus http = x.getStatusCode();
-		Assert.assertEquals(HttpStatus.NOT_FOUND, http);
+	public void testPostOk() throws JsonProcessingException, Exception{
+		VolunteerSummary input = new VolunteerSummary();
+		input.address = new AddressSummary("19 rue Raspail", null, "94200", "Ivry sur seine", "France");
+		input.firstName = "Nour";
+		input.lastName = "Allazkani";
+		input.mailAddress = "nn@Nn.n";
+		input.password = "azerty";
+		
+		
+		mockMvc.perform(post("/volunteers")
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
+				.content(jackson.writeValueAsString(input)))
+		.andExpect(status().isOk());
 	}
-	@Test
-	public void testGetVolunteerSummaryForbidden() {
-		ResponseEntity<?> x = endpoint.getOne(1, "V-11eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
-		HttpStatus http = x.getStatusCode();
-		Assert.assertEquals(HttpStatus.FORBIDDEN, http);
-	}
-	/*
-	@Test
-	public void testGetVolunteerMeetingRequestMessagesOK() {
-		ResponseEntity<?> x = endpoint.getMeetingRequestMessages(1, 1, "V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec");
-		HttpStatus http = x.getStatusCode();
-		Assert.assertEquals(HttpStatus.OK, http);
-	}
-	*/
-
 }

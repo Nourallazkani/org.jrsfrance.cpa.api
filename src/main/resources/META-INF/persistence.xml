@@ -12,7 +12,7 @@
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
 			<property name="javax.persistence.jdbc.user" value="${db.username}" />
 			<property name="javax.persistence.jdbc.password" value="${db.password}" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://${db.server}:5432/cpa_rec" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://${db.server}:5432/${db.name}" />
 
 			<!-- pour utiliser c3p0, la dépendance vers hibernate-c3p0 est nécessaire (voir pom.xml) -->
 			<property name="hibernate.c3p0.min_size" value="5"/>

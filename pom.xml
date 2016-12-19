@@ -12,6 +12,7 @@
 		<db.username>postgres</db.username>
 		<db.password>postgres</db.password>
 		<db.server>localhost</db.server>
+		<db.name>cpa_test</db.name>
 		<smtp.username>AKIAJCQS4ZMC2SUBODMQ</smtp.username>
 		<smtp.password>AipV1kf46I6H7TkGHYil7TKBmSKNjfs2hS6nC+WOLsw9</smtp.password>
 
@@ -203,9 +204,10 @@
 		<profile>
 			<id>aws</id>
 			<properties>
+				<db.server>cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com</db.server>
+				<db.name>cpa_rec</db.name>
 				<db.username>cpa</db.username>
 				<db.password>montaigoual</db.password>
-				<db.server>cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com</db.server>
 			</properties>
 		</profile>
 	</profiles>

@@ -2,20 +2,49 @@ package org.sjr.babel.web.endpoint;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
+import org.sjr.babel.model.entity.AbstractEvent;
 import org.sjr.babel.model.entity.AbstractEvent.Audience;
+import org.sjr.babel.model.entity.AbstractLearningProgram;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.ContactSummary;
 import org.sjr.babel.web.endpoint.EventEndpoint.EventSummary;
+import org.sjr.babel.web.endpoint.LearningProgramEndpoint.LearningProgramSummary;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class EventEndpointTest extends AbstractEndpointTest{
+	
+	
+	// events for refugees : including open for registration and not open yet for registrations
+	@Test
+	public void testGetMany1() throws Exception{
+		String checkQuery = "select e from AbstractEvent e where e.registrationClosingDate >= :d and e.audience = :audience";
+		List<EventSummary> results = em.createQuery(checkQuery, AbstractEvent.class)
+				.setParameter("d", LocalDate.now()).setParameter("audience", Audience.REFUGEE)
+				.getResultList()
+				.stream()
+				.map(x-> new EventSummary(x, "fr"))
+				.collect(Collectors.toList());
+		
+		String expectedJson = this.jackson.writeValueAsString(results);
+	
+		mockMvc.perform(get("/events").param("includePastEvents", "false").param("includeFutureEvents", "true")
+				.param("audience", "REFUGEE")//.param("openForRegistration", "true")
+				.header("Accept-language", "fr"))
+				.andExpect(status().isOk())
+				.andExpect(content().json(expectedJson));
+	}
+	
 	
 	@Test
 	public void testGetMany() throws JsonProcessingException, Exception{
@@ -31,10 +60,10 @@ public class EventEndpointTest extends AbstractEndpointTest{
 		input.address = new AddressSummary("1 rue de Rivoli", null, "75007", "Paris", "France");
 		input.contact = new ContactSummary("John Doe", "x@x.x", null);
 		
-		input.startDate = new Date();
-		input.endDate = new Date();
-		input.registrationClosingDate = new Date();
-		input.registrationOpeningDate = new Date();
+		input.startDate = LocalDateTime.now();
+		input.endDate = LocalDateTime.now();
+		input.registrationClosingDate = LocalDate.now();
+		input.registrationOpeningDate = LocalDate.now();
 		input.subject = "subject";
 		input.description = "description";
 		

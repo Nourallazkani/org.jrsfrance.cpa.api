@@ -19,6 +19,10 @@ import org.springframework.http.MediaType;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class TeachingEndpointTest extends AbstractEndpointTest {
+	
+	
+	
+	
 	@Test
 	public void testGetMany() throws Exception{
 		List<TeachingSummary> results = em.createQuery("select t from Teaching t", Teaching.class)

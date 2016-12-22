@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.reference.OrganisationCategory;
+import org.sjr.babel.web.helper.MailHelper.MailCommand;
+import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,9 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import util.EncryptionUtil;
 
@@ -152,7 +152,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		
 		
 		Organisation organisation = new Organisation();
-		
+		organisation.setRegistrationDate(LocalDate.now());
 		organisation.setName(input.name);
 		organisation.setAddress(input.address.toAddress(this.refDataProvider));
 		organisation.setContact(input.contact.toContact());
@@ -163,6 +163,10 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		organisation.setAdditionalInformations(input.additionalInformations);
 		objectStore.save(organisation);
 		input.id = organisation.getId();
+		
+		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, null, organisation.getMailAddress(), "fr", input.password);
+		afterTx(() -> mailHelper.send(mailCommand));
+		
 		return created(getUri("organisations/"+input.id), input);
 	}
 	

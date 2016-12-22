@@ -1,11 +1,9 @@
 package org.sjr.babel.web.endpoint;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,8 +53,8 @@ public class TeachingEndpointTest extends AbstractEndpointTest {
 	@Test
 	public void testPostCreated() throws Exception{
 		TeachingSummary input = new TeachingSummary();
-		input.registrationOpeningDate = new Date();
-		input.registrationClosingDate = new Date();
+		input.registrationOpeningDate = LocalDate.now();
+		input.registrationClosingDate = LocalDate.now().plusMonths(1);
 		input.address = new AddressSummary("1 rue de rivoli", null, "75001", "Paris", "France");
 		input.contact = new ContactSummary("John Doe", "x@x.x", "123");
 		input.languageLevelRequired = "A1";

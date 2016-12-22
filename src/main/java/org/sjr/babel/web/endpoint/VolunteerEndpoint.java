@@ -24,10 +24,9 @@ import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
+import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -54,7 +53,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		public @NotNull @Valid AddressSummary address;
 		public String civility, phoneNumber;
 		public List<String> languages , fieldsOfStudy;
-		public Date birthDate;
+		public LocalDate birthDate;
 		public Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
 		public String activities;
 		
@@ -130,6 +129,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		account.setAccessKey("V-" + UUID.randomUUID().toString());
 		
 		Volunteer volunteer = new Volunteer();
+		volunteer.setRegistrationDate(LocalDate.now());
 		volunteer.setFirstName(input.firstName);
 		volunteer.setLastName(input.lastName);
 		volunteer.setMailAddress(input.mailAddress);
@@ -151,12 +151,8 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		volunteer.setAccount(account);
 		this.objectStore.save(volunteer);
 		
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
-			@Override
-			public void afterCommit() {
-				mailHelper.send(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, "fr", volunteer.getMailAddress(), volunteer.getMailAddress(), input.password);
-			}
-		});
+		MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, null, volunteer.getMailAddress(), "fr", volunteer.getMailAddress(), input.password);
+		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return successSignUp(volunteer);
 	}
@@ -220,12 +216,8 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			if(StringUtils.hasText(input.password)){
 				v.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
-					@Override
-					public void afterCommit() {
-						mailHelper.send(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, "fr", v.getMailAddress(), v.getMailAddress(), input.password);
-					}
-				});
+				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, null, v.getMailAddress(), "fr", input.password);
+				afterTx(() -> this.mailHelper.send(mailCommand));
 			}
 			
 			Date date = Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant());

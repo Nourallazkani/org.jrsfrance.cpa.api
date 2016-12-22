@@ -32,8 +32,26 @@ public class MailHelper {
 		VOLUNTEER_SIGN_UP_CONFIRMATION,
 		VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION,
 		VOLUNTEER_RESET_PASSWORD,
+		ORGANISATION_SIGN_UP_CONFIRMATION,
+		ORGANISATION_UPDATE_PASSWORD_CONFIRMATION,
+		ORGANISATION_RESET_PASSWORD,
 	}
 
+	public static class MailCommand{
+		public String recipientName, recipientMailAddress, language;
+		public MailType type;
+		public Object[] bodyVars;
+		
+		public MailCommand(MailType type, String recipientName, String recipientMailAddress, String language, Object... bodyVars) {
+			super();
+			this.recipientName = recipientName;
+			this.recipientMailAddress = recipientMailAddress;
+			this.language = language;
+			this.type = type;
+			this.bodyVars = bodyVars;
+		}
+	}
+	
 	private JsonNode templates;
 	
 	@Autowired
@@ -57,20 +75,20 @@ public class MailHelper {
 		public boolean sent;
 	}
 	
-	public SendMailOutcome send(MailType mailType, String language, String to, Object... args){
+	public SendMailOutcome send(MailCommand command){
 
 		try {
-			JsonNode template = templates.get(mailType.name().toLowerCase().replace("_", "-"));
+			JsonNode template = templates.get(command.type.name().toLowerCase().replace("_", "-"));
 			
 			String from = template.get("from").textValue();
-			String subject = template.get("subject").get(language).textValue();
+			String subject = template.get("subject").get(command.language).textValue();
 			String body;
 			if(template.has("body")){
-				String bodyTemplate = template.get("body").get(language).textValue();
-				body = String.format(bodyTemplate, args);
+				String bodyTemplate = template.get("body").get(command.language).textValue();
+				body = String.format(bodyTemplate, command.bodyVars);
 			}
 			else{
-				String bodyUrl = template.get("bodyUrl").get(language).asText();
+				String bodyUrl = template.get("bodyUrl").get(command.language).asText();
 				
 				HttpURLConnection connection = null;
 				try{
@@ -92,7 +110,7 @@ public class MailHelper {
 			
 			MimeMessageHelper helper = new MimeMessageHelper(mime, true);
 			  
-			helper.setTo(to);
+			helper.setTo(command.recipientMailAddress);
 			helper.setText(body, true);
 			helper.setSubject(subject);
 			helper.setFrom(from);
@@ -101,7 +119,7 @@ public class MailHelper {
 			response.body = body;
 			response.subject = subject;
 			
-			if (to == null || to.trim().length() < 12) {
+			if (command.recipientMailAddress == null || command.recipientMailAddress.trim().length() < 12) {
 				response.sent = false;
 			}
 			else{

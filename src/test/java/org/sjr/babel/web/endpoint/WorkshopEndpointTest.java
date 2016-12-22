@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.junit.Test;
 import org.sjr.babel.model.entity.AbstractEvent;
 import org.sjr.babel.model.entity.AbstractEvent.Audience;
+import org.sjr.babel.model.entity.reference.EventType;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.ContactSummary;
 import org.sjr.babel.web.endpoint.EventEndpoint.EventSummary;
@@ -18,15 +19,15 @@ import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-public class EventEndpointTest extends AbstractEndpointTest{
+public class WorkshopEndpointTest extends AbstractEndpointTest{
 	
-	
-	@Test 	// only events open for registrations
-	public void testGetManyRefugeeEvents_strict() throws Exception{
-		String checkQuery = "select e from AbstractEvent e where e.registrationOpeningDate >= :d and e.registrationOpeningDate <= :d and e.audience = :audience and e.type.stereotype = null";
+	@Test 	// only workshops open for registrations
+	public void testGetManyRefugeeWorkshops_strict() throws Exception{
+		String checkQuery = "select e from AbstractEvent e where e.registrationOpeningDate <= :d and e.registrationClosingDate >= :d and e.audience = :audience and e.type.stereotype = :st";
 		List<EventSummary> results = em.createQuery(checkQuery, AbstractEvent.class)
 				.setParameter("d", LocalDate.now())
 				.setParameter("audience", Audience.REFUGEE)
+				.setParameter("st", EventType.Stereotype.WORKSHOP)
 				.getResultList()
 				.stream()
 				.map(x-> new EventSummary(x, "fr"))
@@ -34,7 +35,7 @@ public class EventEndpointTest extends AbstractEndpointTest{
 		
 		String expectedJson = this.jackson.writeValueAsString(results);
 	
-		mockMvc.perform(get("/events")
+		mockMvc.perform(get("/workshops")
 				.param("openForRegistration", "true")
 				.param("audience", "REFUGEE")
 				.header("Accept-language", "fr"))
@@ -42,12 +43,13 @@ public class EventEndpointTest extends AbstractEndpointTest{
 				.andExpect(content().json(expectedJson));
 	}
 
-	// only events open for registrations and not yet open for registrations
+	// only workshops open for registrations and not yet open for registrations
 	@Test
-	public void testGetManyRefugeeEvents_default() throws Exception{
-		String checkQuery = "select e from AbstractEvent e where e.registrationClosingDate >= :d and e.audience = :audience and e.type.stereotype = null";
+	public void testGetManyRefugeeWorkshops_default() throws Exception{
+		String checkQuery = "select e from AbstractEvent e where e.registrationClosingDate >= :d and e.audience = :audience and e.type.stereotype = :st";
 		List<EventSummary> results = em.createQuery(checkQuery, AbstractEvent.class)
 				.setParameter("d", LocalDate.now())
+				.setParameter("st", EventType.Stereotype.WORKSHOP)
 				.setParameter("audience", Audience.REFUGEE)
 				.getResultList()
 				.stream()
@@ -56,19 +58,20 @@ public class EventEndpointTest extends AbstractEndpointTest{
 		
 		String expectedJson = this.jackson.writeValueAsString(results);
 	
-		mockMvc.perform(get("/events").param("includePastEvents", "false").param("includeFutureEvents", "true")
+		mockMvc.perform(get("/workshops").param("includePastEvents", "false").param("includeFutureEvents", "true")
 				.param("audience", "REFUGEE")
 				.header("Accept-language", "fr"))
 				.andExpect(status().isOk())
 				.andExpect(content().json(expectedJson));
 	}
 	
-	// all events for a specific organisation
+	// all workshops for a specific organisation
 	@Test
-	public void testGetManyRefugeeEvents_extended() throws Exception{
-		String checkQuery = "select e from AbstractEvent e where e.organisation.id = :id and e.type.stereotype is null";
+	public void testGetManyRefugeeWorkshop_extended() throws Exception{
+		String checkQuery = "select e from AbstractEvent e where e.organisation.id = :id and e.type.stereotype=:st";
 		List<EventSummary> results = em.createQuery(checkQuery, AbstractEvent.class)
 				.setParameter("id", 5)
+				.setParameter("st", EventType.Stereotype.WORKSHOP)
 				.getResultList()
 				.stream()
 				.map(x-> new EventSummary(x, "fr"))
@@ -76,11 +79,12 @@ public class EventEndpointTest extends AbstractEndpointTest{
 		
 		String expectedJson = this.jackson.writeValueAsString(results);
 	
-		mockMvc.perform(get("/events").param("includePastEvents", "true").param("includeFutureEvents", "true").param("organisationId", "5")
+		mockMvc.perform(get("/workshops").param("includePastEvents", "true").param("includeFutureEvents", "true").param("organisationId", "5")
 				.header("Accept-language", "fr"))
 				.andExpect(status().isOk())
 				.andExpect(content().json(expectedJson));
-	}
+	}	
+	
 	
 	@Test
 	public void testPostCreated() throws JsonProcessingException, Exception{
@@ -105,9 +109,9 @@ public class EventEndpointTest extends AbstractEndpointTest{
 	}
 	
 	@Test
-	public void testPostEventRegistrationCreated() throws JsonProcessingException, Exception{
+	public void testPostWorkshopRegistrationCreated() throws JsonProcessingException, Exception{
 
-		mockMvc.perform(post("/events/3/registrations")
+		mockMvc.perform(post("/workshops/1/registrations")
 				.header("accessKey", "R-3b743606-928a-4086-852a-9efd72f83d01")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))
@@ -115,8 +119,8 @@ public class EventEndpointTest extends AbstractEndpointTest{
 	}
 	
 	@Test
-	public void testPostEventRegistrationConflict() throws JsonProcessingException, Exception{
-		mockMvc.perform(post("/events/3/registrations")
+	public void testPostWorkshopRegistrationConflict() throws JsonProcessingException, Exception{
+		mockMvc.perform(post("/workshops/1/registrations")
 				.header("accessKey", "R-a871ce00-e7d2-497e-8a4e-d272b8b5b520")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))

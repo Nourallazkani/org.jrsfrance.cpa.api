@@ -52,5 +52,32 @@
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
+	},
+	"organisation-reset-password": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Réinitialisation de votre compte sur le site CPA"
+		},
+		"body": {
+			"fr": "Veuillez vous connecter sur : http://localhost:9000/volunteers/profile?ak=%s"
+		}
+	},
+	"organisation-sign-up-confirmation": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Bienvenue sur le site CPA"
+		},
+		"body": {
+			"fr": "Vos identifiants :<br/> %s / %s"
+		}
+	},
+	"organisation-update-password-confirmation": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "Mise à jour de votre mot de passe"
+		},
+		"body": {
+			"fr": "Vos identifiants :<br/> %s / %s"
+		}
 	}
 }

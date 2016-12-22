@@ -1,8 +1,8 @@
 package org.sjr.babel.model.entity;
 
+import java.time.LocalDate;
 import java.util.Map;
 
-import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Convert;
 import javax.persistence.Converter;
@@ -26,8 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @CacheOnStartup(order = 1)
 public class Organisation extends AbstractEntity {
 
-	@Basic
 	private String name, mailAddress;
+	
+	private LocalDate registrationDate;
 
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
@@ -50,6 +51,14 @@ public class Organisation extends AbstractEntity {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public LocalDate getRegistrationDate() {
+		return registrationDate;
+	}
+
+	public void setRegistrationDate(LocalDate registrationDate) {
+		this.registrationDate = registrationDate;
 	}
 
 	public Contact getContact() {

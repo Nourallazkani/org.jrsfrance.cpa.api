@@ -36,6 +36,8 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
@@ -384,17 +386,18 @@ public abstract class AbstractEndpoint {
 		Map<String, String> errorsMap = errorsAsMap(fieldErrors);
 		return ResponseEntity.badRequest().body(errorsMap);
 	}
+
+	protected static interface AfterCommitCallback{
+		void execute();
+	}
 	
-	
-	
-	public static class LocalizableObjectSummary<T>{
-		public T item;
-		public long distanceFromOrigin;
-		public LocalizableObjectSummary(T item, long distanceFromOrigin) {
-			super();
-			this.item = item;
-			this.distanceFromOrigin = distanceFromOrigin;
-		}
+	protected void afterTx(AfterCommitCallback callback){
+		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
+			@Override
+			public void afterCommit() {
+				callback.execute();
+			}
+		});
 	}
 
 }

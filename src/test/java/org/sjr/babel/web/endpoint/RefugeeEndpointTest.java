@@ -1,10 +1,10 @@
 package org.sjr.babel.web.endpoint;
 
+import static org.hamcrest.core.StringStartsWith.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.core.StringStartsWith.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.junit.Test;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
@@ -20,7 +20,7 @@ public class RefugeeEndpointTest extends AbstractEndpointTest{
 	public void testPostOk() throws JsonProcessingException, Exception{
 		RefugeeSummary input = new RefugeeSummary();
 		input.address = new AddressSummary("19 rue Raspail", null, "94200", "Ivry sur seine", "France");
-		input.birthDate = new Date();
+		input.birthDate = LocalDate.of(1979, 8, 15);
 		input.civility = "Mr";
 		input.firstName= "Nour";
 		input.lastName = "Allazkani";
@@ -47,7 +47,7 @@ public class RefugeeEndpointTest extends AbstractEndpointTest{
 	public void testPostConflict() throws JsonProcessingException, Exception{
 		RefugeeSummary input = new RefugeeSummary();
 		input.address = new AddressSummary("1 rue de Rivoli", null, "75007", "Paris", "France");
-		input.birthDate = new Date();
+		input.birthDate = LocalDate.of(1979, 8, 15);
 		input.civility = "Mr";
 		input.firstName= "Nour";
 		input.lastName = "Allazkani";

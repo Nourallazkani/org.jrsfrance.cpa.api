@@ -2,6 +2,7 @@ package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,10 +27,9 @@ import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
 import org.sjr.babel.model.entity.reference.Level;
+import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -57,7 +57,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		public AddressSummary address;
 		public List<String> languages;
 		public String fieldOfStudy;
-		public Date birthDate;
+		public LocalDate birthDate;
 		RefugeeSummary() {}
 		
 		RefugeeSummary(Refugee entity) {
@@ -111,6 +111,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		account.setAccessKey("R" + "-" + UUID.randomUUID().toString());
 		
 		Refugee refugee = new Refugee();
+		refugee.setRegistrationDate(LocalDate.now());
 		refugee.setFirstName(input.firstName);
 		refugee.setLastName(input.lastName);
 		refugee.setMailAddress(input.mailAddress);
@@ -127,13 +128,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}			
 			
 		this.objectStore.save(refugee);
-		
-		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
-			@Override
-			public void afterCommit() {
-				mailHelper.send(MailType.REFUGEE_SIGN_UP_CONFIRMATION, "fr", refugee.getMailAddress(), refugee.getMailAddress(), input.password);
-			}
-		});
+
+		MailCommand mailCommand = new MailCommand(MailType.REFUGEE_SIGN_UP_CONFIRMATION, null, refugee.getMailAddress(), "fr", refugee.getMailAddress(), input.password);
+		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return successSignUp(refugee);
 		
@@ -228,12 +225,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			r.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
 			if(StringUtils.hasText(input.password)){
 				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
-					@Override
-					public void afterCommit() {
-						mailHelper.send(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, "fr", r.getMailAddress(), r.getMailAddress(), input.password);
-					}
-				});
+				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, null, r.getMailAddress(), "fr", input.password);
+				afterTx(() -> this.mailHelper.send(mailCommand));
 			}
 			
 			r.setNationality(safeTransform(input.nationality, x -> this.refDataProvider.resolve(Country.class, x)));

@@ -1,6 +1,6 @@
 package org.sjr.babel.model.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Embedded;
@@ -11,8 +11,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.component.Address;
@@ -27,8 +25,7 @@ public class Refugee extends AbstractEntity {
 
 	private String firstName, lastName, mailAddress, phoneNumber;
 
-	@Temporal(TemporalType.DATE)
-	private Date birthDate;
+	private LocalDate registrationDate, birthDate;
 
 	@Embedded
 	private Account account;
@@ -55,8 +52,6 @@ public class Refugee extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Level hostCountryLanguageLevel ;
 	
-
-
 	public String getFirstName() {
 		return firstName;
 	}
@@ -89,11 +84,19 @@ public class Refugee extends AbstractEntity {
 		this.phoneNumber = phoneNumber;
 	}
 
-	public Date getBirthDate() {
+	public LocalDate getRegistrationDate() {
+		return registrationDate;
+	}
+
+	public void setRegistrationDate(LocalDate registrationDate) {
+		this.registrationDate = registrationDate;
+	}
+
+	public LocalDate getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(Date birthDate) {
+	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
 	}
 

@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public ContactSummary contact;
 		public Boolean master,licence;
 		@NotNull
-		public Date registrationOpeningDate,registrationClosingDate;
+		public LocalDate registrationOpeningDate,registrationClosingDate;
 		// public List<Link> links;
 
 		public TeachingSummary(){
@@ -137,8 +138,6 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "/{id}", method = RequestMethod.DELETE)
 	@Transactional
 	public ResponseEntity<Void> delete(@PathVariable int id) {
-		// return deleteIfExists(Education.class, id);
-
 		Optional<Teaching> t = objectStore.getById(Teaching.class, id);
 		if (t.isPresent()) {
 			objectStore.delete(t.get());
@@ -168,7 +167,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 			Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
 			
-			if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+			if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.isBefore(input.registrationOpeningDate)){
 				errors.put("registrationOpeningDate", "_");
 				errors.put("registrationClosingDate", "_");
 			}
@@ -208,7 +207,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 		Map<String, String> errors = errorsAsMap(binding.getFieldErrors());
 		
-		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.before(input.registrationOpeningDate)){
+		if(input.registrationClosingDate!=null && input.registrationOpeningDate!=null && input.registrationClosingDate.isBefore(input.registrationOpeningDate)){
 			errors.put("registrationOpeningDate", "_");
 			errors.put("registrationClosingDate", "_");
 		}
@@ -273,16 +272,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		if(teaching.getRegistrations().stream().anyMatch(x -> x.getRefugee().getId().equals(r.getId()))){
 			return conflict();
 		}
-		/*
-		List<Registration> registrations = _teaching.get().getRegistrations();
-		for (Registration reg : registrations){
-			if( r.equals(reg.getRefugee())){
-				return conflict();
-			}
-		}
-		*/
+
 		Registration reg = new Registration();
-		reg.setAccepted(null);
 		reg.setRefugee(r);
 		reg.setRegistrationDate(now);
 		teaching.getRegistrations().add(reg);
@@ -301,18 +292,16 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		{
 			return forbidden();
 		}
-		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
-		if (!_r.isPresent()){
+		Optional<Refugee> _refugee = this.objectStore.getById(Refugee.class, rId);
+		if (!_refugee.isPresent()){
 			return notFound();
 		}
-		Refugee r = _r.get();
-		Optional<Registration> _reg = teaching.getRegistrations().stream()
-				.filter(x -> x.getRefugee().getId().equals(r.getId()))
-				.findFirst();
-		if (!_reg.isPresent()){
+		Refugee refugee = _refugee.get();
+
+		if (teaching.getRegistrations().stream().anyMatch(x -> x.getRefugee().getId().equals(refugee.getId()))){
 			return notFound();
 		}
-		Registration reg = _reg.get();
+		Registration reg = new Registration();
 		reg.setAccepted(input.accepted);
 		return noContent();
 	}
@@ -329,12 +318,12 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		{
 			return forbidden();
 		}
-		Optional<Refugee> _r = this.objectStore.getById(Refugee.class, rId);
-		if (!_r.isPresent()){
+		Optional<Refugee> _refugee = this.objectStore.getById(Refugee.class, rId);
+		if (!_refugee.isPresent()){
 			return notFound();
 		}
-		Refugee r = _r.get();
-		if(!teaching.getRegistrations().removeIf(x -> x.getRefugee().getId().equals(r.getId()))){
+		Refugee refugee = _refugee.get();
+		if(!teaching.getRegistrations().removeIf(x -> x.getRefugee().getId().equals(refugee.getId()))){
 			return badRequest();
 		};
 		return noContent();

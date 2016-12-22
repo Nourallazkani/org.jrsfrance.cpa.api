@@ -13,6 +13,7 @@ import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.web.helper.MailHelper;
+import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -92,7 +93,9 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Refugee> _user = tryGetUser(input, Refugee.class);
 			if(_user.isPresent()){
 				Refugee refugee = _user.get();
-				this.mailHelper.send(MailType.REFUGEE_RESET_PASSWORD, "fr", refugee.getMailAddress(), refugee.getAccount().getAccessKey());
+				
+				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_RESET_PASSWORD, null, refugee.getMailAddress(), "fr", refugee.getAccount().getAccessKey());
+				afterTx(() -> mailHelper.send(mailCommand));
 				System.out.println(refugee.getAccount().getAccessKey());
 			}
 		}
@@ -107,7 +110,8 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Volunteer> _user = tryGetUser(input, Volunteer.class);
 			if(_user.isPresent()){
 				Volunteer volunteer = _user.get();
-				this.mailHelper.send(MailType.VOLUNTEER_RESET_PASSWORD, "fr", volunteer.getMailAddress(), volunteer.getAccount().getAccessKey());
+				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_RESET_PASSWORD, null, volunteer.getMailAddress(), "fr", volunteer.getAccount().getAccessKey());
+				afterTx(() -> mailHelper.send(mailCommand));
 			}
 		}
 		else if(input.realm.equals("A")){

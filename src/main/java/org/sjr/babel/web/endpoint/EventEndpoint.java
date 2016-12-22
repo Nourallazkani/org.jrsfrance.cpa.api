@@ -161,8 +161,8 @@ public class EventEndpoint extends AbstractEndpoint {
 			args.put("audience", audience);
 		}
 
-		LocalDate now = LocalDate.now();
-		LocalDateTime nowT = LocalDateTime.now();
+		
+		
 		if(openForRegistration != null){
 			if(openForRegistration){
 				hql.append("and (e.registrationClosingDate >= :d and e.registrationOpeningDate <= :d) ");	
@@ -170,16 +170,19 @@ public class EventEndpoint extends AbstractEndpoint {
 			else{
 				hql.append("and (e.registrationClosingDate < :d || e.registrationOpeningDate > :d) ");
 			}
-			args.put("d", now);
+			args.put("d", LocalDate.now());
 		}
-		if(!includeFutureEvents){
-			hql.append("and e.startDate <= :d ");
-			args.put("d", nowT);
+		
+		if(!includeFutureEvents || !includePastEvents){
+			if(!includeFutureEvents){
+				hql.append("and e.startDate <= :dt ");	
+			}
+			else if(!includePastEvents){
+				hql.append("and e.startDate >= :dt ");
+			}			
+			args.put("dt", LocalDateTime.now());
 		}
-		if(!includePastEvents){
-			hql.append("and e.startDate >= :d ");
-			args.put("d", nowT);
-		}
+
 		hql.append("order by e.startDate");
 		return objectStore.find(AbstractEvent.class, hql.toString(), args)
 				.stream().map(x -> new EventSummary(x, language))

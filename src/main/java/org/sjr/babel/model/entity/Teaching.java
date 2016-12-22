@@ -1,14 +1,12 @@
 package org.sjr.babel.model.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.Contact.ContactConverter;
@@ -23,8 +21,7 @@ public class Teaching extends AbstractEntity {
 	
 	private String link;
 	
-	@Temporal(TemporalType.DATE)
-	private Date registrationOpeningDate, registrationClosingDate;
+	private LocalDate registrationOpeningDate, registrationClosingDate;
 	
 	@ManyToOne
 	private FieldOfStudy fieldOfStudy;
@@ -42,19 +39,19 @@ public class Teaching extends AbstractEntity {
 	private List<Registration> registrations;
 
 
-	public Date getRegistrationOpeningDate() {
+	public LocalDate getRegistrationOpeningDate() {
 		return registrationOpeningDate;
 	}
 
-	public void setRegistrationOpeningDate(Date registrationOpeningDate) {
+	public void setRegistrationOpeningDate(LocalDate registrationOpeningDate) {
 		this.registrationOpeningDate = registrationOpeningDate;
 	}
 
-	public Date getRegistrationClosingDate() {
+	public LocalDate getRegistrationClosingDate() {
 		return registrationClosingDate;
 	}
 
-	public void setRegistrationClosingDate(Date registrationClosingDate) {
+	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
 		this.registrationClosingDate = registrationClosingDate;
 	}
 

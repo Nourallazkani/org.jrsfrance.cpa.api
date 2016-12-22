@@ -42,10 +42,8 @@ public abstract class AbstractEvent extends AbstractEntity {
 	@Convert(converter = MultiLanguageTextConverter.class) @Column(columnDefinition = "json", insertable = false, updatable = false)
 	private MultiLanguageText subjectI18n, descriptionI18n;
 		
-	//@Temporal(TemporalType.DATE)
 	private LocalDate registrationOpeningDate, registrationClosingDate;
 
-	//@Temporal(TemporalType.TIMESTAMP)
 	private LocalDateTime startDate, endDate;
 
 	@Convert(converter = ContactConverter.class)

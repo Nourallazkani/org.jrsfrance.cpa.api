@@ -1,6 +1,6 @@
 package org.sjr.babel.model.entity;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -12,8 +12,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.component.Address;
@@ -24,15 +22,10 @@ import org.sjr.babel.model.entity.reference.Language;
 @Entity
 public class Volunteer extends AbstractEntity {
 
-	private String firstName;
-	private String lastName;
-	private String mailAddress;
-	private String phoneNumber;
+	private String firstName, lastName, mailAddress, phoneNumber;
+	private LocalDate birthDate, registrationDate;
 	private Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
 	private String activities;
-
-	@Temporal(TemporalType.DATE)
-	private Date birthDate;
 	
 	@Embedded
 	private Address address;
@@ -77,12 +70,20 @@ public class Volunteer extends AbstractEntity {
 		this.lastName = lastName;
 	}
 
-	public Date getBirthDate() {
+	public LocalDate getBirthDate() {
 		return birthDate;
 	}
 
-	public void setBirthDate(Date birthDate) {
+	public void setBirthDate(LocalDate birthDate) {
 		this.birthDate = birthDate;
+	}
+
+	public LocalDate getRegistrationDate() {
+		return registrationDate;
+	}
+
+	public void setRegistrationDate(LocalDate registrationDate) {
+		this.registrationDate = registrationDate;
 	}
 
 	public String getMailAddress() {

@@ -164,7 +164,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		objectStore.save(organisation);
 		input.id = organisation.getId();
 		
-		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, null, organisation.getMailAddress(), "fr", input.password);
+		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, null, organisation.getMailAddress(), "fr", organisation.getMailAddress(), input.password);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return created(getUri("organisations/"+input.id), input);

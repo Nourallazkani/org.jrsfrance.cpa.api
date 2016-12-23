@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sjr.babel.JpaConfig4Tests;
-import org.sjr.babel.WebAppInitializer.RestConfiguration;
+import org.sjr.babel.SpringConfig4Tests;
+import org.sjr.babel.SpringConfig;
 import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.sjr.babel.web.helper.MailHelper.SendMailOutcome;
@@ -16,7 +16,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
+@ContextConfiguration(classes = {SpringConfig.class, SpringConfig4Tests.class})
 public class MailHelperTest {
 
 	@Autowired

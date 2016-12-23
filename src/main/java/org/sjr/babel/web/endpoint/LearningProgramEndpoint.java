@@ -183,7 +183,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	public ResponseEntity<?> getOne(@PathVariable Integer id) {
 		// return okOrNotFound(objectStore.getById(Cursus.class, id));
 		Class<? extends AbstractLearningProgram > targetClass = getPath().startsWith("/learnings/language-programs") ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
-		System.out.println(getPath());
+		
 		Optional<? extends AbstractLearningProgram> c = objectStore.getById(targetClass, id);
 		if (c.isPresent()) {
 			return ok(new LearningProgramSummary(c.get()));

@@ -5,8 +5,8 @@ import javax.persistence.PersistenceContext;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.sjr.babel.JpaConfig4Tests;
-import org.sjr.babel.WebAppInitializer.RestConfiguration;
+import org.sjr.babel.SpringConfig4Tests;
+import org.sjr.babel.SpringConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration()
-@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class})
+@ContextConfiguration(classes = {SpringConfig.class, SpringConfig4Tests.class})
 //@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
 //@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public abstract class AbstractEndpointTest {

@@ -3,13 +3,18 @@ package org.sjr.babel.web.helper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.URL;
 import java.nio.charset.Charset;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.sjr.babel.SpringConfig.MailSettings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -22,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class MailHelper {
 
-	@Autowired
 	private JavaMailSenderImpl sender;
 		
 	public enum MailType{
@@ -51,17 +55,31 @@ public class MailHelper {
 			this.bodyVars = bodyVars;
 		}
 	}
+
+	public static class SendMailOutcome{
+		public InternetAddress to;
+		public String body,subject;
+		public boolean sent;
+	}
 	
 	private JsonNode templates;
 	
-	public MailHelper() throws JsonProcessingException, IOException {
+	private boolean mock;
+	
+	@Autowired
+	public MailHelper(MailSettings mailSettings) throws JsonProcessingException, IOException {
+		JavaMailSenderImpl sender = new JavaMailSenderImpl();
+		sender.setDefaultEncoding(mailSettings.defaultEncoding);
+		sender.setHost(mailSettings.smtpHost);
+		sender.setPort(mailSettings.port);
+		sender.setProtocol(mailSettings.smtpProtocol);
+		sender.setUsername(mailSettings.smtpUsername);
+		sender.setPassword(mailSettings.smtpPassword);
+		
+		this.sender = sender;
+		this.mock = mailSettings.mock;
 		ObjectMapper jackson = new ObjectMapper();
 		this.templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
-	}
-	
-	public static class SendMailOutcome{
-		public String body,subject;
-		public boolean sent;
 	}
 	
 	public SendMailOutcome send(MailCommand command){
@@ -98,13 +116,15 @@ public class MailHelper {
 			MimeMessage mime = this.sender.createMimeMessage();
 			
 			MimeMessageHelper helper = new MimeMessageHelper(mime, true);
-			  
-			helper.setTo(command.recipientMailAddress);
+			 
+			InternetAddress to = new InternetAddress(String.format("%s <%s>", command.recipientName, command.recipientMailAddress));
+			helper.setTo(to);
 			helper.setText(body, true);
 			helper.setSubject(subject);
 			helper.setFrom(from);
-			SendMailOutcome response = new SendMailOutcome();
 			
+			SendMailOutcome response = new SendMailOutcome();
+			response.to = to;
 			response.body = body;
 			response.subject = subject;
 			
@@ -112,7 +132,9 @@ public class MailHelper {
 				response.sent = false;
 			}
 			else{
-				this.sender.send(mime);	
+				if(!this.mock){
+					this.sender.send(mime);						
+				}
 				response.sent = true;
 			}
 			return response;

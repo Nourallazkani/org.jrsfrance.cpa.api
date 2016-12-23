@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 
-import org.sjr.babel.WebAppInitializer;
+import org.sjr.babel.SpringConfig;
 import org.sjr.babel.model.entity.AbstractLearningProgram;
 import org.sjr.babel.persistence.ObjectStore;
 import org.springframework.context.ApplicationContext;
@@ -17,8 +17,7 @@ import org.springframework.util.StringUtils;
 @WebServlet(urlPatterns = "/cursus_")
 public class CursusServlet extends HttpServlet {
 
-	
-	private ApplicationContext ctx = new AnnotationConfigApplicationContext(WebAppInitializer.RestConfiguration.class);
+	private ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
 	
 	protected void doGet(javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse resp)
 			throws javax.servlet.ServletException, java.io.IOException {

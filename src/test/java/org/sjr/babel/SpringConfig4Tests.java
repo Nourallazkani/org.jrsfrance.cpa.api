@@ -8,12 +8,14 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.metamodel.EntityType;
 
+import org.sjr.babel.SpringConfig.MailSettings;
 import org.sjr.babel.model.entity.AbstractEntity.CacheOnStartup;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration
-public class JpaConfig4Tests {
+public class SpringConfig4Tests {
 	
 	@Bean
 	public EntityManagerFactory emf() throws Exception{
@@ -31,5 +33,13 @@ public class JpaConfig4Tests {
 			.forEach((x)-> em.createQuery("select o from "+x.getName()+" o").getResultList());
 		em.close();
 		return emf;
+	}
+	
+	@Bean
+	public MailSettings mailSettings(Environment env){
+		MailSettings mailSettings = new MailSettings();
+		mailSettings.defaultEncoding = "UTF-8";
+		mailSettings.mock = true;
+		return mailSettings;
 	}
 }

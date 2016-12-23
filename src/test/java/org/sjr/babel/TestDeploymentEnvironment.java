@@ -55,7 +55,6 @@ public class TestDeploymentEnvironment {
 			Node node = (Node)xPath.evaluate("//persistence-unit[@name='default']/properties/*[@name='"+jpaPropertyName+"']", persistenceXmlRootElement, XPathConstants.NODE);
 			String jpaPropertyValue = node.getAttributes().item(1).getNodeValue();
 			String hibernatePropertyName= entry.getValue();
-			System.out.println(hibernatePropertyName+" "+jpaPropertyValue);
 			hibernateProperties.put(hibernatePropertyName, jpaPropertyValue);
 		}
 

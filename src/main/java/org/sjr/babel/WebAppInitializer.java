@@ -17,8 +17,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -54,6 +56,19 @@ public class WebAppInitializer implements WebApplicationInitializer
 			ObjectMapper jackson = new ObjectMapper().registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 			MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter(jackson);
 			converters.add(jsonConverter);
+		}
+		
+		@Bean
+		public JavaMailSenderImpl mailSender(Environment env){
+			JavaMailSenderImpl sender = new JavaMailSenderImpl();
+			sender.setDefaultEncoding("UTF-8");
+			
+			sender.setHost(env.getProperty("mail.smtp.host"));
+			sender.setPort(env.getProperty("mail.smtp.port", Integer.class));
+			sender.setProtocol(env.getProperty("mail.smtp.protocol"));
+			sender.setUsername(env.getProperty("mail.smtp.username"));
+			sender.setPassword(env.getProperty("mail.smtp.password"));
+			return sender;
 		}
 		
 		@Bean

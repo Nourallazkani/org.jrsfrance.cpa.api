@@ -10,7 +10,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -23,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class MailHelper {
 
+	@Autowired
 	private JavaMailSenderImpl sender;
 		
 	public enum MailType{
@@ -54,18 +54,7 @@ public class MailHelper {
 	
 	private JsonNode templates;
 	
-	@Autowired
-	public MailHelper(Environment env) throws JsonProcessingException, IOException {
-		JavaMailSenderImpl sender = new JavaMailSenderImpl();
-		sender.setDefaultEncoding("UTF-8");
-		
-		sender.setHost(env.getProperty("mail.smtp.host"));
-		sender.setPort(env.getProperty("mail.smtp.port", Integer.class));
-		sender.setProtocol(env.getProperty("mail.smtp.protocol"));
-		sender.setUsername(env.getProperty("mail.smtp.username"));
-		sender.setPassword(env.getProperty("mail.smtp.password"));
-		
-		this.sender = sender;
+	public MailHelper() throws JsonProcessingException, IOException {
 		ObjectMapper jackson = new ObjectMapper();
 		this.templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 	}

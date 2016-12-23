@@ -71,8 +71,8 @@ public class AuthzEndpoint extends AbstractEndpoint {
 		
 		String templateQuery;
 		if(StringUtils.hasText(input.accessKey)){
-			args.put("accessKey", input.accessKey);
 			templateQuery= "select x from %s x where x.account.accessKey = :accessKey";
+			args.put("accessKey", input.accessKey);
 		}
 		else{
 			templateQuery= "select x from %s x where lower(x.mailAddress) = lower(:mailAddress)";
@@ -103,6 +103,8 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Organisation> _user = tryGetUser(input, Organisation.class);
 			if(_user.isPresent()){
 				Organisation organisation = _user.get();
+				MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_RESET_PASSWORD, null, organisation.getMailAddress(), "fr", organisation.getAccount().getAccessKey());
+				afterTx(() -> mailHelper.send(mailCommand));
 				System.out.println(organisation.getAccount().getAccessKey());
 			}
 		}

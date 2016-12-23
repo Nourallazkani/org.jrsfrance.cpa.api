@@ -42,6 +42,9 @@ public class Organisation extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private OrganisationCategory category;
 	
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Administrator createdBy;
+	
 	@Convert(converter=MapConverter.class)
 	private Map<String, String> additionalInformations;
 
@@ -99,6 +102,14 @@ public class Organisation extends AbstractEntity {
 
 	public void setCategory(OrganisationCategory category) {
 		this.category = category;
+	}
+
+	public Administrator getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(Administrator createdBy) {
+		this.createdBy = createdBy;
 	}
 
 	public Map<String, String> getAdditionalInformations() {

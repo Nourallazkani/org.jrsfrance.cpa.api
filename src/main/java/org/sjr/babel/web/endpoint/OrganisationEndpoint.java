@@ -135,21 +135,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		args.put("mailAddress", input.mailAddress);
 		if(this.objectStore.findOne(Organisation.class, query, args).isPresent()){
 			return conflict();
-		}
-		
-		Account account = new Account();
-		if(StringUtils.hasText(input.password)){
-			account.setPassword(EncryptionUtil.sha256(input.password));
-		}
-		else if (StringUtils.hasText(accessKey)) {
-			if(!getAdministratorByAccessKey(accessKey).isPresent()){
-				return forbidden();
-			}
-			
-			account.setAccessKey("O-" + UUID.randomUUID().toString());
-			account.setPassword(EncryptionUtil.sha256(UUID.randomUUID().toString().substring(0, 8)));
-		}
-		
+		}	
 		
 		Organisation organisation = new Organisation();
 		organisation.setRegistrationDate(LocalDate.now());
@@ -157,7 +143,20 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		organisation.setAddress(input.address.toAddress(this.refDataProvider));
 		organisation.setContact(input.contact.toContact());
 		organisation.setMailAddress(input.mailAddress);
+		Account account = new Account();
 		
+		if(StringUtils.hasText(input.password)){
+			account.setPassword(EncryptionUtil.sha256(input.password));
+		}
+		else if (StringUtils.hasText(accessKey)) {
+			Optional<Administrator> _administrator = getAdministratorByAccessKey(accessKey);
+			if(!_administrator.isPresent()){
+				return forbidden();
+			}
+			organisation.setCreatedBy(_administrator.get());
+			account.setAccessKey("O-" + UUID.randomUUID().toString());
+			account.setPassword(EncryptionUtil.sha256(UUID.randomUUID().toString().substring(0, 8)));
+		}		
 		organisation.setAccount(account);
 		
 		organisation.setAdditionalInformations(input.additionalInformations);

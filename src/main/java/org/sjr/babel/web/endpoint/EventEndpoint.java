@@ -111,7 +111,6 @@ public class EventEndpoint extends AbstractEndpoint {
 		}
 	}
 
-			
 	@RequestMapping(path={"events", "workshops"}, method = RequestMethod.GET)
 	@Transactional
 	public List<EventSummary> fullSearch(

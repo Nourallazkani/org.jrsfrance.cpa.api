@@ -386,18 +386,13 @@ public abstract class AbstractEndpoint {
 		Map<String, String> errorsMap = errorsAsMap(fieldErrors);
 		return ResponseEntity.badRequest().body(errorsMap);
 	}
-
-	protected static interface AfterCommitCallback{
-		void execute();
-	}
 	
-	protected void afterTx(AfterCommitCallback callback){
+	protected void afterTx(Runnable callback){
 		TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter(){
 			@Override
 			public void afterCommit() {
-				callback.execute();
+				callback.run();
 			}
 		});
 	}
-
 }

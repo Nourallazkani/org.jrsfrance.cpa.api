@@ -104,7 +104,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			args.put("name" , city);
 			hql.append(" and  t.organisation.address.locality like :name ");
 		}
-		Date now = new Date();
+		
 		if(openForRegistration != null){
 			if(openForRegistration){
 				hql.append("and (t.registrationClosingDate >= :d and t.registrationOpeningDate <= :d) ");	
@@ -112,7 +112,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			else{
 				hql.append("and (t.registrationClosingDate < :d || t.registrationOpeningDate > :d) ");
 			}
-			args.put("d", now);
+			args.put("d", LocalDate.now());
 		}
 		
 		List<TeachingSummary> results = objectStore.find(Teaching.class, hql.toString() , args )

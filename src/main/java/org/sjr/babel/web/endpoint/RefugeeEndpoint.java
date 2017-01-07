@@ -27,6 +27,7 @@ import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
 import org.sjr.babel.model.entity.reference.Level;
+import org.sjr.babel.web.helper.MailHelper.MailBodyVars;
 import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.ResponseEntity;
@@ -129,7 +130,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			
 		this.objectStore.save(refugee);
 
-		MailCommand mailCommand = new MailCommand(MailType.REFUGEE_SIGN_UP_CONFIRMATION, null, refugee.getMailAddress(), "fr", refugee.getMailAddress(), input.password);
+		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", refugee.getMailAddress()).add("password", input.password);
+		MailCommand mailCommand = new MailCommand(MailType.REFUGEE_SIGN_UP_CONFIRMATION, refugee.getFullName(), refugee.getMailAddress(), "fr", mailBodyVars);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return successSignUp(refugee);
@@ -225,7 +227,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			r.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
 			if(StringUtils.hasText(input.password)){
 				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, null, r.getMailAddress(), "fr", input.password);
+				MailBodyVars mailBodyVars = new MailBodyVars().add("password", input.password);
+				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, r.getFullName(), r.getMailAddress(), "fr", mailBodyVars);
 				afterTx(() -> this.mailHelper.send(mailCommand));
 			}
 			

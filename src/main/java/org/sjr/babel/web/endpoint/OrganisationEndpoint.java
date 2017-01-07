@@ -17,6 +17,7 @@ import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.reference.OrganisationCategory;
+import org.sjr.babel.web.helper.MailHelper.MailBodyVars;
 import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.ResponseEntity;
@@ -163,7 +164,8 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		objectStore.save(organisation);
 		input.id = organisation.getId();
 		
-		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, null, organisation.getMailAddress(), "fr", organisation.getMailAddress(), input.password);
+		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", organisation.getMailAddress()).add("password", input.password);
+		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, null, organisation.getMailAddress(), "fr", mailBodyVars);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return created(getUri("organisations/"+input.id), input);

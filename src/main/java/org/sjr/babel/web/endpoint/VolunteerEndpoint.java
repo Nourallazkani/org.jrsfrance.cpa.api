@@ -24,6 +24,7 @@ import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
+import org.sjr.babel.web.helper.MailHelper.MailBodyVars;
 import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.http.ResponseEntity;
@@ -151,7 +152,8 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		volunteer.setAccount(account);
 		this.objectStore.save(volunteer);
 		
-		MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, null, volunteer.getMailAddress(), "fr", volunteer.getMailAddress(), input.password);
+		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", volunteer.getMailAddress()).add("password", input.password);
+		MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, volunteer.getFullName(), volunteer.getMailAddress(), "fr", mailBodyVars);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return successSignUp(volunteer);
@@ -216,7 +218,9 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			if(StringUtils.hasText(input.password)){
 				v.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, null, v.getMailAddress(), "fr", input.password);
+				MailBodyVars mailBodyVars = new MailBodyVars().add("password", input.password);
+
+				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, v.getFullName(), v.getMailAddress(), "fr", mailBodyVars);
 				afterTx(() -> this.mailHelper.send(mailCommand));
 			}
 			

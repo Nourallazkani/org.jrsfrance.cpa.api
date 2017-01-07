@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -38,14 +40,20 @@ public class MailHelper {
 		ORGANISATION_RESET_PASSWORD,
 	}
 
+	public static class MailBodyVars extends HashMap<String, Object>{
+		public MailBodyVars add(String key, Object value){
+			put(key, value);
+			return this;
+		}
+	}
 	public static class MailCommand{
 		public String recipientName, recipientMailAddress, language;
 		public MailType type;
-		public Object[] bodyVars;
+		public MailBodyVars bodyVars;
 		
 		public MailCommand() {}
 		
-		public MailCommand(MailType type, String recipientName, String recipientMailAddress, String language, Object... bodyVars) {
+		public MailCommand(MailType type, String recipientName, String recipientMailAddress, String language, MailBodyVars bodyVars) {
 			super();
 			this.recipientName = recipientName;
 			this.recipientMailAddress = recipientMailAddress;
@@ -87,7 +95,7 @@ public class MailHelper {
 			JsonNode template = templates.get(command.type.name().toLowerCase().replace("_", "-"));
 			String from = template.get("from").textValue();
 			String subject = template.get("subject").get(command.language).textValue();
-			String body;
+			String bodyTemplate;
 			if(template.has("bodyUrl")){
 				String bodyUrl = template.get("bodyUrl").get(command.language).asText();
 				
@@ -95,12 +103,12 @@ public class MailHelper {
 				try{
 					connection = (HttpURLConnection) new URL(bodyUrl).openConnection();
 					InputStream in = connection.getInputStream();
-					body = StreamUtils.copyToString(in, Charset.defaultCharset());
+					bodyTemplate = StreamUtils.copyToString(in, Charset.defaultCharset());
 					in.close();
 				}
 				catch(Exception e){
 					e.printStackTrace();
-					body  = null;
+					bodyTemplate  = null;
 				}
 				finally 
 			    {
@@ -108,10 +116,17 @@ public class MailHelper {
 			    }
 			}
 			else{
-				String bodyTemplate = template.get("body").get(command.language).textValue();
-				body = command.bodyVars.length>0 ? String.format(bodyTemplate, command.bodyVars) : bodyTemplate;
+				bodyTemplate = template.get("body").get(command.language).textValue();
 			}
-			
+			String body = null;
+			if(command.bodyVars != null && !command.bodyVars.isEmpty()){
+				for(Map.Entry<String, Object> entry : command.bodyVars.entrySet()){
+					body = bodyTemplate.replace(String.format("${%s}", entry.getKey()), entry.getValue().toString());
+				}
+			}
+			else{
+				body = bodyTemplate;
+			}
 			MimeMessage mime = this.sender.createMimeMessage();
 			
 			MimeMessageHelper helper = new MimeMessageHelper(mime, true);

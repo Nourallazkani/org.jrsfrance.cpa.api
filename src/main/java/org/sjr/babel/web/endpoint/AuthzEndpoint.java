@@ -13,6 +13,7 @@ import org.sjr.babel.model.entity.Organisation;
 import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.web.helper.MailHelper;
+import org.sjr.babel.web.helper.MailHelper.MailBodyVars;
 import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +95,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if(_user.isPresent()){
 				Refugee refugee = _user.get();
 				
-				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_RESET_PASSWORD, null, refugee.getMailAddress(), "fr", refugee.getAccount().getAccessKey());
+				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_RESET_PASSWORD, refugee.getFullName(), refugee.getMailAddress(), "fr", new MailBodyVars().add("accessKey", refugee.getAccount().getAccessKey()));
 				afterTx(() -> mailHelper.send(mailCommand));
 				System.out.println(refugee.getAccount().getAccessKey());
 			}
@@ -103,7 +104,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Organisation> _user = tryGetUser(input, Organisation.class);
 			if(_user.isPresent()){
 				Organisation organisation = _user.get();
-				MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_RESET_PASSWORD, null, organisation.getMailAddress(), "fr", organisation.getAccount().getAccessKey());
+				MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_RESET_PASSWORD, organisation.getName(), organisation.getMailAddress(), "fr", new MailBodyVars().add("accessKey", organisation.getAccount().getAccessKey()));
 				afterTx(() -> mailHelper.send(mailCommand));
 				System.out.println(organisation.getAccount().getAccessKey());
 			}
@@ -112,7 +113,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Volunteer> _user = tryGetUser(input, Volunteer.class);
 			if(_user.isPresent()){
 				Volunteer volunteer = _user.get();
-				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_RESET_PASSWORD, null, volunteer.getMailAddress(), "fr", volunteer.getAccount().getAccessKey());
+				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_RESET_PASSWORD, volunteer.getFullName(), volunteer.getMailAddress(), "fr", new MailBodyVars().add("accessKey", volunteer.getAccount().getAccessKey()));
 				afterTx(() -> mailHelper.send(mailCommand));
 			}
 		}

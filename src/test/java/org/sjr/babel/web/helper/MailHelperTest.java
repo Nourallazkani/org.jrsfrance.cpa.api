@@ -35,7 +35,7 @@ public class MailHelperTest {
 		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 		for(MailType mt : MailType.values()){
 			for(String language : new String[]{"fr", "en", "ar", "prs"}){
-				MailCommand command = new MailCommand(mt, "Alaric", "a@a.fr", language);
+				MailCommand command = new MailCommand(mt, "Alaric", "a@a.fr", language, null);
 				SendMailOutcome resp = helper.send(command);
 				
 				String templateName = mt.name().toLowerCase().replace("_", "-");

@@ -207,7 +207,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			return notFound();
 		}
 		if(!getAdministratorByAccessKey(accessKey).isPresent()){
-			return unauthorized();
+			return forbidden();
 		}
 		objectStore.delete(o.get());
 		return notFound();

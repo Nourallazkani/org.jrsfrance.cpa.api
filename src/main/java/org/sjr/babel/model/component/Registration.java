@@ -13,7 +13,7 @@ public class Registration {
 	@ManyToOne // because a refugee may have more than one inscription, and an inscription must be done by one and only one refugee(but is that guarantee that a refugee cannot register twice in the same event ?)
 	private Refugee refugee;
 	private Date registrationDate;
-	private Boolean Accepted;
+	private Boolean accepted;
 	
 
 	public Refugee getRefugee() {
@@ -33,11 +33,11 @@ public class Registration {
 	}
 
 	public Boolean getAccepted() {
-		return Accepted;
+		return accepted;
 	}
 
 	public void setAccepted(Boolean accepted) {
-		Accepted = accepted;
+		this.accepted = accepted;
 	}
 
 }

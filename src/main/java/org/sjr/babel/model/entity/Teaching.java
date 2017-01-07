@@ -38,7 +38,6 @@ public class Teaching extends AbstractEntity {
 	@ElementCollection
 	private List<Registration> registrations;
 
-
 	public LocalDate getRegistrationOpeningDate() {
 		return registrationOpeningDate;
 	}

@@ -43,6 +43,8 @@ public class MailHelper {
 		public MailType type;
 		public Object[] bodyVars;
 		
+		public MailCommand() {}
+		
 		public MailCommand(MailType type, String recipientName, String recipientMailAddress, String language, Object... bodyVars) {
 			super();
 			this.recipientName = recipientName;
@@ -83,15 +85,10 @@ public class MailHelper {
 
 		try {
 			JsonNode template = templates.get(command.type.name().toLowerCase().replace("_", "-"));
-			
 			String from = template.get("from").textValue();
 			String subject = template.get("subject").get(command.language).textValue();
 			String body;
-			if(template.has("body")){
-				String bodyTemplate = template.get("body").get(command.language).textValue();
-				body = String.format(bodyTemplate, command.bodyVars);
-			}
-			else{
+			if(template.has("bodyUrl")){
 				String bodyUrl = template.get("bodyUrl").get(command.language).asText();
 				
 				HttpURLConnection connection = null;
@@ -102,12 +99,17 @@ public class MailHelper {
 					in.close();
 				}
 				catch(Exception e){
+					e.printStackTrace();
 					body  = null;
 				}
 				finally 
 			    {
 					connection.disconnect();   
-			    }				
+			    }
+			}
+			else{
+				String bodyTemplate = template.get("body").get(command.language).textValue();
+				body = command.bodyVars.length>0 ? String.format(bodyTemplate, command.bodyVars) : bodyTemplate;
 			}
 			
 			MimeMessage mime = this.sender.createMimeMessage();

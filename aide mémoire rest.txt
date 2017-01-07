@@ -34,7 +34,7 @@ La réponse HTTP se compose de plusieurs choses :
 					401 : utilisateur non identifié
 					403 : utilisateur non autorisé
 					404 : resource non trouvée
-					405 : méthode (c'est à dire le verbe) noèn supportée
+					405 : méthode (c'est à dire le verbe) non supportée
 				s'il y a un problème qui s'apparente à un plantage de l'application :
 					500
 	- un body, qui seria serialisé au format indiqué par l'en-tête Accept de la requête http entrante.

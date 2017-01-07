@@ -2,8 +2,17 @@
 	"refugee-sign-up-confirmation": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Bienvenue sur le site CPA"
+			"fr": "Bienvenue sur le site CPA",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-sign-up-confirmation/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-sign-up-confirmation/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-sign-up-confirmation/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-sign-up-confirmation/template-prs.html"
+		},		
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
@@ -11,8 +20,17 @@
 	"refugee-reset-password": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Réinitialisation de votre compte sur le site CPA"
+			"fr": "Réinitialisation de votre compte sur le site CPA",
+			"en":"",
+			"ar":"",
+			"prs":""	
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-reset-password/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-reset-password/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-reset-password/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-reset-password/template-prs.html"
+		},	
 		"body": {
 			"fr": "Veuillez vous connecter sur : http://localhost:9000/refugees/profile?ak=%s"
 		}
@@ -20,8 +38,17 @@
 	"refugee-update-password-confirmation": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Mise à jour de votre mot de passe"
+			"fr": "Mise à jour de votre mot de passe",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-update-password-confirmation/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-update-password-confirmation/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-update-password-confirmation/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/refugee-update-password-confirmation/template-prs.html"
+		},	
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
@@ -29,8 +56,17 @@
 	"volunteer-reset-password": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Réinitialisation de votre compte sur le site CPA"
+			"fr": "Réinitialisation de votre compte sur le site CPA",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-reset-password/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-reset-password/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-reset-password/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-reset-password/template-prs.html"
+		},		
 		"body": {
 			"fr": "Veuillez vous connecter sur : http://localhost:9000/volunteers/profile?ak=%s"
 		}
@@ -38,8 +74,17 @@
 	"volunteer-sign-up-confirmation": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Bienvenue sur le site CPA"
+			"fr": "Bienvenue sur le site CPA",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-sign-up-confirmation/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-sign-up-confirmation/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-sign-up-confirmation/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-sign-up-confirmation/template-prs.html"
+		},			
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
@@ -47,8 +92,17 @@
 	"volunteer-update-password-confirmation": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Mise à jour de votre mot de passe"
+			"fr": "Mise à jour de votre mot de passe",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-update-password-confirmation/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-update-password-confirmation/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-update-password-confirmation/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/volunteer-update-password-confirmation/template-prs.html"
+		},	
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
@@ -56,8 +110,17 @@
 	"organisation-reset-password": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Réinitialisation de votre compte sur le site CPA"
+			"fr": "Réinitialisation de votre compte sur le site CPA",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-reset-password/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-reset-password/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-reset-password/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-reset-password/template-prs.html"
+		},	
 		"body": {
 			"fr": "Veuillez vous connecter sur : http://localhost:9000/volunteers/profile?ak=%s"
 		}
@@ -65,8 +128,17 @@
 	"organisation-sign-up-confirmation": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Bienvenue sur le site CPA"
+			"fr": "Bienvenue sur le site CPA",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-sign-up-confirmation/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-sign-up-confirmation/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-sign-up-confirmation/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-sign-up-confirmation/template-prs.html"
+		},		
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
@@ -74,8 +146,17 @@
 	"organisation-update-password-confirmation": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
-			"fr": "Mise à jour de votre mot de passe"
+			"fr": "Mise à jour de votre mot de passe",
+			"en":"",
+			"ar":"",
+			"prs":""
 		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-update-password-confirmation/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-update-password-confirmation/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-update-password-confirmation/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/organisation-update-password-confirmation/template-prs.html"
+		},	
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}

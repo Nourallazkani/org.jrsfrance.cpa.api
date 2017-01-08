@@ -3,7 +3,7 @@
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Bienvenue sur le site CPA",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -21,7 +21,7 @@
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Réinitialisation de votre compte sur le site CPA",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""	
 		},
@@ -39,7 +39,7 @@
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Mise à jour de votre mot de passe",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -53,11 +53,12 @@
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
 	},
+	
 	"volunteer-reset-password": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Réinitialisation de votre compte sur le site CPA",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -75,7 +76,7 @@
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Bienvenue sur le site CPA",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -93,7 +94,7 @@
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Mise à jour de votre mot de passe",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -107,11 +108,12 @@
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
 	},
+	
 	"organisation-reset-password": {
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Réinitialisation de votre compte sur le site CPA",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -129,7 +131,7 @@
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Bienvenue sur le site CPA",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -147,7 +149,7 @@
 		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
 		"subject": {
 			"fr": "Mise à jour de votre mot de passe",
-			"en":"",
+			"en": "[Subject to be defined]",
 			"ar":"",
 			"prs":""
 		},
@@ -160,5 +162,265 @@
 		"body": {
 			"fr": "Vos identifiants :<br/> %s / %s"
 		}
-	}
+	},
+	
+	"teaching-registration-request": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request/template-prs.html"
+		}
+	},	
+	"teaching-registration-request-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-accepted/template-prs.html"
+		}
+	},
+	"teaching-registration-request-not-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-not-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-not-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-not-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/teaching-registration-request-not-accepted/template-prs.html"
+		}
+	},
+	"professional-learning-program-registration-request": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request/template-prs.html"
+		}
+	},		
+	"professional-learning-program-registration-request-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-accepted/template-prs.html"
+		}
+	},
+	"professional-learning-program-registration-request-not-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-not-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-not-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-not-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/professional-learning-program-registration-request-not-accepted/template-prs.html"
+		}
+	},
+	
+	"language-learning-program-registration-request": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request/template-prs.html"
+		}
+	},
+	"language-learning-program-registration-request-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-accepted/template-prs.html"
+		}
+	},
+	"language-learning-program-registration-request-not-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-not-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-not-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-not-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/language-learning-program-registration-request-not-accepted/template-prs.html"
+		}
+	},
+	
+	"event-registration-request": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request/template-prs.html"
+		}
+	},
+	"event-registration-request-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-accepted/template-prs.html"
+		}
+	},
+	"event-registration-request-not-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-not-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-not-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-not-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/event-registration-request-not-accepted/template-prs.html"
+		}
+	},
+	
+	"workshop-registration-request": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request/template-prs.html"
+		}
+	},		
+	"workshop-registration-request-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-accepted/template-prs.html"
+		}
+	},
+	"workshop-registration-request-not-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-not-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-not-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-not-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/workshop-registration-request-not-accepted/template-prs.html"
+		}
+	},
+	
+	"meeting-request-accepted": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-accepted/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-accepted/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-accepted/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-accepted/template-prs.html"
+		}
+	},
+	"meeting-request-canceled": {
+		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"subject": {
+			"fr": "[Sujet à définir]",
+			"en": "[Subject to be defined]",
+			"ar":"",
+			"prs":""
+		},
+		"bodyUrl":{
+			"fr":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-canceled/template-fr.html",
+			"en":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-canceled/template-en.html",
+			"ar":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-canceled/template-ar.html",
+			"prs":"http://templates.cpafrance.fr.s3-website-eu-west-1.amazonaws.com/meeting-request-canceled/template-prs.html"
+		}
+	}	
 }

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,8 +60,8 @@ public class SpringLikeSimpleServlet extends javax.servlet.http.HttpServlet {
 						boolean pathMatch = IntStream.range(0, rmPathParts.length)
 								.allMatch(i-> (rmPathParts[i].startsWith("{") && rmPathParts[i].endsWith("}")) || rmPathParts[i].equals(pathParts[i]));
 						if(pathMatch){
-							boolean verbMath = Stream.of(rm.method()).anyMatch(m -> m.name().equals(req.getMethod()));
-							if(verbMath){
+							boolean verbMatch = Stream.of(rm.method()).anyMatch(m -> m.name().equalsIgnoreCase(req.getMethod()));
+							if(verbMatch){
 								return method;
 							}
 						}
@@ -102,7 +103,7 @@ public class SpringLikeSimpleServlet extends javax.servlet.http.HttpServlet {
 				String mappingPath = methodToInvoke.getAnnotation(RequestMapping.class).path()[0];
 				 
 				int pathVariableIndex = Arrays.asList(mappingPath.split("/")).indexOf("{"+p.getName()+"}");
-				argsForMethodToInvoke[i] = req.getPathInfo().split("/")[pathVariableIndex];
+				argsForMethodToInvoke[i] = req.getRequestURI().split("/")[pathVariableIndex];
 			}
 			else if(p.isAnnotationPresent(RequestParam.class)){
 				argsForMethodToInvoke[i] = req.getParameter(p.getName());
@@ -170,12 +171,13 @@ public class SpringLikeSimpleServlet extends javax.servlet.http.HttpServlet {
 				else{
 					resp.setStatus(200);
 					Object body = ret;
-					if(body!=null){
+					if(body != null){
 						String accept = req.getHeader("accept");
 						if("application/json".equals(accept)){
 							jackson4Json.writeValue(resp.getOutputStream(), body);
 						}
 						else{
+							
 							resp.setStatus(406); // NOT ACCEPTED
 							return;
 						}

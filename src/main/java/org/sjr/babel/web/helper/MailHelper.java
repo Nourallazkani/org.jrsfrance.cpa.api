@@ -32,14 +32,41 @@ public class MailHelper {
 		REFUGEE_SIGN_UP_CONFIRMATION, 
 		REFUGEE_UPDATE_PASSWORD_CONFIRMATION,
 		REFUGEE_RESET_PASSWORD,
+		
 		VOLUNTEER_SIGN_UP_CONFIRMATION,
 		VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION,
 		VOLUNTEER_RESET_PASSWORD,
+		
 		ORGANISATION_SIGN_UP_CONFIRMATION,
 		ORGANISATION_UPDATE_PASSWORD_CONFIRMATION,
 		ORGANISATION_RESET_PASSWORD,
+		
+		TEACHING_REGISTRATION_REQUEST,
+		TEACHING_REGISTRATION_REQUEST_ACCEPTED,
+		TEACHING_REGISTRATION_REQUEST_NOT_ACCEPTED,
+		
+		LANGUAGE_LEARNING_PROGRAM_REGISTRATION_REQUEST,
+		LANGUAGE_LEARNING_PROGRAM_REGISTRATION_REQUEST_ACCEPTED,
+		LANGUAGE_LEARNING_PROGRAM_REGISTRATION_REQUEST_NOT_ACCEPTED,
+		
+		PROFESSIONAL_LEARNING_PROGRAM_REGISTRATION_REQUEST,
+		PROFESSIONAL_LEARNING_PROGRAM_REGISTRATION_REQUEST_ACCEPTED,
+		PROFESSIONAL_LEARNING_PROGRAM_REGISTRATION_REQUEST_NOT_ACCEPTED,
+		
+		WORKSHOP_REGISTRATION_REQUEST,
+		WORKSHOP_REGISTRATION_REQUEST_ACCEPTED,
+		WORKSHOP_REGISTRATION_REQUEST_NOT_ACCEPTED,
+		
+		EVENT_REGISTRATION_REQUEST,
+		EVENT_REGISTRATION_REQUEST_ACCEPTED,
+		EVENT_REGISTRATION_REQUEST_NOT_ACCEPTED,
+		
+		MEETING_REQUEST_ACCEPTED,
+		MEETING_REQUEST_CANCELED
 	}
 
+
+	@SuppressWarnings("serial")
 	public static class MailBodyVars extends HashMap<String, Object>{
 		public MailBodyVars add(String key, Object value){
 			put(key, value);
@@ -89,6 +116,7 @@ public class MailHelper {
 		this.templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 	}
 	
+	@SuppressWarnings("el-syntax")
 	public SendMailOutcome send(MailCommand command){
 
 		try {
@@ -96,6 +124,8 @@ public class MailHelper {
 			String from = template.get("from").textValue();
 			String subject = template.get("subject").get(command.language).textValue();
 			String bodyTemplate;
+			
+			
 			if(template.has("bodyUrl")){
 				String bodyUrl = template.get("bodyUrl").get(command.language).asText();
 				

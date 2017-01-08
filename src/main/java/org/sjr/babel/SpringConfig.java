@@ -75,7 +75,7 @@ public class SpringConfig extends WebMvcConfigurerAdapter {
 		
 		Set<EntityType<?>> entities = emf.getMetamodel().getEntities();
 		
-		// fill level 2 cache so @manyToOne relationships can eager fetched without additional sql select.
+		// fill level 2 cache so @manyToOne relationships can be eager fetched without additional sql select.
 		entities.stream()
 			.map(e -> e.getJavaType())
 			.filter(c -> c.isAnnotationPresent(Cacheable.class) && c.isAnnotationPresent(CacheOnStartup.class))

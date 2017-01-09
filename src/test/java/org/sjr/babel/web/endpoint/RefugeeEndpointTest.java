@@ -33,7 +33,7 @@ public class RefugeeEndpointTest extends AbstractEndpointTest{
         node.put("password", "azerty");
 
         String jsonWithPassword = jackson.writeValueAsString(node);
-		
+
 		mockMvc.perform(post("/refugees")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
@@ -55,10 +55,16 @@ public class RefugeeEndpointTest extends AbstractEndpointTest{
 		input.mailAddress = "r@R.r";
 		input.password = "azerty";
 		
+        String jsonWithoutPassword = jackson.writeValueAsString(input); // n'incluera pas le json. A partir de là plus de lien avec la classe RefugeeSummary.
+        ObjectNode node = (ObjectNode) jackson.readTree(jsonWithoutPassword);
+        node.put("password", "azerty");
+
+        String jsonWithPassword = jackson.writeValueAsString(node);
+        
 		mockMvc.perform(post("/refugees")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.content(jackson.writeValueAsString(input)))
+				.content(jsonWithPassword))
 		.andExpect(status().isConflict());
 	}
 	

@@ -9,6 +9,7 @@ import org.sjr.babel.web.endpoint.VolunteerEndpoint.VolunteerSummary;
 import org.springframework.http.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class VolunteerEndpointTest extends AbstractEndpointTest {
 	
@@ -21,11 +22,16 @@ public class VolunteerEndpointTest extends AbstractEndpointTest {
 		input.mailAddress = "v@V.v";
 		input.password = "azerty";
 		
+        String jsonWithoutPassword = jackson.writeValueAsString(input); // n'incluera pas le json. A partir de là plus de lien avec la classe RefugeeSummary.
+        ObjectNode node = (ObjectNode) jackson.readTree(jsonWithoutPassword);
+        node.put("password", "azerty");
+
+        String jsonWithPassword = jackson.writeValueAsString(node);
 		
 		mockMvc.perform(post("/volunteers")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.content(jackson.writeValueAsString(input)))
+				.content(jsonWithPassword))
 		.andExpect(status().isConflict());
 	}
 	
@@ -38,11 +44,16 @@ public class VolunteerEndpointTest extends AbstractEndpointTest {
 		input.mailAddress = "nn@Nn.n";
 		input.password = "azerty";
 		
-		
+        String jsonWithoutPassword = jackson.writeValueAsString(input); // n'incluera pas le json. A partir de là plus de lien avec la classe RefugeeSummary.
+        ObjectNode node = (ObjectNode) jackson.readTree(jsonWithoutPassword);
+        node.put("password", "azerty");
+
+        String jsonWithPassword = jackson.writeValueAsString(node);
+        
 		mockMvc.perform(post("/volunteers")
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON)
-				.content(jackson.writeValueAsString(input)))
+				.content(jsonWithPassword))
 		.andExpect(status().isOk());
 	}
 }

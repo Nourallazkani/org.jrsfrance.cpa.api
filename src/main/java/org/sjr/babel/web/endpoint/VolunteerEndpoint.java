@@ -39,6 +39,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import util.EncryptionUtil;
 
 @RestController
@@ -49,7 +52,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		public int id;
 		
 		public @NotNull String mailAddress;
-		public /*@JsonProperty(access = Access.WRITE_ONLY)*/ String password;
+		public @JsonProperty(access = Access.WRITE_ONLY) String password;
 		public @NotNull @Size(min = 1) String firstName, lastName;
 		public @NotNull @Valid AddressSummary address;
 		public String civility, phoneNumber;

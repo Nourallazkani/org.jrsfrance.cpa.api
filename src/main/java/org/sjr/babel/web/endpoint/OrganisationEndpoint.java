@@ -30,6 +30,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import util.EncryptionUtil;
 
 @RestController
@@ -39,7 +42,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		public Integer id;
 		@NotNull @Size(min = 1)
 		public String name, mailAddress;
-		public /*@JsonProperty(access = Access.WRITE_ONLY)*/ String password;
+		public @JsonProperty(access = Access.WRITE_ONLY) String password;
 		@NotNull @Size(min = 1)
 		public String category;
 		@NotNull @Valid

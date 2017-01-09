@@ -41,6 +41,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
+
 import util.EncryptionUtil;
 
 @RestController
@@ -53,13 +56,14 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		public String nationality;
 		public String mailAddress;
 		public String hostCountryLanguageLevel;
-		public /*@JsonProperty(access = Access.WRITE_ONLY)*/ String password;
+		public @JsonProperty(access = Access.WRITE_ONLY) String password;
 		public String civility, firstName, lastName, phoneNumber;
 		public AddressSummary address;
 		public List<String> languages;
 		public String fieldOfStudy;
 		public LocalDate birthDate;
-		RefugeeSummary() {}
+		
+		public RefugeeSummary() {}
 		
 		RefugeeSummary(Refugee entity) {
 			this.id = entity.getId();

@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
@@ -42,7 +43,8 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		public Integer id;
 		@NotNull @Size(min = 1)
 		public String name, mailAddress;
-		public @JsonProperty(access = Access.WRITE_ONLY) String password;
+		@JsonProperty(access = Access.WRITE_ONLY)
+		public String password;
 		@NotNull @Size(min = 1)
 		public String category;
 		@NotNull @Valid
@@ -50,10 +52,12 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		@NotNull @Valid
 		public ContactSummary contact;
 		public Map<String, String> additionalInformations;
+		@JsonProperty(access = Access.READ_ONLY) @JsonInclude(JsonInclude.Include.NON_NULL)
+		public String accessKey;
 		
 		OrganisationSummary() {}
 		
-		OrganisationSummary(Organisation entity) {
+		OrganisationSummary(Organisation entity, boolean includeAccessKey) {
 			this.id = entity.getId();
 			this.name = entity.getName();
 			this.mailAddress = entity.getMailAddress();
@@ -61,13 +65,23 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			this.contact = safeTransform(entity.getContact(), ContactSummary::new);
 			this.address = safeTransform(entity.getAddress(), x -> new AddressSummary(x));
 			this.additionalInformations = entity.getAdditionalInformations();
+			if(includeAccessKey){
+				this.accessKey = entity.getAccount().getAccessKey();
+			}
 		}
 	}
 	
 	@RequestMapping(path = {"/organisations", "/libraries"}, method = RequestMethod.GET)
 	@Transactional
-	public List<OrganisationSummary> search(@RequestParam(required=false) Integer categoryId, @RequestParam(required=false) String city) 
+	public ResponseEntity<?> search(@RequestParam(required=false) Integer categoryId, @RequestParam(required=false) String city, @RequestHeader(required = false) String accessKey) 
 	{
+		if(StringUtils.hasText(accessKey)){
+			Optional<Administrator> _admin = getAdministratorByAccessKey(accessKey);
+			if(_admin.isPresent()){
+				return forbidden();
+			}
+		}
+		
 		StringBuffer query = new StringBuffer("select o from Organisation o join o.category c where 0=0 ");
 		Map<String, Object> args = new HashMap<>();
 
@@ -85,8 +99,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		}
 		
 		List<Organisation> results = objectStore.find(Organisation.class, query.toString(), args);
-
-		return results.stream().map(OrganisationSummary::new).collect(Collectors.toList());
+		return ok(results.stream().map(o -> new OrganisationSummary(o, accessKey != null)).collect(Collectors.toList()));
 	}
 
 	
@@ -127,12 +140,18 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			}
 		}
 
-		return ok(new OrganisationSummary(organisation));
+		return ok(new OrganisationSummary(organisation, true));
 	}
 	
 	@RequestMapping(path = "organisations", method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid OrganisationSummary input, @RequestHeader(required = false) String accessKey) {
+		
+		if (accessKey == null && !StringUtils.hasText(input.password)) {
+			Map<String, String> errors = new HashMap<>();
+			errors.put("accessKey", null);
+			return badRequest(errors);
+		}
 		
 		String query = "select o from Organisation o where lower(o.mailAddress) = lower(:mailAddress)";
 		Map<String, Object> args= new HashMap<>();
@@ -146,28 +165,33 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		organisation.setName(input.name);
 		organisation.setAddress(input.address.toAddress(this.refDataProvider));
 		organisation.setContact(input.contact.toContact());
+		
+		organisation.setCategory(this.refDataProvider.resolve(OrganisationCategory.class, input.category));
 		organisation.setMailAddress(input.mailAddress);
 		Account account = new Account();
 		
+		String password;
 		if(StringUtils.hasText(input.password)){
-			account.setPassword(EncryptionUtil.sha256(input.password));
+			password = input.password;
+			account.setPassword(EncryptionUtil.sha256(password));
 		}
-		else if (StringUtils.hasText(accessKey)) {
+		else {
 			Optional<Administrator> _administrator = getAdministratorByAccessKey(accessKey);
 			if(!_administrator.isPresent()){
 				return forbidden();
 			}
+			password = UUID.randomUUID().toString().substring(0, 8);
 			organisation.setCreatedBy(_administrator.get());
 			account.setAccessKey("O-" + UUID.randomUUID().toString());
-			account.setPassword(EncryptionUtil.sha256(UUID.randomUUID().toString().substring(0, 8)));
-		}		
+			account.setPassword(EncryptionUtil.sha256(password));
+		}
 		organisation.setAccount(account);
 		
 		organisation.setAdditionalInformations(input.additionalInformations);
 		objectStore.save(organisation);
 		input.id = organisation.getId();
 		
-		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", organisation.getMailAddress()).add("password", input.password);
+		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", organisation.getMailAddress()).add("password", password);
 		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, null, organisation.getMailAddress(), "fr", mailBodyVars);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
@@ -197,9 +221,14 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		organisation.setMailAddress(input.mailAddress);
 		if (StringUtils.hasText(input.password)) {
 			organisation.getAccount().setPassword(EncryptionUtil.sha256(input.password));
+			
+			MailBodyVars vars = new MailBodyVars().add("mailAddress", organisation.getMailAddress()).add("password", input.password);
+			MailCommand mc = new MailCommand(MailType.ORGANISATION_UPDATE_PASSWORD_CONFIRMATION, organisation.getName(), organisation.getMailAddress(), "fr", vars);
+			afterTx(() -> this.mailHelper.send(mc));
 		}
 		organisation.setAdditionalInformations(input.additionalInformations);
 		objectStore.save(organisation);
+
 		return noContent();
 	}
 	

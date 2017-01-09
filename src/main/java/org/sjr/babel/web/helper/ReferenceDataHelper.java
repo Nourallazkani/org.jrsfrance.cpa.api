@@ -8,12 +8,14 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.sjr.babel.model.entity.reference.AbstractReferenceEntity;
+import org.sjr.babel.model.entity.reference.Civility;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.EventType;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
 import org.sjr.babel.model.entity.reference.LanguageLearningProgramType;
 import org.sjr.babel.model.entity.reference.Level;
+import org.sjr.babel.model.entity.reference.OrganisationCategory;
 import org.sjr.babel.model.entity.reference.ProfessionalLearningProgramDomain;
 import org.sjr.babel.persistence.ObjectStore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +67,16 @@ public class ReferenceDataHelper {
 			map.put("all", this.objectStore.findAll(Country.class));
 			return map;
 		});
+		loaders.put(getRegion(OrganisationCategory.class), ()-> {
+			Map<String, List<?>> map = new HashMap<>();
+			map.put("all", this.objectStore.findAll(OrganisationCategory.class));
+			return map;
+		});		
+		loaders.put(getRegion(Civility.class), ()-> {
+			Map<String, List<?>> map = new HashMap<>();
+			map.put("all", this.objectStore.findAll(Civility.class));
+			return map;
+		});			
 		loaders.put(getRegion(Language.class), ()-> {
 			Map<String, List<?>> map = new HashMap<>();
 			map.put("all", this.objectStore.findAll(Language.class));

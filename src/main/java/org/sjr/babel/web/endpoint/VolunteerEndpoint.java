@@ -221,8 +221,8 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			
 			if(StringUtils.hasText(input.password)){
 				v.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				MailBodyVars mailBodyVars = new MailBodyVars().add("password", input.password);
-
+				
+				MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", v.getMailAddress()).add("password", input.password);
 				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, v.getFullName(), v.getMailAddress(), "fr", mailBodyVars);
 				afterTx(() -> this.mailHelper.send(mailCommand));
 			}

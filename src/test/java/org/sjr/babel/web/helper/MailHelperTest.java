@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sjr.babel.SpringConfig;
 import org.sjr.babel.SpringConfig4Tests;
+import org.sjr.babel.web.helper.MailHelper.MailBodyVars;
 import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.sjr.babel.web.helper.MailHelper.SendMailOutcome;
@@ -30,11 +31,29 @@ public class MailHelperTest {
 	private MailHelper helper;
 	
 	@Test
-	public void testSend() throws JsonProcessingException, IOException {
+	public void testSendWithBodyVars() throws JsonProcessingException, IOException {
 		ObjectMapper jackson = new ObjectMapper();
 		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 		for(MailType mt : MailType.values()){
 			for(String language : new String[]{"fr", "en", "ar", "prs"}){
+				MailBodyVars mb = new MailBodyVars().add("var1", "??").add("var2", null);
+				MailCommand command = new MailCommand(mt, "Alaric", "a@a.fr", language, mb);
+				SendMailOutcome resp = helper.send(command);
+				
+				String templateName = mt.name().toLowerCase().replace("_", "-");
+				String expectedSubject = templates.get(templateName).get("subject").get(language).textValue();
+				Assert.assertEquals(expectedSubject, resp.subject);
+			}
+		}
+	}
+	
+	@Test
+	public void testSendWithoutBodyVars() throws JsonProcessingException, IOException {
+		ObjectMapper jackson = new ObjectMapper();
+		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
+		for(MailType mt : MailType.values()){
+			for(String language : new String[]{"fr", "en", "ar", "prs"}){
+				
 				MailCommand command = new MailCommand(mt, "Alaric", "a@a.fr", language, null);
 				SendMailOutcome resp = helper.send(command);
 				

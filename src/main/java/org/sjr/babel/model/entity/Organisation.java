@@ -39,7 +39,7 @@ public class Organisation extends AbstractEntity {
 	@Embedded
 	private Account account;
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	private OrganisationCategory category;
 	
 	@ManyToOne(fetch = FetchType.LAZY)

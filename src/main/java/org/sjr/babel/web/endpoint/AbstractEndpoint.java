@@ -177,13 +177,14 @@ public abstract class AbstractEndpoint {
         binder.initDirectFieldAccess();
     }
 	
-	@JsonIgnoreProperties("formatted_address")
+	@JsonIgnoreProperties({"formattedAddress", "formatted_address"})
 	protected static class AddressSummary {
 		public String street1, street2;
 		@NotNull @Size(min = 1)
 		public String postalCode, locality;
 		public String country="France";
-		public Double lat,lng; 
+		public Double lat,lng;
+		public String googleMapId;
 		
 		public AddressSummary(){}
 		
@@ -203,6 +204,7 @@ public abstract class AbstractEndpoint {
 			this.postalCode = a.getPostalCode();
 			this.lat = a.getLat();
 			this.lng = a.getLng();
+			this.googleMapId = a.getGoogleMapId();
 			
 			this.locality = a.getLocality();
 			this.country = safeTransform(a.getCountry(), x -> x.getName());
@@ -216,7 +218,7 @@ public abstract class AbstractEndpoint {
 			address.setLocality(this.locality);
 			address.setLat(this.lat);
 			address.setLng(this.lng);
-			
+			address.setGoogleMapId(this.googleMapId);
 			address.setCountry(referenceDataProvider.resolve(Country.class, this.country));
 			return address;
 		}

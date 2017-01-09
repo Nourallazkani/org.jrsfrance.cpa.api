@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.Administrator;
@@ -23,6 +25,7 @@ import org.sjr.babel.model.entity.MeetingRequest.Direction;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
 import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
+import org.sjr.babel.model.entity.reference.Civility;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
@@ -53,15 +56,16 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	static class RefugeeSummary {
 
 		public int id;
-		public String nationality;
-		public String mailAddress;
+		@NotNull @Size(min = 1)
+		public String civility, firstName, lastName, mailAddress;
+		public String nationality, phoneNumber;
 		public String hostCountryLanguageLevel;
-		public @JsonProperty(access = Access.WRITE_ONLY) String password;
-		public String civility, firstName, lastName, phoneNumber;
 		public AddressSummary address;
 		public List<String> languages;
 		public String fieldOfStudy;
-		public LocalDate birthDate;
+		public LocalDate birthDate;		
+		public @JsonProperty(access = Access.WRITE_ONLY) String password;
+
 		
 		public RefugeeSummary() {}
 		
@@ -125,6 +129,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		refugee.setPhoneNumber(input.phoneNumber);
 		refugee.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x-> this.refDataProvider.resolve(Level.class, x)));
 		refugee.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
+		refugee.setCivility(safeTransform(input.civility, x -> this.refDataProvider.resolve(Civility.class, x)));
+		
 		if(input.languages!=null){
 			List<Language> languages = input.languages.stream()
 					.map(x->this.refDataProvider.resolve(Language.class, x))
@@ -229,19 +235,20 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			r.setPhoneNumber(input.phoneNumber);
 			r.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 			r.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
-			if(StringUtils.hasText(input.password)){
-				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
-				MailBodyVars mailBodyVars = new MailBodyVars().add("password", input.password);
-				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, r.getFullName(), r.getMailAddress(), "fr", mailBodyVars);
-				afterTx(() -> this.mailHelper.send(mailCommand));
-			}
-			
+			r.setCivility(safeTransform(input.civility, x -> this.refDataProvider.resolve(Civility.class, x)));
 			r.setNationality(safeTransform(input.nationality, x -> this.refDataProvider.resolve(Country.class, x)));
 			r.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
 			if(input.languages!=null){
 				r.getLanguages().clear();
 				input.languages.stream().map(x -> this.refDataProvider.resolve(Language.class, x)).forEach(r.getLanguages()::add);
 			}
+			if(StringUtils.hasText(input.password)){
+				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
+				
+				MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress",  r.getMailAddress()).add("password", input.password);
+				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, r.getFullName(), r.getMailAddress(), "fr", mailBodyVars);
+				afterTx(() -> this.mailHelper.send(mailCommand));
+			}			
 			
 			this.objectStore.save(r);
 			

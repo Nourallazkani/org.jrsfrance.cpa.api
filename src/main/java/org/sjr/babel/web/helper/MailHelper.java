@@ -151,7 +151,8 @@ public class MailHelper {
 			String body = null;
 			if(command.bodyVars != null && !command.bodyVars.isEmpty()){
 				for(Map.Entry<String, Object> entry : command.bodyVars.entrySet()){
-					body = bodyTemplate.replace(String.format("${%s}", entry.getKey()), entry.getValue().toString());
+					String value = entry.getValue() == null ? "" : entry.getValue().toString();
+					body = bodyTemplate.replace(String.format("${%s}", entry.getKey()), value);
 				}
 			}
 			else{

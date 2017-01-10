@@ -72,10 +72,10 @@ update Teaching set contact=o.contact, link = 'http://jrsfrance.org' from Teachi
 insert into Teaching_registrations( refugee_id, Teaching_id) values (1,1);
 
 
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now() + interval '-60 day', 4,1,'L', 1);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now() + interval '-30 day', 4,3,'L', 3);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now(), 6,1,'L', 2);
-insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now() + interval '30 day', 6,3,'L', 1);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now() + interval '-30 day', 4,1,'L', 1);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now(), 4,3,'L', 3);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now() + interval '30 day', 6,1,'L', 2);
+insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, type_id) values(now() + interval '60 day', 6,3,'L', 1);
 insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, domain_id) values(now() + interval '60 day', 5,1,'P', 1);
 insert into AbstractLearningProgram(startDate, organisation_id,level_id, DTYPE, domain_id) values(now() + interval '90 day', 7,3,'P', 2);
 update AbstractLearningProgram set link='http://www.jrsfrance.org/', registrationOpeningDate=startDate + INTERVAL '-120 day', registrationClosingDate=startDate + INTERVAL '-30 day', endDate=startDate + INTERVAL '90 day';

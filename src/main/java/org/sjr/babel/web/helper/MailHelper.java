@@ -18,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -150,9 +151,17 @@ public class MailHelper {
 			}
 			String body = null;
 			if(command.bodyVars != null && !command.bodyVars.isEmpty()){
-				for(Map.Entry<String, Object> entry : command.bodyVars.entrySet()){
-					String value = entry.getValue() == null ? "" : entry.getValue().toString();
-					body = bodyTemplate.replace(String.format("${%s}", entry.getKey()), value);
+				if(!StringUtils.hasText(bodyTemplate)){
+					try{
+						body = new ObjectMapper().writeValueAsString(command.bodyVars);
+					}
+					catch(Exception e){	}
+				}
+				else{
+					for(Map.Entry<String, Object> entry : command.bodyVars.entrySet()){
+						String value = entry.getValue() == null ? "" : entry.getValue().toString();
+						body = bodyTemplate.replace(String.format("${%s}", entry.getKey()), value);
+					}
 				}
 			}
 			else{

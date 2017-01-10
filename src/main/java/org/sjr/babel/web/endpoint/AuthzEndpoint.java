@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.hibernate.SessionFactory;
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.AbstractEntity;
 import org.sjr.babel.model.entity.Administrator;
@@ -94,10 +95,8 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Refugee> _user = tryGetUser(input, Refugee.class);
 			if(_user.isPresent()){
 				Refugee refugee = _user.get();
-				
 				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_RESET_PASSWORD, refugee.getFullName(), refugee.getMailAddress(), "fr", new MailBodyVars().add("accessKey", refugee.getAccount().getAccessKey()));
-				afterTx(() -> mailHelper.send(mailCommand));
-				System.out.println(refugee.getAccount().getAccessKey());
+				mailHelper.send(mailCommand);
 			}
 		}
 		else if(input.realm.equals("O")){
@@ -105,8 +104,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if(_user.isPresent()){
 				Organisation organisation = _user.get();
 				MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_RESET_PASSWORD, organisation.getName(), organisation.getMailAddress(), "fr", new MailBodyVars().add("accessKey", organisation.getAccount().getAccessKey()));
-				afterTx(() -> mailHelper.send(mailCommand));
-				System.out.println(organisation.getAccount().getAccessKey());
+				mailHelper.send(mailCommand);
 			}
 		}
 		else if(input.realm.equals("V")){
@@ -114,7 +112,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			if(_user.isPresent()){
 				Volunteer volunteer = _user.get();
 				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_RESET_PASSWORD, volunteer.getFullName(), volunteer.getMailAddress(), "fr", new MailBodyVars().add("accessKey", volunteer.getAccount().getAccessKey()));
-				afterTx(() -> mailHelper.send(mailCommand));
+				mailHelper.send(mailCommand);
 			}
 		}
 		else if(input.realm.equals("A")){

@@ -1,6 +1,7 @@
 package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.Date;
@@ -13,6 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.mail.internet.InternetAddress;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -140,8 +142,9 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			
 		this.objectStore.save(refugee);
 
+		InternetAddress to = new InternetAddress(refugee.getMailAddress(), refugee.getFullName());
 		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", refugee.getMailAddress()).add("password", input.password);
-		MailCommand mailCommand = new MailCommand(MailType.REFUGEE_SIGN_UP_CONFIRMATION, refugee.getFullName(), refugee.getMailAddress(), "fr", mailBodyVars);
+		MailCommand mailCommand = new MailCommand(MailType.REFUGEE_SIGN_UP_CONFIRMATION, to, "fr", mailBodyVars);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return successSignUp(refugee);
@@ -192,7 +195,6 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = "{id}", method = RequestMethod.GET)
 	@Transactional
 	public ResponseEntity<?> search(@PathVariable int id, @RequestHeader String accessKey) {
-
 		Optional<Refugee> r = objectStore.getById(Refugee.class, id);
 		if (!r.isPresent()) {
 			return notFound();
@@ -207,7 +209,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid RefugeeSummary input, @RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid RefugeeSummary input, @RequestHeader String accessKey) throws UnsupportedEncodingException {
 		if (input.id != id) {
 			return badRequest();
 		} else {
@@ -215,8 +217,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			if (!_r.isPresent()) {
 				return notFound();
 			} 
-			Refugee r = _r.get();
-			if (!hasAccess(accessKey, r)) {
+			Refugee refugee = _r.get();
+			if (!hasAccess(accessKey, refugee)) {
 				return forbidden();
 			}
 			
@@ -229,28 +231,29 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 				return conflict(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
 			
-			r.setFirstName(input.firstName);
-			r.setLastName(input.lastName);
-			r.setMailAddress(input.mailAddress);
-			r.setPhoneNumber(input.phoneNumber);
-			r.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
-			r.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
-			r.setCivility(safeTransform(input.civility, x -> this.refDataProvider.resolve(Civility.class, x)));
-			r.setNationality(safeTransform(input.nationality, x -> this.refDataProvider.resolve(Country.class, x)));
-			r.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
-			if(input.languages!=null){
-				r.getLanguages().clear();
-				input.languages.stream().map(x -> this.refDataProvider.resolve(Language.class, x)).forEach(r.getLanguages()::add);
+			refugee.setFirstName(input.firstName);
+			refugee.setLastName(input.lastName);
+			refugee.setMailAddress(input.mailAddress);
+			refugee.setPhoneNumber(input.phoneNumber);
+			refugee.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+			refugee.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
+			refugee.setCivility(safeTransform(input.civility, x -> this.refDataProvider.resolve(Civility.class, x)));
+			refugee.setNationality(safeTransform(input.nationality, x -> this.refDataProvider.resolve(Country.class, x)));
+			refugee.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
+			if(input.languages != null){
+				refugee.getLanguages().clear();
+				input.languages.stream().map(x -> this.refDataProvider.resolve(Language.class, x)).forEach(refugee.getLanguages()::add);
 			}
 			if(StringUtils.hasText(input.password)){
-				r.getAccount().setPassword(EncryptionUtil.sha256(input.password));
+				refugee.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 				
-				MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress",  r.getMailAddress()).add("password", input.password);
-				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, r.getFullName(), r.getMailAddress(), "fr", mailBodyVars);
+				InternetAddress to = new InternetAddress(refugee.getMailAddress(), refugee.getFullName());
+				MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress",  refugee.getMailAddress()).add("password", input.password);
+				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_UPDATE_PASSWORD_CONFIRMATION, to, "fr", mailBodyVars);
 				afterTx(() -> this.mailHelper.send(mailCommand));
 			}			
 			
-			this.objectStore.save(r);
+			this.objectStore.save(refugee);
 			
 			return noContent();
 		}

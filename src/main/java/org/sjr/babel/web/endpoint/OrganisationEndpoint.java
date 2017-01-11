@@ -1,5 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.mail.internet.InternetAddress;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -150,7 +152,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "organisations", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> create(@RequestBody @Valid OrganisationSummary input, @RequestHeader(required = false) String accessKey) {
+	public ResponseEntity<?> create(@RequestBody @Valid OrganisationSummary input, @RequestHeader(required = false) String accessKey) throws UnsupportedEncodingException {
 		
 		if (accessKey == null && !StringUtils.hasText(input.password)) {
 			Map<String, String> errors = new HashMap<>();
@@ -196,8 +198,9 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		objectStore.save(organisation);
 		input.id = organisation.getId();
 		
+		InternetAddress to = new InternetAddress(organisation.getMailAddress(), organisation.getName());
 		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", organisation.getMailAddress()).add("password", password);
-		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, null, organisation.getMailAddress(), "fr", mailBodyVars);
+		MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_SIGN_UP_CONFIRMATION, to, "fr", mailBodyVars);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return created(getUri("organisations/"+input.id), input);
@@ -205,7 +208,7 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "organisations/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> update(@RequestBody @Valid OrganisationSummary input, @PathVariable int id, @RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@RequestBody @Valid OrganisationSummary input, @PathVariable int id, @RequestHeader String accessKey) throws UnsupportedEncodingException {
 		if (input.id == null || !input.id.equals(id)) {
 			return badRequest();
 		}
@@ -227,8 +230,9 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 		if (StringUtils.hasText(input.password)) {
 			organisation.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 			
+			InternetAddress to = new InternetAddress(organisation.getMailAddress(), organisation.getName());
 			MailBodyVars vars = new MailBodyVars().add("mailAddress", organisation.getMailAddress()).add("password", input.password);
-			MailCommand mc = new MailCommand(MailType.ORGANISATION_UPDATE_PASSWORD_CONFIRMATION, organisation.getName(), organisation.getMailAddress(), "fr", vars);
+			MailCommand mc = new MailCommand(MailType.ORGANISATION_UPDATE_PASSWORD_CONFIRMATION, to, "fr", vars);
 			afterTx(() -> this.mailHelper.send(mc));
 		}
 		organisation.setAdditionalInformations(input.additionalInformations);
@@ -249,6 +253,6 @@ public class OrganisationEndpoint extends AbstractEndpoint {
 			return forbidden();
 		}
 		objectStore.delete(o.get());
-		return notFound();
+		return noContent();
 	}	
 }

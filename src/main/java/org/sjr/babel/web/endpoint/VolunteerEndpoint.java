@@ -1,6 +1,7 @@
 package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.mail.internet.InternetAddress;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -155,8 +157,9 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		volunteer.setAccount(account);
 		this.objectStore.save(volunteer);
 		
+		InternetAddress to = new InternetAddress(volunteer.getMailAddress(), volunteer.getFullName());
 		MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", volunteer.getMailAddress()).add("password", input.password);
-		MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, volunteer.getFullName(), volunteer.getMailAddress(), "fr", mailBodyVars);
+		MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_SIGN_UP_CONFIRMATION, to, "fr", mailBodyVars);
 		afterTx(() -> mailHelper.send(mailCommand));
 		
 		return successSignUp(volunteer);
@@ -191,7 +194,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/volunteers/{id}", method = RequestMethod.PUT)
 	@Transactional
-	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, /*BindingResult binding, */@RequestHeader String accessKey) {
+	public ResponseEntity<?> update(@PathVariable int id, @RequestBody @Valid VolunteerSummary input, /*BindingResult binding, */@RequestHeader String accessKey) throws UnsupportedEncodingException {
 		if (input.id!=id) {
 			return badRequest();
 		} else {
@@ -199,8 +202,8 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 			if (!_v.isPresent()) {
 				return notFound();
 			} 
-			Volunteer v = _v.get();
-			if (!hasAccess(accessKey, v)) {
+			Volunteer volunteer = _v.get();
+			if (!hasAccess(accessKey, volunteer)) {
 				return forbidden();
 			}
 
@@ -213,92 +216,93 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 				return conflict(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
 			
-			v.setFirstName(input.firstName);
-			v.setLastName(input.lastName);
-			v.setMailAddress(input.mailAddress);
-			v.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
-			v.setPhoneNumber(input.phoneNumber);
+			volunteer.setFirstName(input.firstName);
+			volunteer.setLastName(input.lastName);
+			volunteer.setMailAddress(input.mailAddress);
+			volunteer.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
+			volunteer.setPhoneNumber(input.phoneNumber);
 			
 			if(StringUtils.hasText(input.password)){
-				v.getAccount().setPassword(EncryptionUtil.sha256(input.password));
+				volunteer.getAccount().setPassword(EncryptionUtil.sha256(input.password));
 				
-				MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", v.getMailAddress()).add("password", input.password);
-				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, v.getFullName(), v.getMailAddress(), "fr", mailBodyVars);
+				InternetAddress to = new InternetAddress(volunteer.getMailAddress(), volunteer.getFullName());
+				MailBodyVars mailBodyVars = new MailBodyVars().add("mailAddress", volunteer.getMailAddress()).add("password", input.password);
+				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_UPDATE_PASSWORD_CONFIRMATION, to, "fr", mailBodyVars);
 				afterTx(() -> this.mailHelper.send(mailCommand));
 			}
 			
 			Date date = Date.from(LocalDate.now().minusMonths(1).atStartOfDay(ZoneId.systemDefault()).toInstant());
 			if(input.availableForConversation !=null &&  input.availableForConversation.booleanValue()){
-				boolean wasNotAvailableForConversationBefore = (v.getAvailableForConversation() == null || !v.getAvailableForConversation());
+				boolean wasNotAvailableForConversationBefore = (volunteer.getAvailableForConversation() == null || !volunteer.getAvailableForConversation());
 				
-				v.setAvailableForConversation(true);
+				volunteer.setAvailableForConversation(true);
 				if(wasNotAvailableForConversationBefore){
 					String q = "select x from MeetingRequest x where x.postDate > :date and x.volunteer is null and x.reason=:reason";
 					Map<String, Object> qArs = new HashMap<>();
 					qArs.put("date", date);
 					qArs.put("reason", Reason.CONVERSATION);
-					v.getMeetingRequests().addAll(this.objectStore.find(MeetingRequest.class, q, qArs));
+					volunteer.getMeetingRequests().addAll(this.objectStore.find(MeetingRequest.class, q, qArs));
 				}
 				
 			}
 			else{
-				v.getMeetingRequests().removeIf(x -> Reason.CONVERSATION.equals(x.getReason()));
-				v.setAvailableForConversation(input.availableForConversation /*null or false*/);
+				volunteer.getMeetingRequests().removeIf(x -> Reason.CONVERSATION.equals(x.getReason()));
+				volunteer.setAvailableForConversation(input.availableForConversation /*null or false*/);
 			}
 			
 			if(input.availableForInterpreting !=null &&  input.availableForInterpreting.booleanValue() && input.languages != null && !input.languages.isEmpty())
 			{
-				boolean wasNotAvailableForInterpretingBefore = (v.getAvailableForInterpreting() == null || !v.getAvailableForInterpreting());
-				v.setAvailableForInterpreting(true);
+				boolean wasNotAvailableForInterpretingBefore = (volunteer.getAvailableForInterpreting() == null || !volunteer.getAvailableForInterpreting());
+				volunteer.setAvailableForInterpreting(true);
 				List<Language> languages = input.languages.stream()
 						.filter(StringUtils::hasText)
 						.map(x -> this.refDataProvider.resolve(Language.class, x))
 						.collect(Collectors.toList());
-				v.setLanguages(languages);
+				volunteer.setLanguages(languages);
 
 				if(wasNotAvailableForInterpretingBefore){
 					String q = "select x from MeetingRequest x join x.refugee r join r.languages l where x.postDate> :date and x.volunteer is null and x.reason=:reason and l in :languages";
 					Map<String, Object> qArs = new HashMap<>();
 					qArs.put("date", date);
 					qArs.put("reason", Reason.INTERPRETING);
-					qArs.put("languages", v.getLanguages());
-					v.getMeetingRequests().addAll(this.objectStore.find(MeetingRequest.class, q, qArs));	
+					qArs.put("languages", volunteer.getLanguages());
+					volunteer.getMeetingRequests().addAll(this.objectStore.find(MeetingRequest.class, q, qArs));	
 				}
 			}
 			else{
-				v.getMeetingRequests().removeIf(x -> Reason.INTERPRETING.equals(x.getReason()));
-				v.setAvailableForInterpreting(input.availableForInterpreting /*null or false*/);
+				volunteer.getMeetingRequests().removeIf(x -> Reason.INTERPRETING.equals(x.getReason()));
+				volunteer.setAvailableForInterpreting(input.availableForInterpreting /*null or false*/);
 			}
 			
 			
 			if(input.availableForSupportInStudies !=null &&  input.availableForSupportInStudies.booleanValue() && input.fieldsOfStudy != null && !input.fieldsOfStudy.isEmpty())
 			{
-				boolean wasNotAvailableForSupportInStudies = (v.getAvailableForSupportInStudies() == null || !v.getAvailableForSupportInStudies());
-				v.setAvailableForSupportInStudies(true);
+				boolean wasNotAvailableForSupportInStudies = (volunteer.getAvailableForSupportInStudies() == null || !volunteer.getAvailableForSupportInStudies());
+				volunteer.setAvailableForSupportInStudies(true);
 				List<FieldOfStudy> fieldsOfStudy = input.fieldsOfStudy.stream()
 						.filter(StringUtils::hasText)
 						.map(x -> this.refDataProvider.resolve(FieldOfStudy.class, x))
 						.collect(Collectors.toList());
-				v.setFieldsOfStudy(fieldsOfStudy);
+				volunteer.setFieldsOfStudy(fieldsOfStudy);
 								
 				if(wasNotAvailableForSupportInStudies){
 					String q = "select x from MeetingRequest x join x.refugee r join r.fieldOfStudy f where x.postDate > :date and x.volunteer is null and x.reason=:reason and f in :fieldsOfStudy ";
 					Map<String, Object> qArs = new HashMap<>();
 					qArs.put("date", date);
 					qArs.put("reason", Reason.SUPPORT_IN_STUDIES);
-					qArs.put("fieldsOfStudy", v.getFieldsOfStudy());
-					v.getMeetingRequests().addAll(this.objectStore.find(MeetingRequest.class, q, qArs));	
+					qArs.put("fieldsOfStudy", volunteer.getFieldsOfStudy());
+					volunteer.getMeetingRequests().addAll(this.objectStore.find(MeetingRequest.class, q, qArs));	
 				}
 			}
 			else{
-				v.getMeetingRequests().removeIf(x -> Reason.SUPPORT_IN_STUDIES.equals(x.getReason()));
-				v.setAvailableForInterpreting(input.availableForSupportInStudies /*null or false*/);
+				volunteer.getMeetingRequests().removeIf(x -> Reason.SUPPORT_IN_STUDIES.equals(x.getReason()));
+				volunteer.setAvailableForInterpreting(input.availableForSupportInStudies /*null or false*/);
 			}
 			
-			v.setAvailableForActivities(input.availableForActivities);
-			v.setActivities(input.activities);
+			volunteer.setAvailableForActivities(input.availableForActivities);
+			volunteer.setActivities(input.activities);
 			
-			this.objectStore.save(v);
+			this.objectStore.save(volunteer);
 			
 			return noContent();
 		}

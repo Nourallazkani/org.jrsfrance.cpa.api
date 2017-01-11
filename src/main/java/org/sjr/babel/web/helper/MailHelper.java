@@ -75,20 +75,24 @@ public class MailHelper {
 		}
 	}
 	public static class MailCommand{
-		public String recipientName, recipientMailAddress, language;
+		public InternetAddress to, replyTo;
+		public String language;
 		public MailType type;
 		public MailBodyVars bodyVars;
 		
 		public MailCommand() {}
 		
-		public MailCommand(MailType type, String recipientName, String recipientMailAddress, String language, MailBodyVars bodyVars) {
+		public MailCommand(MailType type, InternetAddress to, String language, MailBodyVars bodyVars) {
 			super();
-			this.recipientName = recipientName;
-			this.recipientMailAddress = recipientMailAddress;
+			this.to = to;
 			this.language = language;
 			this.type = type;
 			this.bodyVars = bodyVars;
 		}
+		public MailCommand(MailType type, InternetAddress to, InternetAddress replyTo, String language, MailBodyVars bodyVars) {
+			this(type, to, language, bodyVars);
+			this.replyTo = replyTo;
+		}		
 	}
 
 	public static class SendMailOutcome{
@@ -117,7 +121,6 @@ public class MailHelper {
 		this.templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 	}
 	
-	@SuppressWarnings("el-syntax")
 	public SendMailOutcome send(MailCommand command){
 
 		try {
@@ -171,18 +174,23 @@ public class MailHelper {
 			
 			MimeMessageHelper helper = new MimeMessageHelper(mime, true);
 			 
-			InternetAddress to = new InternetAddress(String.format("%s <%s>", command.recipientName, command.recipientMailAddress));
-			helper.setTo(to);
+			if(command.replyTo!=null){
+				helper.setReplyTo(command.replyTo);
+			}
+			helper.setTo(command.to);
 			helper.setText(body, true);
 			helper.setSubject(subject);
 			helper.setFrom(from);
+			if(command.replyTo != null){
+				helper.setReplyTo(command.replyTo);
+			}
 			
 			SendMailOutcome response = new SendMailOutcome();
-			response.to = to;
+			response.to = command.to;
 			response.body = body;
 			response.subject = subject;
 			
-			if (command.recipientMailAddress == null || command.recipientMailAddress.trim().length() < 12) {
+			if (command.to == null || command.to.getAddress().trim().length() < 12) {
 				response.sent = false;
 			}
 			else{

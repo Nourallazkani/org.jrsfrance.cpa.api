@@ -1,6 +1,6 @@
 {
 	"refugee-sign-up-confirmation": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Bienvenue sur le site CPA",
 			"en": "[Subject to be defined]",
@@ -18,7 +18,7 @@
 		}
 	},
 	"refugee-reset-password": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Réinitialisation de votre compte sur le site CPA",
 			"en": "[Subject to be defined]",
@@ -36,7 +36,7 @@
 		}
 	},	
 	"refugee-update-password-confirmation": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Mise à jour de votre mot de passe",
 			"en": "[Subject to be defined]",
@@ -55,7 +55,7 @@
 	},
 	
 	"volunteer-reset-password": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Réinitialisation de votre compte sur le site CPA",
 			"en": "[Subject to be defined]",
@@ -73,7 +73,7 @@
 		}
 	},
 	"volunteer-sign-up-confirmation": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Bienvenue sur le site CPA",
 			"en": "[Subject to be defined]",
@@ -91,7 +91,7 @@
 		}
 	},
 	"volunteer-update-password-confirmation": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Mise à jour de votre mot de passe",
 			"en": "[Subject to be defined]",
@@ -110,7 +110,7 @@
 	},
 	
 	"organisation-reset-password": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Réinitialisation de votre compte sur le site CPA",
 			"en": "[Subject to be defined]",
@@ -128,7 +128,7 @@
 		}
 	},
 	"organisation-sign-up-confirmation": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Bienvenue sur le site CPA",
 			"en": "[Subject to be defined]",
@@ -146,7 +146,7 @@
 		}
 	},
 	"organisation-update-password-confirmation": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "Mise à jour de votre mot de passe",
 			"en": "[Subject to be defined]",
@@ -165,7 +165,7 @@
 	},
 	
 	"teaching-registration-request": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -180,7 +180,7 @@
 		}
 	},	
 	"teaching-registration-request-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -195,7 +195,7 @@
 		}
 	},
 	"teaching-registration-request-not-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -210,7 +210,7 @@
 		}
 	},
 	"professional-learning-program-registration-request": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -225,7 +225,7 @@
 		}
 	},		
 	"professional-learning-program-registration-request-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -240,7 +240,7 @@
 		}
 	},
 	"professional-learning-program-registration-request-not-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -256,7 +256,7 @@
 	},
 	
 	"language-learning-program-registration-request": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -271,7 +271,7 @@
 		}
 	},
 	"language-learning-program-registration-request-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -286,7 +286,7 @@
 		}
 	},
 	"language-learning-program-registration-request-not-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -302,7 +302,7 @@
 	},
 	
 	"event-registration-request": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -317,7 +317,7 @@
 		}
 	},
 	"event-registration-request-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -332,7 +332,7 @@
 		}
 	},
 	"event-registration-request-not-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -348,7 +348,7 @@
 	},
 	
 	"workshop-registration-request": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -363,7 +363,7 @@
 		}
 	},		
 	"workshop-registration-request-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -378,7 +378,7 @@
 		}
 	},
 	"workshop-registration-request-not-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -394,7 +394,7 @@
 	},
 	
 	"meeting-request-accepted": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",
@@ -409,7 +409,7 @@
 		}
 	},
 	"meeting-request-canceled": {
-		"from": "Alaric Hermant<alaric_hermant@hotmail.com>",
+		"from": "CPA France <noreply.cpa@jrsfrance.org>",
 		"subject": {
 			"fr": "[Sujet à définir]",
 			"en": "[Subject to be defined]",

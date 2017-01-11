@@ -1,12 +1,13 @@
 package org.sjr.babel.web.endpoint;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.mail.internet.InternetAddress;
 import javax.transaction.Transactional;
 
-import org.hibernate.SessionFactory;
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.AbstractEntity;
 import org.sjr.babel.model.entity.Administrator;
@@ -84,7 +85,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	}
 	
 	@RequestMapping(path = "authz/passwordRecovery", method = RequestMethod.POST)
-	public ResponseEntity<?> passwordRecovery(@RequestBody SignInCommand input){
+	public ResponseEntity<?> passwordRecovery(@RequestBody SignInCommand input) throws UnsupportedEncodingException{
 		if (!StringUtils.hasText(input.realm) || !StringUtils.hasText(input.mailAddress)) {
 			Map<String, String> errors = new HashMap<>();
 			if(input.mailAddress == null) errors.put("mailAddress", null);
@@ -95,7 +96,10 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Refugee> _user = tryGetUser(input, Refugee.class);
 			if(_user.isPresent()){
 				Refugee refugee = _user.get();
-				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_RESET_PASSWORD, refugee.getFullName(), refugee.getMailAddress(), "fr", new MailBodyVars().add("accessKey", refugee.getAccount().getAccessKey()));
+				
+				InternetAddress to = new InternetAddress(refugee.getMailAddress(), refugee.getFullName());
+				MailBodyVars mailBodyVars = new MailBodyVars().add("accessKey", refugee.getAccount().getAccessKey());
+				MailCommand mailCommand = new MailCommand(MailType.REFUGEE_RESET_PASSWORD, to, "fr", mailBodyVars);
 				mailHelper.send(mailCommand);
 			}
 		}
@@ -103,7 +107,10 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Organisation> _user = tryGetUser(input, Organisation.class);
 			if(_user.isPresent()){
 				Organisation organisation = _user.get();
-				MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_RESET_PASSWORD, organisation.getName(), organisation.getMailAddress(), "fr", new MailBodyVars().add("accessKey", organisation.getAccount().getAccessKey()));
+				
+				InternetAddress to = new InternetAddress(organisation.getMailAddress(), organisation.getName());
+				MailBodyVars mailBodyVars = new MailBodyVars().add("accessKey", organisation.getAccount().getAccessKey());
+				MailCommand mailCommand = new MailCommand(MailType.ORGANISATION_RESET_PASSWORD, to, "fr", mailBodyVars);
 				mailHelper.send(mailCommand);
 			}
 		}
@@ -111,7 +118,10 @@ public class AuthzEndpoint extends AbstractEndpoint {
 			Optional<Volunteer> _user = tryGetUser(input, Volunteer.class);
 			if(_user.isPresent()){
 				Volunteer volunteer = _user.get();
-				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_RESET_PASSWORD, volunteer.getFullName(), volunteer.getMailAddress(), "fr", new MailBodyVars().add("accessKey", volunteer.getAccount().getAccessKey()));
+				
+				InternetAddress to = new InternetAddress(volunteer.getMailAddress(), volunteer.getFullName());
+				MailBodyVars mailBodyVars = new MailBodyVars().add("accessKey", volunteer.getAccount().getAccessKey());
+				MailCommand mailCommand = new MailCommand(MailType.VOLUNTEER_RESET_PASSWORD, to, "fr", mailBodyVars);
 				mailHelper.send(mailCommand);
 			}
 		}
@@ -127,7 +137,7 @@ public class AuthzEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "authentication", method = RequestMethod.POST)
 	@Transactional
-	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) {
+	public ResponseEntity<?> signIn(@RequestBody SignInCommand input) throws InterruptedException {
 		if (input.accessKey == null && (input.mailAddress == null || input.password == null || input.realm == null)) {
 			Map<String, String> errors = new HashMap<>();
 			if(!StringUtils.hasText(input.mailAddress)) errors.put("mailAddress", "_");

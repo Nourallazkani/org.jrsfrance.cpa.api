@@ -2,6 +2,8 @@ package org.sjr.babel.web.helper;
 
 import java.io.IOException;
 
+import javax.mail.internet.InternetAddress;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,7 +39,8 @@ public class MailHelperTest {
 		for(MailType mt : MailType.values()){
 			for(String language : new String[]{"fr", "en", "ar", "prs"}){
 				MailBodyVars mb = new MailBodyVars().add("var1", "??").add("var2", null);
-				MailCommand command = new MailCommand(mt, "Alaric", "a@a.fr", language, mb);
+				InternetAddress to = new InternetAddress("a@a.fr", "John Doe");
+				MailCommand command = new MailCommand(mt, to, language, mb);
 				SendMailOutcome resp = helper.send(command);
 				
 				String templateName = mt.name().toLowerCase().replace("_", "-");
@@ -53,8 +56,9 @@ public class MailHelperTest {
 		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 		for(MailType mt : MailType.values()){
 			for(String language : new String[]{"fr", "en", "ar", "prs"}){
-				
-				MailCommand command = new MailCommand(mt, "Alaric", "a@a.fr", language, null);
+				InternetAddress to = new InternetAddress("a@a.fr", "John Doe");
+
+				MailCommand command = new MailCommand(mt, to, language, null);
 				SendMailOutcome resp = helper.send(command);
 				
 				String templateName = mt.name().toLowerCase().replace("_", "-");

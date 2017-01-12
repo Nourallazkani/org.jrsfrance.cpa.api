@@ -1,10 +1,14 @@
-classes de J2SE utilisées (en plus des primitifs) : String, Date, List, Set, Map
+classes de Java SE utilisées (en plus des primitifs) : String, Date, List, Set, Map
 
-Autres objets : 
+couplages avec les API Java EE : 
+	- JPA : le contexte de persistence peut-être injecté (@PersistenceContext sur un champ de type EntityManager). Voir JpaObjectStoreImpl.
+	- JTA : reconnaissance de l'annotaiton @javax.transaction.Transactional
+	- bean validation : reconnaissance de l'annotation @Valid, délégation de la validation à hibernate validator (implémentation de l'API bean validation).
+	- servlet : Spring MVC est une surcouche à Servlet.
+
+Objets Spring
 	org.springframework.context.ApplicationContext pour le contexte spring
 	org.springframework.core.env.Environment pour l'environnement
-	javax.sql.DataSource pour la connexion à la base, 
-	javax.persistence.EntityManagerFactory et javax.persistence.EntityManager pour JPA
 	PlatformTransactionManager pour la gestion de transactions.
 	ResponseEntity pour REST
 
@@ -13,7 +17,7 @@ Les annotations :
 
 	configuration générale : 
 		@Configuration pour la classe de configuration
-		@ComponentScan pour activer la détection des @Component et dérivés de @Component (@Service, @Repository, etc...).
+		@ComponentScan pour activer la détection des @Component et dérivés de @Component (@Service, @Repository, @RestController, @Controller).
 		@EnableTransactionManagement pour activer la prise en charge des transactions avec l'annotation @Transactional
 			cela suppose d'avoir inscrit dans le contexte spring un PlatformTransactionManager (et donc la dépendance maven vers spring-orm)
 		@EnableScheduling pour activer les invocations planifiées
@@ -23,13 +27,12 @@ Les annotations :
 		  @Repository (pour l'accès aux données) 
 		  @RestController (pour les endpoints REST)
 		  D'autres existes : @Service, @Controller
+		@Bean pour les méthodes productrices. Celles ci servent à inscrire dans le contexte des instances de classes que nous ne pouvons pas annoter.
 
 	pour les injections
-		@Inject 
-		@Autowired (au lieu de @Inject) pour les injections facultatives (voir l'attribut required)
-		@PersistenceContext pour obtenir l'EntityManager lié à la transaction en cours
-		@PersistenceUnit pour obtenir l'entityManagerFactory
-		L'ApplicationContext spring et l'Environment spring sont injectable partout de manière automatique. 
+		@Autowired 
+		@PersistenceContext pour obtenir l'EntityManager lié à la transaction en cours (suppose d'avoir inscrit un EntityManagerFactory dans le contexte)
+		L'ApplicationContext spring et l'Environment spring sont injectable partout. 
 	
 	pour les callbacks :
 		@PostConstruct sur une méthode qui doit être invoquée après la préparation de l'objet (c'est à dire après instanciation et injection)
@@ -44,11 +47,7 @@ Les annotations :
 		  propagation MANDATORY pour la couche business et persistence.
 		  prérequis pour les transactions : 
 			- la présence d'un PlatformTransactionManager dans le contexte
-			- l'annotation @EnableTransactionManagement sur la classe de config.
-		@javax.annotation.security.RolesAllowed ou @Secured pour la sécurité
-		  prérequis pour la sécurité :
-			- un authenticationManager
-			- un référentiels utilisateur (in memory, ldap, jdbc...).
+			- l'annotation @EnableTransactionManagement sur la classe de configuration.
 
 	pour l'aguillage des requêtes http vers les méthodes : 
 		@RequestMapping et, sur les paramètres annotés par @RequestMapping :
@@ -58,7 +57,9 @@ Les annotations :
 			- pour récupérer le body de la requête (déserialisé) : @RequestBody
 			- pour récupérer une valeur dans la session : @SessionAttribute
 			- pour récupérer une valeur dans le cookie : @CookieValue
-
+		Les méthodes annotées par @RequestMapping renvoie la plupart du temps un ResponseEntity, qui encapsule le body, le statut et les en-tête.
+		
 	pour les tests : 
 		@RunWith pour lier Spring à Junit
 		@ContextConfiguration pour indiquer à Spring quel(s) contexte(s) utiliser.
+		@WebAppConfiguration pour simuler

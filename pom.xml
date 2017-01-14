@@ -32,7 +32,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
+				<version>3.6.0</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -66,9 +66,10 @@
 					<scanIntervalSeconds>3</scanIntervalSeconds>
 					<webAppSourceDirectory>WebContent</webAppSourceDirectory>
 				</configuration>
-			</plugin>
+			</plugin>		
 		</plugins>
 	</build>
+	
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -201,14 +202,33 @@
 
 
 	<profiles>
-		<profile>
-			<id>aws</id>
-			<properties>
-				<db.server>cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com</db.server>
-				<db.name>cpa_rec</db.name>
-				<db.username>cpa</db.username>
-				<db.password>montaigoual</db.password>
-			</properties>
-		</profile>
+	<profile>
+		<id>aws</id>
+		<!-- <properties> <db.server>cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com</db.server> 
+			<db.name>cpa_rec</db.name> <db.username>cpa</db.username> <db.password>montaigoual</db.password> 
+			</properties> -->
+		<build>
+			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>properties-maven-plugin</artifactId>
+					<version>1.0.0</version>
+					<executions>
+						<execution>
+							<phase>initialize</phase>
+							<goals>
+								<goal>read-project-properties</goal>
+							</goals>
+							<configuration>
+								<files>
+									<file>deploy.properties</file>
+								</files>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+			</plugins>
+		</build>
+	</profile>
 	</profiles>
 </project>

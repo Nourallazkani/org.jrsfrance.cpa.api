@@ -1,6 +1,7 @@
 package org.sjr.babel.web.endpoint;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -255,20 +256,23 @@ public abstract class AbstractEndpoint {
 	}
 	
 	static class RegistrationSummary{
+		public int id;
 		public ContactSummary refugee;
-		public Date acceptationDate;
+		public LocalDate requestDate, decisionDate;
 		public Boolean accepted;
-		
 		public RegistrationSummary() {}
 		
 		public RegistrationSummary(Registration r) {
+			this.id = r.getRefugee().getId();
 			Contact contact = new Contact();
 			contact.setMailAddress(r.getRefugee().getMailAddress());
 			contact.setName(r.getRefugee().getFullName());
 			contact.setPhoneNumber(r.getRefugee().getPhoneNumber());
 			this.refugee = new ContactSummary(contact);
-			this.acceptationDate = r.getRegistrationDate();
+			this.requestDate = r.getRequestDate();
+			this.decisionDate = r.getDecisionDate();
 			this.accepted = r.getAccepted();
+			
 		}	
 	}
 	

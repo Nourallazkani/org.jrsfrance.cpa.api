@@ -22,6 +22,8 @@ public class Teaching extends AbstractEntity {
 	private String link;
 	
 	private LocalDate registrationOpeningDate, registrationClosingDate;
+
+	private Integer maxAge, minAge;
 	
 	@ManyToOne
 	private FieldOfStudy fieldOfStudy;
@@ -52,6 +54,22 @@ public class Teaching extends AbstractEntity {
 
 	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
 		this.registrationClosingDate = registrationClosingDate;
+	}
+
+	public Integer getMaxAge() {
+		return maxAge;
+	}
+
+	public void setMaxAge(Integer maxAge) {
+		this.maxAge = maxAge;
+	}
+
+	public Integer getMinAge() {
+		return minAge;
+	}
+
+	public void setMinAge(Integer minAge) {
+		this.minAge = minAge;
 	}
 
 	public Boolean getMaster() {

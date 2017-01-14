@@ -38,13 +38,16 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	private String subject, description, link;
 	
-	
 	@Convert(converter = MultiLanguageTextConverter.class) @Column(columnDefinition = "json", insertable = false, updatable = false)
 	private MultiLanguageText subjectI18n, descriptionI18n;
 		
 	private LocalDate registrationOpeningDate, registrationClosingDate;
 
 	private LocalDateTime startDate, endDate;
+	
+	private Integer maxAge, minAge;
+	
+	private Boolean forWomenOnly;
 
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
@@ -167,6 +170,30 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
 		this.registrationClosingDate = registrationClosingDate;
+	}
+
+	public Integer getMaxAge() {
+		return maxAge;
+	}
+
+	public void setMaxAge(Integer maxAge) {
+		this.maxAge = maxAge;
+	}
+
+	public Integer getMinAge() {
+		return minAge;
+	}
+
+	public void setMinAge(Integer minAge) {
+		this.minAge = minAge;
+	}
+
+	public Boolean getForWomenOnly() {
+		return forWomenOnly;
+	}
+
+	public void setForWomenOnly(Boolean forWomenOnly) {
+		this.forWomenOnly = forWomenOnly;
 	}
 
 	@Entity

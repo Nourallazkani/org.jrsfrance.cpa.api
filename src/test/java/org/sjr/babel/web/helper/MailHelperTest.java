@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sjr.babel.SpringConfig;
@@ -32,7 +33,7 @@ public class MailHelperTest {
 	@Autowired
 	private MailHelper helper;
 	
-	@Test
+	@Test @Ignore
 	public void testSendWithBodyVars() throws JsonProcessingException, IOException {
 		ObjectMapper jackson = new ObjectMapper();
 		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
@@ -50,7 +51,7 @@ public class MailHelperTest {
 		}
 	}
 	
-	@Test
+	@Test @Ignore
 	public void testSendWithoutBodyVars() throws JsonProcessingException, IOException {
 		ObjectMapper jackson = new ObjectMapper();
 		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));

@@ -2,7 +2,6 @@ package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +59,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		public boolean openForRegistration;
 		@NotNull @Valid
 		public ContactSummary contact;
+		public Integer minAge,maxAge;
+		public Boolean forWomenOnly;
 		
 		
 		@JsonInclude(value=Include.NON_NULL)
@@ -78,6 +79,10 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			this.registrationClosingDate = entity.getRegistrationClosingDate();
 			this.startDate = entity.getStartDate();
 			this.endDate = entity.getEndDate();
+			this.minAge = entity.getMinAge();
+			this.maxAge = entity.getMaxAge();
+			this.forWomenOnly = entity.getForWomenOnly();			
+			
 			if(entity.getContact()!=null){
 				this.contact = new ContactSummary(entity.getContact());
 			}
@@ -355,7 +360,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@RequestMapping(path={"language-programs/{id}/registrations" ,"professional-programs/{id}/registrations"}, method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> addRegistration (@PathVariable int id, @RequestHeader("accessKey") String refugeeAccessKey) {
-		Date now = new Date();
+		
 		Optional<AbstractLearningProgram> _lp = objectStore.getById(AbstractLearningProgram.class, id);
 		if (!_lp.isPresent()){
 			return notFound();
@@ -379,9 +384,9 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			}
 		}*/
 		Registration reg = new Registration();
-		reg.setAccepted(null);
+		
 		reg.setRefugee(r);
-		reg.setRegistrationDate(now);
+		reg.setRequestDate(LocalDate.now());
 		lp.getRegistrations().add(reg);
 		return created(getUri(getPath()+"/"+r.getId()),new RegistrationSummary(reg));
 	}
@@ -412,6 +417,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		// verification si il y a de changement? (acceptation ou pas)
 		Registration reg = _reg.get();
 		reg.setAccepted(input.accepted);
+		reg.setDecisionDate(LocalDate.now());
 		return noContent();
 	}
 	

@@ -30,6 +30,10 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	private LocalDate startDate, endDate;
 
+	private Integer maxAge, minAge;
+	
+	private Boolean forWomenOnly;
+	
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Organisation organisation;
 
@@ -100,6 +104,30 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
 		this.registrationClosingDate = registrationClosingDate;
+	}
+	
+	public Integer getMaxAge() {
+		return maxAge;
+	}
+
+	public void setMaxAge(Integer maxAge) {
+		this.maxAge = maxAge;
+	}
+
+	public Integer getMinAge() {
+		return minAge;
+	}
+
+	public void setMinAge(Integer minAge) {
+		this.minAge = minAge;
+	}
+
+	public Boolean getForWomenOnly() {
+		return forWomenOnly;
+	}
+
+	public void setForWomenOnly(Boolean forWomenOnly) {
+		this.forWomenOnly = forWomenOnly;
 	}
 
 	public Organisation getOrganisation() {

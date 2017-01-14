@@ -4,7 +4,6 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +54,8 @@ public class EventEndpoint extends AbstractEndpoint {
 		public LocalDate registrationOpeningDate,registrationClosingDate;
 		@NotNull @Valid
 		public ContactSummary contact;
+		public Integer minAge,maxAge;
+		public Boolean forWomenOnly;
 
 		public EventSummary() {	} // for jackson deserialisation
 		
@@ -73,6 +74,9 @@ public class EventEndpoint extends AbstractEndpoint {
 			this.type = safeTransform(entity.getType(), x -> x.getName());
 			this.link = entity.getLink();
 			this.contact = safeTransform(entity.getContact(), ContactSummary::new);
+			this.minAge = entity.getMinAge();
+			this.maxAge = entity.getMaxAge();
+			this.forWomenOnly = entity.getForWomenOnly();
 			if (entity instanceof VolunteerEvent) {
 				VolunteerEvent e = (VolunteerEvent) entity;
 				this.organisedBy = e.getVolunteer().getFullName();
@@ -371,7 +375,7 @@ public class EventEndpoint extends AbstractEndpoint {
 	@RequestMapping(path={"events/{id}/registrations" ,"workshops/{id}/registrations"}, method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> addRegistration (@PathVariable int id, @RequestHeader("accessKey") String refugeeAccessKey) {
-		Date now = new Date();
+		
 		Optional<AbstractEvent> _ae = objectStore.getById(AbstractEvent.class, id);
 		if (!_ae.isPresent()){
 			return notFound();
@@ -389,9 +393,8 @@ public class EventEndpoint extends AbstractEndpoint {
 		}
 		
 		Registration reg = new Registration();
-		reg.setAccepted(null);
 		reg.setRefugee(r);
-		reg.setRegistrationDate(now);
+		reg.setRequestDate(LocalDate.now());
 		abstractEvent.getRegistrations().add(reg);
 		return created(getUri(getPath()+"/"+r.getId()), new RegistrationSummary(reg));
 	}
@@ -422,6 +425,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		// verification si il y a de changement? (acceptation ou pas)
 		Registration reg = _reg.get();
 		reg.setAccepted(input.accepted);
+		reg.setDecisionDate(LocalDate.now());
 		return noContent();
 	}
 	

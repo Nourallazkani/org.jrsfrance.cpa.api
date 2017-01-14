@@ -1,7 +1,6 @@
 package org.sjr.babel.web.endpoint;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public Boolean master,licence;
 		@NotNull
 		public LocalDate registrationOpeningDate,registrationClosingDate;
-		// public List<Link> links;
+		public Integer minAge, maxAge;
 
 		public TeachingSummary(){
 			
@@ -63,6 +62,8 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			this.licence = entity.getLicence();
 			this.registrationOpeningDate = entity.getRegistrationOpeningDate();
 			this.registrationClosingDate = entity.getRegistrationClosingDate();
+			this.minAge = entity.getMinAge();
+			this.maxAge = entity.getMaxAge();
 		}
 	}
 	
@@ -258,7 +259,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 	@RequestMapping(path={"/{id}/registrations"}, method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> addRegistration (@PathVariable int id, @RequestHeader("accessKey") String refugeeAccessKey) {
-		Date now = new Date();
+		
 		Optional<Teaching> _teaching = objectStore.getById(Teaching.class, id);
 		if (!_teaching.isPresent()){
 			return notFound();
@@ -275,7 +276,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 
 		Registration reg = new Registration();
 		reg.setRefugee(r);
-		reg.setRegistrationDate(now);
+		reg.setRequestDate(LocalDate.now());
 		teaching.getRegistrations().add(reg);
 		return created(getUri(getPath()+"/"+r.getId()), new RegistrationSummary(reg));
 	}
@@ -303,6 +304,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 		Registration reg = new Registration();
 		reg.setAccepted(input.accepted);
+		reg.setDecisionDate(LocalDate.now());
 		return noContent();
 	}
 	

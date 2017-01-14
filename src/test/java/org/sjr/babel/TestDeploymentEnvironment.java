@@ -26,9 +26,7 @@ import org.w3c.dom.Node;
 
 public class TestDeploymentEnvironment {
 
-	//private Logger logger= LoggerFactory.getLogger(getClass());
-	
-	
+
 	@Test
 	public void testDbSchema() throws Exception{
 

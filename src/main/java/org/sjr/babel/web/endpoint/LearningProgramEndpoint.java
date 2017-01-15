@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.GenderRestriction;
 import org.sjr.babel.model.StatusRestriction;
 import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.AbstractLearningProgram;
@@ -27,7 +28,6 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.reference.LanguageLearningProgramType;
 import org.sjr.babel.model.entity.reference.Level;
 import org.sjr.babel.model.entity.reference.ProfessionalLearningProgramDomain;
-import org.sjr.babel.web.endpoint.AbstractEndpoint.RegistrationSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -42,8 +42,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -67,9 +65,9 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		// restrictions
 		@NotNull @Size(min = 1)
 		public String level;
-		public String statusRestriction;
 		public Integer minAge,maxAge;
-		public Boolean forWomenOnly;
+		public String statusRestriction;
+		public String genderRestriction;
 		
 		// calculated fields
 		public String organisation;
@@ -94,8 +92,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			this.level = safeTransform(entity.getLevel(), x -> x.getName());
 			this.minAge = entity.getMinAge();
 			this.maxAge = entity.getMaxAge();
-			this.forWomenOnly = entity.getForWomenOnly();
-			this.statusRestriction = safeTransform(entity.getStatusRestriction(), x -> x.name());
+			this.genderRestriction = safeTransform(entity.getGenderRestriction(), x->x.name());
+			this.statusRestriction = safeTransform(entity.getStatusRestriction(), x->x.name());
 			
 			if(entity.getContact()!=null){
 				this.contact = new ContactSummary(entity.getContact());
@@ -303,10 +301,11 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		// restrictions
 		entity.setLevel(this.refDataProvider.resolve(Level.class, input.level));
-		entity.setForWomenOnly(input.forWomenOnly);
+		
 		entity.setMinAge(input.minAge);
 		entity.setMaxAge(input.maxAge);
-		entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
+		entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
+		entity.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
 		
 		objectStore.save(entity);
 		return noContent();
@@ -372,12 +371,11 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		// restrictions
 		entity.setLevel(this.refDataProvider.resolve(Level.class, input.level));
-		entity.setForWomenOnly(input.forWomenOnly);
+		
 		entity.setMinAge(input.minAge);
 		entity.setMaxAge(input.maxAge);
-		entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
-		
-		
+		entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
+		entity.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
 		
 		objectStore.save(entity);
 		input.id = entity.getId();

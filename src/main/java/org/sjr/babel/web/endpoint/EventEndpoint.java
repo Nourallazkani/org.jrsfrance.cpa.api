@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.GenderRestriction;
 import org.sjr.babel.model.StatusRestriction;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.MultiLanguageText;
@@ -30,7 +31,6 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.EventType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,7 +63,7 @@ public class EventEndpoint extends AbstractEndpoint {
 		// restrictions
 		public String level;
 		public Integer minAge,maxAge;
-		public Boolean forWomenOnly;
+		public String genderRestriction;
 		public String statusRestriction;
 		
 		@JsonInclude(value=Include.NON_NULL)
@@ -91,9 +91,8 @@ public class EventEndpoint extends AbstractEndpoint {
 			this.level = safeTransform(entity.getLanguageLevelRequired(), x -> x.getName());
 			this.minAge = entity.getMinAge();
 			this.maxAge = entity.getMaxAge();
-			this.forWomenOnly = entity.getForWomenOnly();
+			this.genderRestriction = safeTransform(entity.getGenderRestriction(), x -> x.name());
 			this.statusRestriction = safeTransform(entity.getStatusRestriction(), x -> x.name());
-		
 			
 			if (entity instanceof VolunteerEvent) {
 				VolunteerEvent e = (VolunteerEvent) entity;
@@ -290,10 +289,10 @@ public class EventEndpoint extends AbstractEndpoint {
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
 		
 		// restrictions
-		event.setForWomenOnly(input.forWomenOnly);
 		event.setMinAge(input.minAge);
 		event.setMaxAge(input.maxAge);
-		event.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
+		event.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
+		event.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
 		return noContent();
 
 	}
@@ -373,10 +372,10 @@ public class EventEndpoint extends AbstractEndpoint {
 		event.setEndDate(input.endDate);
 		
 		// restrictions
-		event.setForWomenOnly(input.forWomenOnly);
 		event.setMinAge(input.minAge);
 		event.setMaxAge(input.maxAge);
-		event.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
+		event.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
+		event.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
 		
 		this.objectStore.save(event);
 		input.id = event.getId();

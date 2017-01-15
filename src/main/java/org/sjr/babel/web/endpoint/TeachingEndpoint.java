@@ -21,7 +21,6 @@ import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -205,7 +204,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			entity.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
 			entity.setMinAge(input.minAge);
 			entity.setMaxAge(input.maxAge);
-			entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
+			entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
 			
 			objectStore.save(entity);
 			return noContent();
@@ -253,7 +252,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		entity.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
 		entity.setMinAge(input.minAge);
 		entity.setMaxAge(input.maxAge);
-		entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
+		entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
 		
 		objectStore.save(entity);
 		

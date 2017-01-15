@@ -52,9 +52,6 @@
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
-				<configuration>
-					<warSourceDirectory>WebContent</warSourceDirectory>
-				</configuration>
 			</plugin>
 			<plugin>
 				<!-- permet de lancer maven avec jetty:run, l'application est ensuite 
@@ -64,7 +61,6 @@
 				<version>9.3.3.v20150827</version>
 				<configuration>
 					<scanIntervalSeconds>3</scanIntervalSeconds>
-					<webAppSourceDirectory>WebContent</webAppSourceDirectory>
 				</configuration>
 			</plugin>		
 		</plugins>
@@ -204,9 +200,6 @@
 	<profiles>
 	<profile>
 		<id>aws</id>
-		<!-- <properties> <db.server>cpa-postgresql.c0patx0njnp3.eu-west-1.rds.amazonaws.com</db.server> 
-			<db.name>cpa_rec</db.name> <db.username>cpa</db.username> <db.password>montaigoual</db.password> 
-			</properties> -->
 		<build>
 			<plugins>
 				<plugin>

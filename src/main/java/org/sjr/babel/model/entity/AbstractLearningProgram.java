@@ -7,11 +7,14 @@ import javax.persistence.Convert;
 import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 
+import org.sjr.babel.model.StatusRestriction;
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.Contact.ContactConverter;
@@ -34,7 +37,10 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	
 	private Boolean forWomenOnly;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+	@Enumerated(EnumType.STRING)
+	private StatusRestriction statusRestriction;
+	
+	@ManyToOne(fetch = FetchType.EAGER, optional = false)
 	private Organisation organisation;
 
 	@Convert(converter = ContactConverter.class)
@@ -46,7 +52,6 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	@ElementCollection
 	private List<Registration> registrations;
 	
-
 	@ManyToOne
 	private Level level;
 
@@ -74,6 +79,22 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 		this.groupSize = groupSize;
 	}
 
+	public LocalDate getRegistrationOpeningDate() {
+		return registrationOpeningDate;
+	}
+
+	public void setRegistrationOpeningDate(LocalDate registrationOpeningDate) {
+		this.registrationOpeningDate = registrationOpeningDate;
+	}
+
+	public LocalDate getRegistrationClosingDate() {
+		return registrationClosingDate;
+	}
+
+	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
+		this.registrationClosingDate = registrationClosingDate;
+	}
+
 	public LocalDate getStartDate() {
 		return startDate;
 	}
@@ -90,22 +111,6 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 		this.endDate = endDate;
 	}
 
-	public LocalDate getRegistrationOpeningDate() {
-		return registrationOpeningDate;
-	}
-
-	public void setRegistrationOpeningDate(LocalDate registrationOpeningDate) {
-		this.registrationOpeningDate = registrationOpeningDate;
-	}
-
-	public LocalDate getRegistrationClosingDate() {
-		return registrationClosingDate;
-	}
-
-	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
-		this.registrationClosingDate = registrationClosingDate;
-	}
-	
 	public Integer getMaxAge() {
 		return maxAge;
 	}
@@ -128,6 +133,14 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 
 	public void setForWomenOnly(Boolean forWomenOnly) {
 		this.forWomenOnly = forWomenOnly;
+	}
+
+	public StatusRestriction getStatusRestriction() {
+		return statusRestriction;
+	}
+
+	public void setStatusRestriction(StatusRestriction statusRestriction) {
+		this.statusRestriction = statusRestriction;
 	}
 
 	public Organisation getOrganisation() {
@@ -153,6 +166,7 @@ public abstract class AbstractLearningProgram extends AbstractEntity {
 	public void setAddress(Address address) {
 		this.address = address;
 	}
+
 	public List<Registration> getRegistrations() {
 		return registrations;
 	}

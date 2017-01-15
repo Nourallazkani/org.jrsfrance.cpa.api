@@ -17,6 +17,7 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 
+import org.sjr.babel.model.StatusRestriction;
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.Contact.ContactConverter;
@@ -24,6 +25,7 @@ import org.sjr.babel.model.component.MultiLanguageText;
 import org.sjr.babel.model.component.MultiLanguageText.MultiLanguageTextConverter;
 import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.reference.EventType;
+import org.sjr.babel.model.entity.reference.Level;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -48,7 +50,13 @@ public abstract class AbstractEvent extends AbstractEntity {
 	private Integer maxAge, minAge;
 	
 	private Boolean forWomenOnly;
+	
+	@Enumerated(EnumType.STRING)
+	private StatusRestriction statusRestriction;
 
+	@ManyToOne
+	private Level languageLevelRequired;
+	
 	@Convert(converter = ContactConverter.class)
 	private Contact contact;
 
@@ -69,6 +77,14 @@ public abstract class AbstractEvent extends AbstractEntity {
 		this.audience = audience;
 	}
 
+	public String getSubject() {
+		return subject;
+	}
+
+	public void setSubject(String subject) {
+		this.subject = subject;
+	}
+
 	public String getDescription() {
 		return description;
 	}
@@ -77,14 +93,14 @@ public abstract class AbstractEvent extends AbstractEntity {
 		this.description = description;
 	}
 
-	public String getSubject() {
-		return subject;
+	public String getLink() {
+		return link;
 	}
 
-	public void setSubject(String subject) {
-		this.subject = subject;
+	public void setLink(String link) {
+		this.link = link;
 	}
-	
+
 	public MultiLanguageText getSubjectI18n() {
 		return subjectI18n;
 	}
@@ -101,43 +117,20 @@ public abstract class AbstractEvent extends AbstractEntity {
 		this.descriptionI18n = descriptionI18n;
 	}
 
-	public String getLink() {
-		return link;
+	public LocalDate getRegistrationOpeningDate() {
+		return registrationOpeningDate;
 	}
 
-	public void setLink(String link) {
-		this.link = link;
+	public void setRegistrationOpeningDate(LocalDate registrationOpeningDate) {
+		this.registrationOpeningDate = registrationOpeningDate;
 	}
 
-	public Contact getContact() {
-		return contact;
+	public LocalDate getRegistrationClosingDate() {
+		return registrationClosingDate;
 	}
 
-	public void setContact(Contact contact) {
-		this.contact = contact;
-	}
-
-	public EventType getType() {
-		return type;
-	}
-
-	public void setType(EventType type) {
-		this.type = type;
-	}
-
-	public Address getAddress() {
-		return address;
-	}
-
-	public void setAddress(Address address) {
-		this.address = address;
-	}
-	public List<Registration> getRegistrations() {
-		return registrations;
-	}
-
-	public void setRegistrations(List<Registration> registratios) {
-		this.registrations = registratios;
+	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
+		this.registrationClosingDate = registrationClosingDate;
 	}
 
 	public LocalDateTime getStartDate() {
@@ -154,22 +147,6 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	public void setEndDate(LocalDateTime endDate) {
 		this.endDate = endDate;
-	}
-
-	public LocalDate getRegistrationOpeningDate() {
-		return registrationOpeningDate;
-	}
-
-	public void setRegistrationOpeningDate(LocalDate registrationOpeningDate) {
-		this.registrationOpeningDate = registrationOpeningDate;
-	}
-
-	public LocalDate getRegistrationClosingDate() {
-		return registrationClosingDate;
-	}
-
-	public void setRegistrationClosingDate(LocalDate registrationClosingDate) {
-		this.registrationClosingDate = registrationClosingDate;
 	}
 
 	public Integer getMaxAge() {
@@ -194,6 +171,54 @@ public abstract class AbstractEvent extends AbstractEntity {
 
 	public void setForWomenOnly(Boolean forWomenOnly) {
 		this.forWomenOnly = forWomenOnly;
+	}
+
+	public StatusRestriction getStatusRestriction() {
+		return statusRestriction;
+	}
+
+	public void setStatusRestriction(StatusRestriction statusRestriction) {
+		this.statusRestriction = statusRestriction;
+	}
+
+	public Level getLanguageLevelRequired() {
+		return languageLevelRequired;
+	}
+
+	public void setLanguageLevelRequired(Level languageLevelRequired) {
+		this.languageLevelRequired = languageLevelRequired;
+	}
+
+	public Contact getContact() {
+		return contact;
+	}
+
+	public void setContact(Contact contact) {
+		this.contact = contact;
+	}
+
+	public Address getAddress() {
+		return address;
+	}
+
+	public void setAddress(Address address) {
+		this.address = address;
+	}
+
+	public List<Registration> getRegistrations() {
+		return registrations;
+	}
+
+	public void setRegistrations(List<Registration> registrations) {
+		this.registrations = registrations;
+	}
+
+	public EventType getType() {
+		return type;
+	}
+
+	public void setType(EventType type) {
+		this.type = type;
 	}
 
 	@Entity

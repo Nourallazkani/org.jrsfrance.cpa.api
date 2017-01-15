@@ -16,6 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.StatusRestriction;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.MultiLanguageText;
 import org.sjr.babel.model.component.Registration;
@@ -29,6 +30,7 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.Volunteer;
 import org.sjr.babel.model.entity.reference.EventType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +39,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @RestController
 public class EventEndpoint extends AbstractEndpoint {
@@ -54,9 +59,16 @@ public class EventEndpoint extends AbstractEndpoint {
 		public LocalDate registrationOpeningDate,registrationClosingDate;
 		@NotNull @Valid
 		public ContactSummary contact;
+
+		// restrictions
+		public String level;
 		public Integer minAge,maxAge;
 		public Boolean forWomenOnly;
-
+		public String statusRestriction;
+		
+		@JsonInclude(value=Include.NON_NULL)
+		public Boolean alreadyRegisterd;
+		
 		public EventSummary() {	} // for jackson deserialisation
 		
 		public EventSummary(AbstractEvent entity, String language) {
@@ -74,9 +86,15 @@ public class EventEndpoint extends AbstractEndpoint {
 			this.type = safeTransform(entity.getType(), x -> x.getName());
 			this.link = entity.getLink();
 			this.contact = safeTransform(entity.getContact(), ContactSummary::new);
+			
+			// restrictions
+			this.level = safeTransform(entity.getLanguageLevelRequired(), x -> x.getName());
 			this.minAge = entity.getMinAge();
 			this.maxAge = entity.getMaxAge();
 			this.forWomenOnly = entity.getForWomenOnly();
+			this.statusRestriction = safeTransform(entity.getStatusRestriction(), x -> x.name());
+		
+			
 			if (entity instanceof VolunteerEvent) {
 				VolunteerEvent e = (VolunteerEvent) entity;
 				this.organisedBy = e.getVolunteer().getFullName();
@@ -271,6 +289,11 @@ public class EventEndpoint extends AbstractEndpoint {
 		event.setRegistrationClosingDate(input.registrationClosingDate);
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
 		
+		// restrictions
+		event.setForWomenOnly(input.forWomenOnly);
+		event.setMinAge(input.minAge);
+		event.setMaxAge(input.maxAge);
+		event.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
 		return noContent();
 
 	}
@@ -348,6 +371,12 @@ public class EventEndpoint extends AbstractEndpoint {
 		event.setRegistrationOpeningDate(input.registrationOpeningDate);
 		event.setStartDate(input.startDate);
 		event.setEndDate(input.endDate);
+		
+		// restrictions
+		event.setForWomenOnly(input.forWomenOnly);
+		event.setMinAge(input.minAge);
+		event.setMaxAge(input.maxAge);
+		event.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
 		
 		this.objectStore.save(event);
 		input.id = event.getId();

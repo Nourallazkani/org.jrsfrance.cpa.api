@@ -2,6 +2,7 @@ package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.StatusRestriction;
 import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.AbstractLearningProgram;
 import org.sjr.babel.model.entity.Administrator;
@@ -25,6 +27,7 @@ import org.sjr.babel.model.entity.Refugee;
 import org.sjr.babel.model.entity.reference.LanguageLearningProgramType;
 import org.sjr.babel.model.entity.reference.Level;
 import org.sjr.babel.model.entity.reference.ProfessionalLearningProgramDomain;
+import org.sjr.babel.web.endpoint.AbstractEndpoint.RegistrationSummary;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
@@ -39,32 +42,39 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 @RestController @RequestMapping(path = "learnings")
 public class LearningProgramEndpoint extends AbstractEndpoint {
 	
-
 	static class LearningProgramSummary {
 		public Integer id;
-		@NotNull @Size(min = 1)
-		public String level;
-		public String organisation, link;
 		public Integer groupSize;
+			
+		public String link;
 		@NotNull @Valid
 		public AddressSummary address;
 		@NotNull
 		public LocalDate startDate, endDate, registrationOpeningDate,registrationClosingDate;
-		public boolean openForRegistration;
 		@NotNull @Valid
 		public ContactSummary contact;
+		@JsonInclude(value=Include.NON_NULL)
+		public String domain, type;
+		
+		// restrictions
+		@NotNull @Size(min = 1)
+		public String level;
+		public String statusRestriction;
 		public Integer minAge,maxAge;
 		public Boolean forWomenOnly;
 		
-		
+		// calculated fields
+		public String organisation;
 		@JsonInclude(value=Include.NON_NULL)
-		public String domain, type;
+		public Boolean alreadyRegisterd;
 		
 		LearningProgramSummary() {} // for jackson deserialisation
 		
@@ -79,9 +89,13 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			this.registrationClosingDate = entity.getRegistrationClosingDate();
 			this.startDate = entity.getStartDate();
 			this.endDate = entity.getEndDate();
+			
+			// restrictions
+			this.level = safeTransform(entity.getLevel(), x -> x.getName());
 			this.minAge = entity.getMinAge();
 			this.maxAge = entity.getMaxAge();
-			this.forWomenOnly = entity.getForWomenOnly();			
+			this.forWomenOnly = entity.getForWomenOnly();
+			this.statusRestriction = safeTransform(entity.getStatusRestriction(), x -> x.name());
 			
 			if(entity.getContact()!=null){
 				this.contact = new ContactSummary(entity.getContact());
@@ -115,7 +129,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"language-programs", "professional-programs"} ,method = RequestMethod.GET)
 	@Transactional
-	public List<LearningProgramSummary> search(
+	public ResponseEntity<?> search(
 			@RequestParam(required=false, name = "city") String city, 
 			@RequestParam(required=false) Integer levelId,
 			@RequestParam(required=false) Integer domainId,
@@ -124,7 +138,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			@RequestParam(defaultValue="false") boolean includePastEvents,
 			@RequestParam(defaultValue="true") boolean includeFutureEvents,
 			@RequestParam(defaultValue="false") boolean includeClosedEvents,
-			@RequestParam(required=false) Boolean openForRegistration
+			@RequestParam(required=false) Boolean openForRegistration,
+			@RequestHeader(required=false) String accessKey
 		) { 
 		
 		Class<? extends AbstractLearningProgram > targetClass = requestedPathEquals("learnings/language-programs") ? LanguageLearningProgram.class : ProfessionalLearningProgram.class;
@@ -177,10 +192,27 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		}
 		
 		query.append("order by c.startDate");
-		List<? extends AbstractLearningProgram> results = objectStore.find(targetClass, query.toString(), args);
-		return results.stream()
+		List<LearningProgramSummary> results = objectStore.find(targetClass, query.toString(), args).stream()
 				.map(LearningProgramSummary::new)
 				.collect(Collectors.toList());
+		
+		if(!StringUtils.hasText(accessKey)){
+			return ok(results);
+		}
+		else{
+			Optional<Refugee> _refugee = getRefugeeByAccesskey(accessKey);
+			if(!_refugee.isPresent()){
+				return forbidden();
+			}
+			else{
+				Refugee refugee = _refugee.get();
+				List<AbstractLearningProgram> lp = new ArrayList<>();
+				for (LearningProgramSummary learningProgramSummary : results) {
+					learningProgramSummary.alreadyRegisterd = lp.stream().anyMatch(x -> x.getId().equals(learningProgramSummary.id));
+				}
+				return ok(results);
+			}
+		}
 	}
 
 	@RequestMapping(path = {"language-programs/{id}", "professional-programs/{id}"}, method = RequestMethod.GET)
@@ -269,7 +301,12 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		entity.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 		entity.setContact(safeTransform(input.contact, x -> x.toContact()));
 		
+		// restrictions
 		entity.setLevel(this.refDataProvider.resolve(Level.class, input.level));
+		entity.setForWomenOnly(input.forWomenOnly);
+		entity.setMinAge(input.minAge);
+		entity.setMaxAge(input.maxAge);
+		entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
 		
 		objectStore.save(entity);
 		return noContent();
@@ -280,7 +317,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	@RequestMapping(path = {"language-programs", "professional-programs"}, method = RequestMethod.POST)
 	@Transactional
 	public ResponseEntity<?> create(@RequestBody @Valid LearningProgramSummary input, BindingResult binding, @RequestHeader String accessKey) throws JsonParseException, JsonMappingException, IOException {
-		if(input.id!=null){
+		if(input.id != null){
 			return badRequest();
 		}
 		
@@ -306,6 +343,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			errors.put("domain", "_");
 		}		
 		if(!errors.isEmpty()){
+			errors.forEach((x, y)-> System.out.println(x+" "+y));
 			return badRequest(errors);
 		}
 		
@@ -332,7 +370,13 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		entity.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 		entity.setContact(safeTransform(input.contact, x -> x.toContact()));
 		
+		// restrictions
 		entity.setLevel(this.refDataProvider.resolve(Level.class, input.level));
+		entity.setForWomenOnly(input.forWomenOnly);
+		entity.setMinAge(input.minAge);
+		entity.setMaxAge(input.maxAge);
+		entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
+		
 		
 		
 		objectStore.save(entity);

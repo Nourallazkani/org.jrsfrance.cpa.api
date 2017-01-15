@@ -12,6 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.StatusRestriction;
 import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
@@ -20,6 +21,7 @@ import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Level;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
 @RestController @RequestMapping(path = "/teachings") @CrossOrigin
 public class TeachingEndpoint extends AbstractEndpoint {
 
@@ -37,7 +42,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public Integer id;
 		public String organisation;
 		@NotNull @Size(min = 1)
-		public String fieldOfStudy, languageLevelRequired;
+		public String fieldOfStudy;
 		public String link;
 		public AddressSummary address;
 		@NotNull @Valid
@@ -45,15 +50,21 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		public Boolean master,licence;
 		@NotNull
 		public LocalDate registrationOpeningDate,registrationClosingDate;
-		public Integer minAge, maxAge;
 
+		// restrictions
+		public String languageLevelRequired;
+		public Integer minAge, maxAge;
+		public String statusRestriction;
+
+		@JsonInclude(value=Include.NON_NULL)
+		public Boolean alreadyRegisterd;
+		
 		public TeachingSummary(){
 			
 		}
 		public TeachingSummary(Teaching entity) {
 			this.id = entity.getId();
 			this.fieldOfStudy = entity.getFieldOfStudy().getName();
-			this.languageLevelRequired  = entity.getLanguageLevelRequired().getName();
 			this.link = entity.getLink();
 			this.organisation = entity.getOrganisation().getName();
 			this.contact = safeTransform(entity.getContact(), ContactSummary::new);
@@ -62,8 +73,13 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			this.licence = entity.getLicence();
 			this.registrationOpeningDate = entity.getRegistrationOpeningDate();
 			this.registrationClosingDate = entity.getRegistrationClosingDate();
+			
+			// restrictions
+			this.languageLevelRequired = safeTransform(entity.getLanguageLevelRequired(), x -> x.getName());
 			this.minAge = entity.getMinAge();
 			this.maxAge = entity.getMaxAge();
+			this.statusRestriction = safeTransform(entity.getStatusRestriction(), x -> x.name());
+			
 		}
 	}
 	
@@ -160,9 +176,9 @@ public class TeachingEndpoint extends AbstractEndpoint {
 				return notFound();
 			}
 			
-			Teaching teaching = _teaching.get();
+			Teaching entity = _teaching.get();
 			
-			if(!hasAccess(accessKey, teaching)){
+			if(!hasAccess(accessKey, entity)){
 				return unauthorized();
 			}
 
@@ -177,18 +193,21 @@ public class TeachingEndpoint extends AbstractEndpoint {
 				return badRequest(errors);
 			}
 			
-			teaching.setContact(safeTransform(input.contact, x -> x.toContact()));
+			entity.setContact(safeTransform(input.contact, x -> x.toContact()));
+			entity.setFieldOfStudy(this.refDataProvider.resolve(FieldOfStudy.class, input.fieldOfStudy));
+			entity.setLicence(input.licence);
+			entity.setMaster(input.master);
+			entity.setLink(input.link);
+			entity.setRegistrationOpeningDate(input.registrationOpeningDate);
+			entity.setRegistrationClosingDate(input.registrationClosingDate);			
 			
-			teaching.setLicence(input.licence);
-			teaching.setMaster(input.master);
-			teaching.setLink(input.link);
-			teaching.setRegistrationOpeningDate(input.registrationOpeningDate);
-			teaching.setRegistrationClosingDate(input.registrationClosingDate);			
+			// restrictions
+			entity.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
+			entity.setMinAge(input.minAge);
+			entity.setMaxAge(input.maxAge);
+			entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
 			
-			teaching.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
-			teaching.setFieldOfStudy(this.refDataProvider.resolve(FieldOfStudy.class, input.fieldOfStudy));
-
-			objectStore.save(teaching);
+			objectStore.save(entity);
 			return noContent();
 		}
 
@@ -218,25 +237,30 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		}
 		
 		//objectStore.save(t);
-		Teaching teaching = new Teaching();
-		teaching.setOrganisation(o.get());
-		teaching.setContact(safeTransform(input.contact, x -> x.toContact()));
+		Teaching entity = new Teaching();
+		entity.setOrganisation(o.get());
+		entity.setContact(safeTransform(input.contact, x -> x.toContact()));
 		
-		teaching.setLicence(input.licence);
-		teaching.setMaster(input.master);
-		teaching.setLink(input.link);
+		entity.setLicence(input.licence);
+		entity.setMaster(input.master);
+		entity.setLink(input.link);
 		
-		teaching.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
-		teaching.setFieldOfStudy(this.refDataProvider.resolve(FieldOfStudy.class, input.fieldOfStudy));
-		teaching.setRegistrationOpeningDate(input.registrationOpeningDate);
-		teaching.setRegistrationClosingDate(input.registrationClosingDate);
+		entity.setFieldOfStudy(this.refDataProvider.resolve(FieldOfStudy.class, input.fieldOfStudy));
+		entity.setRegistrationOpeningDate(input.registrationOpeningDate);
+		entity.setRegistrationClosingDate(input.registrationClosingDate);
 		
-		objectStore.save(teaching);
+		// restrictions
+		entity.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
+		entity.setMinAge(input.minAge);
+		entity.setMaxAge(input.maxAge);
+		entity.setStatusRestriction(StringUtils.hasText(input.statusRestriction) ? StatusRestriction.valueOf(input.statusRestriction) : null);
 		
-		input.id = teaching.getId();
-		input.address = new AddressSummary(teaching.getOrganisation().getAddress());
-		input.organisation = teaching.getOrganisation().getName();
-		return created(getUri("/teachings/" + teaching.getId()), input);
+		objectStore.save(entity);
+		
+		input.id = entity.getId();
+		input.address = new AddressSummary(entity.getOrganisation().getAddress());
+		input.organisation = entity.getOrganisation().getName();
+		return created(getUri("/teachings/" + entity.getId()), input);
 	}
 	
 	

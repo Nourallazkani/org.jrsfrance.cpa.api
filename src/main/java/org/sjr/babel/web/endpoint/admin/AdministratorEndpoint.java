@@ -12,7 +12,7 @@ import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.Administrator;
-import org.sjr.babel.model.entity.reference.Civility;
+
 import org.sjr.babel.web.endpoint.AbstractEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -40,7 +40,6 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 		
 		public AdministratorSummary(Administrator entity) {
 			this.id = entity.getId();
-			this.civility = entity.getCivility().getName();
 			this.firstName = entity.getFirstName();
 			this.lastName = entity.getLastName();
 			this.mailAddress = entity.getMailAddress();
@@ -81,7 +80,6 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 		Administrator admin = new Administrator();
 		
 		admin.setFirstName(input.firstName);
-		admin.setCivility(this.refDataProvider.resolve(Civility.class, input.civility));
 		admin.setLastName(input.lastName);
 		admin.setPhoneNumber(input.phoneNumber);
 		admin.setAccount(new Account());
@@ -106,7 +104,6 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 		}
 		Administrator admin = _admin.get();
 		admin.setFirstName(input.firstName);
-		admin.setCivility(this.refDataProvider.resolve(Civility.class, input.civility));
 		admin.setLastName(input.lastName);
 		admin.setMailAddress(input.mailAddress);
 		admin.setPhoneNumber(input.phoneNumber);

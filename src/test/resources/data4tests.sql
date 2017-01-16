@@ -22,8 +22,6 @@ insert into LanguageLearningProgramType(name) values ('Francais');
 insert into OrganisationCategory(name, stereotype) values ('université', 'UNIVERSITY');
 insert into OrganisationCategory(name, stereotype, additionalInformations) values ('bibliothéque', 'LIBRARY', '["Horaires d''ouverture", "Initiation par des bénévomes"]');
 insert into OrganisationCategory(name, stereotype) values ('association', 'NGO');
-insert into Civility(name) values ( 'Mr' );
-insert into Civility(name) values ( 'Mme' );
 insert into Country(name ,isoCode) values ('France', 'FR');
 insert into Country(name , isoCode) values ('Syrie' , 'SYR');
 insert into Country(name , isoCode) values ('Afganistan' , 'Afg');
@@ -50,16 +48,16 @@ update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e7', pass
 update Organisation set accessKey='O-d6daffe2-01ed-4e40-bf1e-b2b102c873e8', password='f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', mailAddress='pole.emploi@cpafrance.fr' where id=7;
 update Organisation set additionalInformations='{"Horaires d''ouverture":"Du lundi au vendredi de 9h00 à 19h00"}' where category_id =2;
 
-insert into Refugee (firstName,lastName, fieldOfStudy_id, civility_id, birthDate,mailAddress,phoneNumber,accessKey,password) values ('Alaric', 'Hermant', 1, 1,  NULL, 'r@r.r', NULL, 'R-a871ce00-e7d2-497e-8a4e-d272b8b5b520', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
+insert into Refugee (firstName,lastName, fieldOfStudy_id, gender, birthDate,mailAddress,phoneNumber,accessKey,password) values ('Alaric', 'Hermant', 1, 'MAN',  NULL, 'r@r.r', NULL, 'R-a871ce00-e7d2-497e-8a4e-d272b8b5b520', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
 insert into Refugee_Language(refugee_id, language_id) values(1,1);
-insert into Refugee (firstName,lastName, fieldOfStudy_id, civility_id, birthDate,mailAddress,phoneNumber,accessKey,password) values ('Nour', 'Allazkani', 1, 1, NULL, 'r2@r2.r2', NULL, 'R-3b743606-928a-4086-852a-9efd72f83d01', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
+insert into Refugee (firstName,lastName, fieldOfStudy_id, gender, birthDate,mailAddress,phoneNumber,accessKey,password) values ('Nour', 'Allazkani', 1, 'MAN', NULL, 'r2@r2.r2', NULL, 'R-3b743606-928a-4086-852a-9efd72f83d01', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
 insert into Refugee_Language(refugee_id, language_id) values(2,1);
 insert into Refugee_Language(refugee_id, language_id) values(2,2);
 
-insert into Volunteer (firstName, lastName, birthDate, mailAddress, phoneNumber, accessKey, password, street1, street2, postalCode, locality, lat, lng, googleMapId, availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities, activities, civility_id, country_id, organisation_id) values('Alaric', 'Hermant', NULL, 'v@v.v', NULL, 'V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', NULL, NULL, '75007', 'Paris', 48.85433450, 2.31340290, NULL, NULL, true, true, false, NULL, NULL, NULL, NULL);
+insert into Volunteer (firstName, lastName, birthDate, mailAddress, phoneNumber, accessKey, password, street1, street2, postalCode, locality, lat, lng, googleMapId, availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities, activities, gender, country_id, organisation_id) values('Alaric', 'Hermant', NULL, 'v@v.v', NULL, 'V-41eed0a4-0bbb-4594-a1cf-f8ab3ff810ec', 'f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9', NULL, NULL, '75007', 'Paris', 48.85433450, 2.31340290, NULL, NULL, true, true, false, NULL, 'MAN', NULL, NULL);
 
-insert into Administrator(firstName, lastName, mailAddress, accessKey, phoneNumber, password, civility_id)  values('Alaric','Hermant','alaric_hermant@yahoo.fr','A-cfa5be9e-c8dd-477c-9d3d-a3cb452be3f6','07123456','f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9',2);
-insert into Administrator(firstName, lastName, mailAddress, accessKey, phoneNumber, password, civility_id)  values('Irinda','riquelme','irinda.r@gmail.com','A-f51d7ea3-1624-45e6-94ab-c85b4c458638','07123456','f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9',1);
+insert into Administrator(firstName, lastName, mailAddress, accessKey, phoneNumber, password)  values('Alaric','Hermant','alaric_hermant@yahoo.fr','A-cfa5be9e-c8dd-477c-9d3d-a3cb452be3f6','07123456','f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9');
+insert into Administrator(firstName, lastName, mailAddress, accessKey, phoneNumber, password)  values('Irinda','riquelme','irinda.r@gmail.com','A-f51d7ea3-1624-45e6-94ab-c85b4c458638','07123456','f2d81a260dea8a100dd517984e53c56a7523d96942a834b9cdc249bd4e8c7aa9);
 	
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (true, false, 1, 2, 1, now() + interval '-1 MONTH');
 insert into Teaching(licence,master,fieldOfStudy_id,languageLevelRequired_id,organisation_id, registrationOpeningDate) values (false,true,2,1,2, now() + interval '-1 MONTH');

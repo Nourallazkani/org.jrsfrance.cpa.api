@@ -16,8 +16,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.sjr.babel.model.GenderRestriction;
-import org.sjr.babel.model.StatusRestriction;
+import org.sjr.babel.model.Gender;
+import org.sjr.babel.model.Status;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.MultiLanguageText;
 import org.sjr.babel.model.component.Registration;
@@ -291,8 +291,8 @@ public class EventEndpoint extends AbstractEndpoint {
 		// restrictions
 		event.setMinAge(input.minAge);
 		event.setMaxAge(input.maxAge);
-		event.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
-		event.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
+		event.setGenderRestriction(safeTransform(input.genderRestriction, Gender::valueOf));
+		event.setStatusRestriction(safeTransform(input.statusRestriction, Status::valueOf));
 		return noContent();
 
 	}
@@ -374,8 +374,8 @@ public class EventEndpoint extends AbstractEndpoint {
 		// restrictions
 		event.setMinAge(input.minAge);
 		event.setMaxAge(input.maxAge);
-		event.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
-		event.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
+		event.setGenderRestriction(safeTransform(input.genderRestriction, Gender::valueOf));
+		event.setStatusRestriction(safeTransform(input.statusRestriction, Status::valueOf));
 		
 		this.objectStore.save(event);
 		input.id = event.getId();

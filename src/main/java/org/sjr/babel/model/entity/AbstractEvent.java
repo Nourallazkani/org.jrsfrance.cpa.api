@@ -17,8 +17,8 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 
-import org.sjr.babel.model.GenderRestriction;
-import org.sjr.babel.model.StatusRestriction;
+import org.sjr.babel.model.Gender;
+import org.sjr.babel.model.Status;
 import org.sjr.babel.model.component.Address;
 import org.sjr.babel.model.component.Contact;
 import org.sjr.babel.model.component.Contact.ContactConverter;
@@ -51,10 +51,10 @@ public abstract class AbstractEvent extends AbstractEntity {
 	private Integer maxAge, minAge;
 	
 	@Enumerated(EnumType.STRING)
-	private GenderRestriction genderRestriction;
+	private Gender genderRestriction;
 	
 	@Enumerated(EnumType.STRING)
-	private StatusRestriction statusRestriction;
+	private Status statusRestriction;
 
 	@ManyToOne
 	private Level languageLevelRequired;
@@ -167,19 +167,19 @@ public abstract class AbstractEvent extends AbstractEntity {
 		this.minAge = minAge;
 	}
 
-	public GenderRestriction getGenderRestriction() {
+	public Gender getGenderRestriction() {
 		return genderRestriction;
 	}
 
-	public void setGenderRestriction(GenderRestriction genderRestriction) {
+	public void setGenderRestriction(Gender genderRestriction) {
 		this.genderRestriction = genderRestriction;
 	}
 
-	public StatusRestriction getStatusRestriction() {
+	public Status getStatusRestriction() {
 		return statusRestriction;
 	}
 
-	public void setStatusRestriction(StatusRestriction statusRestriction) {
+	public void setStatusRestriction(Status statusRestriction) {
 		this.statusRestriction = statusRestriction;
 	}
 

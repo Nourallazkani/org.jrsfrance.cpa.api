@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 
 import org.sjr.babel.model.entity.reference.AbstractReferenceEntity;
-import org.sjr.babel.model.entity.reference.Civility;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.EventType;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
@@ -72,11 +71,6 @@ public class ReferenceDataHelper {
 			map.put("all", this.objectStore.findAll(OrganisationCategory.class));
 			return map;
 		});		
-		loaders.put(getRegion(Civility.class), ()-> {
-			Map<String, List<?>> map = new HashMap<>();
-			map.put("all", this.objectStore.findAll(Civility.class));
-			return map;
-		});			
 		loaders.put(getRegion(Language.class), ()-> {
 			Map<String, List<?>> map = new HashMap<>();
 			map.put("all", this.objectStore.findAll(Language.class));

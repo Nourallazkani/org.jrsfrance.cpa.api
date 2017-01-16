@@ -20,14 +20,19 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.Gender;
 import org.sjr.babel.model.component.Account;
+import org.sjr.babel.model.component.Registration;
+import org.sjr.babel.model.entity.AbstractEvent;
 import org.sjr.babel.model.entity.Administrator;
+import org.sjr.babel.model.entity.LanguageLearningProgram;
 import org.sjr.babel.model.entity.MeetingRequest;
 import org.sjr.babel.model.entity.MeetingRequest.Direction;
 import org.sjr.babel.model.entity.MeetingRequest.Reason;
+import org.sjr.babel.model.entity.ProfessionalLearningProgram;
 import org.sjr.babel.model.entity.Refugee;
+import org.sjr.babel.model.entity.Teaching;
 import org.sjr.babel.model.entity.Volunteer;
-import org.sjr.babel.model.entity.reference.Civility;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
@@ -59,7 +64,8 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 
 		public int id;
 		@NotNull @Size(min = 1)
-		public String civility, firstName, lastName, mailAddress;
+		public String firstName, lastName, mailAddress;
+		public String gender = Gender.MAN.name();
 		public String nationality, phoneNumber;
 		public String hostCountryLanguageLevel;
 		public AddressSummary address;
@@ -73,7 +79,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		
 		RefugeeSummary(Refugee entity) {
 			this.id = entity.getId();
-			this.civility = safeTransform(entity.getCivility(), x -> x.getName());
+			this.gender = safeTransform(entity.getGender(), x -> x.name());
 			this.nationality = safeTransform(entity.getNationality(), x -> x.getName());
 			this.hostCountryLanguageLevel = safeTransform(entity.getHostCountryLanguageLevel(), x->x.getName());
 			this.firstName = entity.getFirstName();
@@ -131,7 +137,7 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		refugee.setPhoneNumber(input.phoneNumber);
 		refugee.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x-> this.refDataProvider.resolve(Level.class, x)));
 		refugee.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
-		refugee.setCivility(safeTransform(input.civility, x -> this.refDataProvider.resolve(Civility.class, x)));
+		refugee.setGender(safeTransform(input.gender, Gender::valueOf));
 		
 		if(input.languages!=null){
 			List<Language> languages = input.languages.stream()
@@ -235,9 +241,10 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 			refugee.setLastName(input.lastName);
 			refugee.setMailAddress(input.mailAddress);
 			refugee.setPhoneNumber(input.phoneNumber);
+			refugee.setGender(safeTransform(input.gender, Gender::valueOf));
 			refugee.setAddress(safeTransform(input.address, x -> x.toAddress(this.refDataProvider)));
 			refugee.setHostCountryLanguageLevel(safeTransform(input.hostCountryLanguageLevel, x -> this.refDataProvider.resolve(Level.class, x)));
-			refugee.setCivility(safeTransform(input.civility, x -> this.refDataProvider.resolve(Civility.class, x)));
+			
 			refugee.setNationality(safeTransform(input.nationality, x -> this.refDataProvider.resolve(Country.class, x)));
 			refugee.setFieldOfStudy(safeTransform(input.fieldOfStudy, x -> this.refDataProvider.resolve(FieldOfStudy.class, x)));
 			if(input.languages != null){
@@ -400,6 +407,69 @@ public class RefugeeEndpoint extends AbstractEndpoint {
 		}
 	}
 	
+	@RequestMapping(path="{id}/language-learning-programs-registrations")
+	@Transactional
+	public ResponseEntity<?> learningProgramRegistrations(@PathVariable int id, @RequestHeader String accessKey){
+		Optional<Refugee> _refugee = this.objectStore.getById(Refugee.class, id);
+		if(!_refugee.isPresent()){
+			return notFound();
+		}
+		Refugee refugee = _refugee.get();
+		if (!refugee.getAccount().getAccessKey().equals(accessKey)){
+			return forbidden();
+		}
+		Map<LanguageLearningProgram, Registration> map = refugee.getLanguageLearningProgramRegistrations();
+		System.out.println(map.size());
+		return noContent();
+	}
+	
+	@RequestMapping(path="{id}/professional-learning-programs-registrations")
+	@Transactional
+	public ResponseEntity<?> professionalProgramRegistrations(@PathVariable int id, @RequestHeader String accessKey){
+		Optional<Refugee> _refugee = this.objectStore.getById(Refugee.class, id);
+		if(!_refugee.isPresent()){
+			return notFound();
+		}
+		Refugee refugee = _refugee.get();
+		if (!refugee.getAccount().getAccessKey().equals(accessKey)){
+			return forbidden();
+		}
+		Map<ProfessionalLearningProgram, Registration> map = refugee.getProfessionalProgramRegistrations();
+		System.out.println(map.size());
+		return noContent();
+	}
+	
+	@RequestMapping(path="{id}/event-registrations")
+	@Transactional
+	public ResponseEntity<?> eventRegistrations(@PathVariable int id, @RequestHeader String accessKey){
+		Optional<Refugee> _refugee = this.objectStore.getById(Refugee.class, id);
+		if(!_refugee.isPresent()){
+			return notFound();
+		}
+		Refugee refugee = _refugee.get();
+		if (!refugee.getAccount().getAccessKey().equals(accessKey)){
+			return forbidden();
+		}
+		Map<AbstractEvent, Registration> map = refugee.getEventRegistrations();
+		System.out.println(map.size());
+		return noContent();
+	}	
+	
+	@RequestMapping(path="{id}/teaching-registrations")
+	@Transactional
+	public ResponseEntity<?> teachingRegistrations(@PathVariable int id, @RequestHeader String accessKey){
+		Optional<Refugee> _refugee = this.objectStore.getById(Refugee.class, id);
+		if(!_refugee.isPresent()){
+			return notFound();
+		}
+		Refugee refugee = _refugee.get();
+		if (!refugee.getAccount().getAccessKey().equals(accessKey)){
+			return forbidden();
+		}
+		Map<Teaching, Registration> map = refugee.getTeachingRegistrations();
+		System.out.println(map.size());
+		return noContent();
+	}	
 	/*
 	
 	@RequestMapping (path="/{rId}/meeting-requests/{mId}/messages", method = RequestMethod.GET)

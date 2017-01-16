@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.sjr.babel.model.Gender;
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.MeetingRequest;
 import org.sjr.babel.model.entity.MeetingRequest.Direction;
@@ -57,7 +58,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		public @JsonProperty(access = Access.WRITE_ONLY) String password;
 		public @NotNull @Size(min = 1) String firstName, lastName;
 		public @NotNull @Valid AddressSummary address;
-		public String civility, phoneNumber;
+		public String gender, phoneNumber;
 		public List<String> languages , fieldsOfStudy;
 		public LocalDate birthDate;
 		public Boolean availableForConversation, availableForInterpreting, availableForSupportInStudies, availableForActivities;
@@ -68,7 +69,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		public VolunteerSummary(Volunteer entity) {
 			this.id = entity.getId();
 			
-			this.civility = safeTransform(entity.getCivility(), x -> x.getName());
+			this.gender = safeTransform(entity.getGender(), x -> x.name());
 			this.firstName = entity.getFirstName();
 			this.lastName = entity.getLastName();
 			this.birthDate = entity.getBirthDate();
@@ -135,12 +136,12 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 		account.setAccessKey("V-" + UUID.randomUUID().toString());
 		
 		Volunteer volunteer = new Volunteer();
-		volunteer.setRegistrationDate(LocalDate.now());
+		volunteer.setGender(safeTransform(input.gender, Gender::valueOf));
 		volunteer.setFirstName(input.firstName);
 		volunteer.setLastName(input.lastName);
 		volunteer.setMailAddress(input.mailAddress);
 		volunteer.setAddress(safeTransform(input.address, x -> x.toAddress(refDataProvider)));	
-		
+		volunteer.setRegistrationDate(LocalDate.now());
 		volunteer.setPhoneNumber(input.phoneNumber);
 		if(input.fieldsOfStudy!=null){
 			List<FieldOfStudy> fieldsOfStudy = input.fieldsOfStudy.stream()
@@ -216,6 +217,7 @@ public class VolunteerEndpoint extends AbstractEndpoint {
 				return conflict(Error.MAIL_ADDRESS_ALREADY_EXISTS);
 			}
 			
+			volunteer.setGender(safeTransform(input.gender, Gender::valueOf));
 			volunteer.setFirstName(input.firstName);
 			volunteer.setLastName(input.lastName);
 			volunteer.setMailAddress(input.mailAddress);

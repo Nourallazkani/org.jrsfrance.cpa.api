@@ -4,12 +4,9 @@ import java.util.UUID;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 
 import org.sjr.babel.model.component.Account;
-import org.sjr.babel.model.entity.reference.Civility;
 
 @Entity
 public class Administrator extends AbstractEntity {
@@ -19,17 +16,6 @@ public class Administrator extends AbstractEntity {
 	@Embedded
 	private Account account;
 	
-	@ManyToOne (fetch=FetchType.EAGER)
-	private Civility civility;
-
-	public Civility getCivility() {
-		return civility;
-	}
-
-	public void setCivility(Civility civility) {
-		this.civility = civility;
-	}
-
 	public String getFirstName() {
 		return firstName;
 	}

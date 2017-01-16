@@ -2,19 +2,26 @@ package org.sjr.babel.model.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapKeyJoinColumn;
 import javax.persistence.OneToMany;
 
+import org.sjr.babel.model.Gender;
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.component.Address;
-import org.sjr.babel.model.entity.reference.Civility;
+import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.reference.Country;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
@@ -30,8 +37,11 @@ public class Refugee extends AbstractEntity {
 	@Embedded
 	private Account account;
 
-	@ManyToOne(fetch = FetchType.EAGER, optional = false)
-	private Civility civility;
+	@Enumerated(EnumType.STRING)
+	private Gender gender;
+	
+	@Embedded
+	private Address address;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	private Country nationality;
@@ -39,19 +49,39 @@ public class Refugee extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.EAGER)
 	private FieldOfStudy fieldOfStudy;
 
-	@Embedded
-	private Address address;
-
-	@OneToMany(mappedBy = "refugee", fetch = FetchType.LAZY)
-	private List<MeetingRequest> meetingRequests;
+	@ManyToOne(fetch = FetchType.EAGER)
+	private Level hostCountryLanguageLevel ;
 
 	@ManyToMany
 	@JoinTable(name = "Refugee_Language", joinColumns = @JoinColumn(name = "Refugee_id"), inverseJoinColumns = @JoinColumn(name = "Language_id"))
 	private List<Language> languages;
+
+	@ElementCollection
+	@CollectionTable(name="AbstractLearningProgram_registrations")
+	@MapKeyJoinColumn(name="AbstractLearningProgram_id")
+	private Map<LanguageLearningProgram, Registration> languageLearningProgramRegistrations;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
-	private Level hostCountryLanguageLevel ;
+	@ElementCollection
+	@CollectionTable(name="AbstractLearningProgram_registrations")
+	@MapKeyJoinColumn(name="AbstractLearningProgram_id")
+	private Map<ProfessionalLearningProgram, Registration> professionalProgramRegistrations;
 	
+
+	@ElementCollection
+	@CollectionTable(name="AbstractEvent_registrations")
+	@MapKeyJoinColumn(name="AbstractEvent_id")
+	private Map<AbstractEvent, Registration> eventRegistrations;
+
+	@ElementCollection
+	@CollectionTable(name="Teaching_registrations")
+	@MapKeyJoinColumn(name="Teaching_id")
+	private Map<Teaching, Registration> teachingRegistrations;
+	
+	
+	@OneToMany(mappedBy = "refugee", fetch = FetchType.LAZY)
+	private List<MeetingRequest> meetingRequests;
+	
+
 	public String getFirstName() {
 		return firstName;
 	}
@@ -116,12 +146,12 @@ public class Refugee extends AbstractEntity {
 		this.account = account;
 	}
 
-	public Civility getCivility() {
-		return civility;
+	public Gender getGender() {
+		return gender;
 	}
 
-	public void setCivility(Civility civility) {
-		this.civility = civility;
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 	public Country getNationality() {
@@ -162,6 +192,40 @@ public class Refugee extends AbstractEntity {
 
 	public void setMeetingRequests(List<MeetingRequest> meetingRequests) {
 		this.meetingRequests = meetingRequests;
+	}
+	
+	public Map<LanguageLearningProgram, Registration> getLanguageLearningProgramRegistrations() {
+		return languageLearningProgramRegistrations;
+	}
+
+	public void setLanguageLearningProgramRegistrations(
+			Map<LanguageLearningProgram, Registration> languageLearningProgramRegistrations) {
+		this.languageLearningProgramRegistrations = languageLearningProgramRegistrations;
+	}
+
+	public Map<ProfessionalLearningProgram, Registration> getProfessionalProgramRegistrations() {
+		return professionalProgramRegistrations;
+	}
+
+	public void setProfessionalProgramRegistrations(
+			Map<ProfessionalLearningProgram, Registration> professionalProgramRegistrations) {
+		this.professionalProgramRegistrations = professionalProgramRegistrations;
+	}
+
+	public Map<AbstractEvent, Registration> getEventRegistrations() {
+		return eventRegistrations;
+	}
+
+	public void setEventRegistrations(Map<AbstractEvent, Registration> eventRegistrations) {
+		this.eventRegistrations = eventRegistrations;
+	}
+
+	public Map<Teaching, Registration> getTeachingRegistrations() {
+		return teachingRegistrations;
+	}
+
+	public void setTeachingRegistrations(Map<Teaching, Registration> teachingRegistrations) {
+		this.teachingRegistrations = teachingRegistrations;
 	}
 
 	public String getFullName() {

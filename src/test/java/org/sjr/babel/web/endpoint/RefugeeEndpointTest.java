@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 
 import org.junit.Test;
+import org.sjr.babel.model.Gender;
 import org.sjr.babel.web.endpoint.AbstractEndpoint.AddressSummary;
 import org.sjr.babel.web.endpoint.RefugeeEndpoint.RefugeeSummary;
 import org.springframework.http.MediaType;
@@ -21,7 +22,7 @@ public class RefugeeEndpointTest extends AbstractEndpointTest{
 		RefugeeSummary input = new RefugeeSummary();
 		input.address = new AddressSummary("19 rue Raspail", null, "94200", "Ivry sur seine", "France");
 		input.birthDate = LocalDate.of(1979, 8, 15);
-		input.civility = "Mr";
+		input.gender = Gender.MAN.name();
 		input.firstName= "Nour";
 		input.lastName = "Allazkani";
 		input.fieldOfStudy = "Informatique";
@@ -48,7 +49,7 @@ public class RefugeeEndpointTest extends AbstractEndpointTest{
 		RefugeeSummary input = new RefugeeSummary();
 		input.address = new AddressSummary("1 rue de Rivoli", null, "75007", "Paris", "France");
 		input.birthDate = LocalDate.of(1979, 8, 15);
-		input.civility = "Mr";
+		input.gender= Gender.MAN.name();
 		input.firstName= "Nour";
 		input.lastName = "Allazkani";
 		input.fieldOfStudy = "Informatique";

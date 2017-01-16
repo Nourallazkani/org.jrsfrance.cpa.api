@@ -16,8 +16,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.sjr.babel.model.GenderRestriction;
-import org.sjr.babel.model.StatusRestriction;
+import org.sjr.babel.model.Gender;
+import org.sjr.babel.model.Status;
 import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.AbstractLearningProgram;
 import org.sjr.babel.model.entity.Administrator;
@@ -194,10 +194,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 				.map(LearningProgramSummary::new)
 				.collect(Collectors.toList());
 		
-		if(!StringUtils.hasText(accessKey)){
-			return ok(results);
-		}
-		else{
+		if(StringUtils.hasText(accessKey) && accessKey.startsWith("R-")){
 			Optional<Refugee> _refugee = getRefugeeByAccesskey(accessKey);
 			if(!_refugee.isPresent()){
 				return forbidden();
@@ -209,7 +206,10 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 					learningProgramSummary.alreadyRegisterd = lp.stream().anyMatch(x -> x.getId().equals(learningProgramSummary.id));
 				}
 				return ok(results);
-			}
+			}	
+		}
+		else{
+			return ok(results);
 		}
 	}
 
@@ -304,8 +304,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		entity.setMinAge(input.minAge);
 		entity.setMaxAge(input.maxAge);
-		entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
-		entity.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
+		entity.setStatusRestriction(safeTransform(input.statusRestriction, Status::valueOf));
+		entity.setGenderRestriction(safeTransform(input.genderRestriction, Gender::valueOf));
 		
 		objectStore.save(entity);
 		return noContent();
@@ -374,8 +374,8 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		
 		entity.setMinAge(input.minAge);
 		entity.setMaxAge(input.maxAge);
-		entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
-		entity.setGenderRestriction(safeTransform(input.genderRestriction, GenderRestriction::valueOf));
+		entity.setStatusRestriction(safeTransform(input.statusRestriction, Status::valueOf));
+		entity.setGenderRestriction(safeTransform(input.genderRestriction, Gender::valueOf));
 		
 		objectStore.save(entity);
 		input.id = entity.getId();

@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.sjr.babel.model.StatusRestriction;
+import org.sjr.babel.model.Status;
 import org.sjr.babel.model.component.Registration;
 import org.sjr.babel.model.entity.Administrator;
 import org.sjr.babel.model.entity.Organisation;
@@ -204,7 +204,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 			entity.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
 			entity.setMinAge(input.minAge);
 			entity.setMaxAge(input.maxAge);
-			entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
+			entity.setStatusRestriction(safeTransform(input.statusRestriction, Status::valueOf));
 			
 			objectStore.save(entity);
 			return noContent();
@@ -252,7 +252,7 @@ public class TeachingEndpoint extends AbstractEndpoint {
 		entity.setLanguageLevelRequired(this.refDataProvider.resolve(Level.class, input.languageLevelRequired));
 		entity.setMinAge(input.minAge);
 		entity.setMaxAge(input.maxAge);
-		entity.setStatusRestriction(safeTransform(input.statusRestriction, StatusRestriction::valueOf));
+		entity.setStatusRestriction(safeTransform(input.statusRestriction, Status::valueOf));
 		
 		objectStore.save(entity);
 		

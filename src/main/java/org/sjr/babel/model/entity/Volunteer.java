@@ -6,6 +6,8 @@ import java.util.Set;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -13,9 +15,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.sjr.babel.model.Gender;
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.component.Address;
-import org.sjr.babel.model.entity.reference.Civility;
 import org.sjr.babel.model.entity.reference.FieldOfStudy;
 import org.sjr.babel.model.entity.reference.Language;
 
@@ -33,8 +35,8 @@ public class Volunteer extends AbstractEntity {
 	@Embedded
 	private Account account;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	private Civility civility;
+	@Enumerated(EnumType.STRING)
+	private Gender gender;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Organisation organisation;
@@ -158,12 +160,12 @@ public class Volunteer extends AbstractEntity {
 		this.account = account;
 	}
 
-	public Civility getCivility() {
-		return civility;
+	public Gender getGender() {
+		return gender;
 	}
 
-	public void setCivility(Civility civility) {
-		this.civility = civility;
+	public void setGender(Gender gender) {
+		this.gender = gender;
 	}
 
 	public Organisation getOrganisation() {

@@ -1,5 +1,5 @@
 package org.sjr.babel.model;
 
-public enum StatusRestriction {
+public enum Status {
 	ASYLUM_SEEKER, REFUGEE
 }

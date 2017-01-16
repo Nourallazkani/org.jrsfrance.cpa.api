@@ -33,7 +33,7 @@ public class MailHelperTest {
 	@Autowired
 	private MailHelper helper;
 	
-	@Test @Ignore
+	@Test
 	public void testSendWithBodyVars() throws JsonProcessingException, IOException {
 		ObjectMapper jackson = new ObjectMapper();
 		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
@@ -51,7 +51,7 @@ public class MailHelperTest {
 		}
 	}
 	
-	@Test @Ignore
+	@Test
 	public void testSendWithoutBodyVars() throws JsonProcessingException, IOException {
 		ObjectMapper jackson = new ObjectMapper();
 		JsonNode templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));

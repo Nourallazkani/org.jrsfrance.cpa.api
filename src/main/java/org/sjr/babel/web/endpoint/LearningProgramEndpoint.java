@@ -2,11 +2,11 @@ package org.sjr.babel.web.endpoint;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -72,7 +72,7 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 		// calculated fields
 		public String organisation;
 		@JsonInclude(value=Include.NON_NULL)
-		public Boolean alreadyRegisterd;
+		public Boolean alreadyRegistered;
 		
 		LearningProgramSummary() {} // for jackson deserialisation
 		
@@ -201,9 +201,9 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 			}
 			else{
 				Refugee refugee = _refugee.get();
-				List<AbstractLearningProgram> lp = new ArrayList<>();
+				Set<LanguageLearningProgram> lp = refugee.getLanguageLearningProgramRegistrations().keySet();
 				for (LearningProgramSummary learningProgramSummary : results) {
-					learningProgramSummary.alreadyRegisterd = lp.stream().anyMatch(x -> x.getId().equals(learningProgramSummary.id));
+					learningProgramSummary.alreadyRegistered = lp.stream().anyMatch(x -> x.getId().equals(learningProgramSummary.id));
 				}
 				return ok(results);
 			}	

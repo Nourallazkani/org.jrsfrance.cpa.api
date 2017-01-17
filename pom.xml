@@ -1,13 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.jrsfrance.cpa</groupId>
-	<artifactId>api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>org.it4ngo</groupId>
+	<artifactId>cpa-api</artifactId>
+	<version>1.0.0</version>
 	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		 
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
+		 
    		<docker.image.prefix>it4ngo</docker.image.prefix>
 		
 		<db.username>postgres</db.username>
@@ -18,8 +20,7 @@
 		<integration-test.db.username>postgres</integration-test.db.username>
 		<integration-test.db.password>postgres</integration-test.db.password>
 		<integration-test.db.server>localhost</integration-test.db.server>
-		<integration-test.db.name>cpa_test</integration-test.db.name>		
-
+		<integration-test.db.name>cpa_test</integration-test.db.name>
 	</properties>
 
 	<repositories>
@@ -29,8 +30,9 @@
 		</repository>
 	</repositories>
 	<build>
+		<!-- 
 		<finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
-
+		 -->
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -64,6 +66,23 @@
 					</execution>
 				</executions>
 			</plugin>
+ 			<plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.11</version>
+                <configuration>
+                    <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+                    <dockerDirectory>src/main/docker</dockerDirectory>
+                    
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
+			</plugin>			
 		</plugins>
 	</build>
 	<dependencyManagement>

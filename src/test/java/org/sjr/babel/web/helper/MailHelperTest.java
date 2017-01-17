@@ -5,19 +5,17 @@ import java.io.IOException;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.sjr.babel.SpringConfig;
-import org.sjr.babel.SpringConfig4Tests;
+import org.sjr.babel.MyApplication;
 import org.sjr.babel.web.helper.MailHelper.MailBodyVars;
 import org.sjr.babel.web.helper.MailHelper.MailCommand;
 import org.sjr.babel.web.helper.MailHelper.MailType;
 import org.sjr.babel.web.helper.MailHelper.SendMailOutcome;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,8 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = {SpringConfig.class, SpringConfig4Tests.class})
+@SpringBootTest(classes = {MyApplication.class})
+@TestPropertySource("classpath:application-for-tests.properties")
 public class MailHelperTest {
 
 	@Autowired

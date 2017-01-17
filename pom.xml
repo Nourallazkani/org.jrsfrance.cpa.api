@@ -4,22 +4,30 @@
 	<groupId>org.jrsfrance.cpa</groupId>
 	<artifactId>api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.build.timestamp.format>yyyy-MM-dd'T'HH-mm-ss'Z'</maven.build.timestamp.format>
-
+   		<docker.image.prefix>it4ngo</docker.image.prefix>
+		
 		<db.username>postgres</db.username>
 		<db.password>postgres</db.password>
 		<db.server>localhost</db.server>
 		<db.name>cpa_test</db.name>
-		<smtp.username>AKIAJCQS4ZMC2SUBODMQ</smtp.username>
-		<smtp.password>AipV1kf46I6H7TkGHYil7TKBmSKNjfs2hS6nC+WOLsw9</smtp.password>
+		
+		<integration-test.db.username>postgres</integration-test.db.username>
+		<integration-test.db.password>postgres</integration-test.db.password>
+		<integration-test.db.server>localhost</integration-test.db.server>
+		<integration-test.db.name>cpa_test</integration-test.db.name>		
 
-		<spring.version>4.3.5.RELEASE</spring.version>
-		<jackson.version>2.8.5</jackson.version>
-		<hibernate.version>5.2.2.Final</hibernate.version>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>spring</id>
+			<url>https://repo.spring.io/milestone</url>
+		</repository>
+	</repositories>
 	<build>
 		<finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
 
@@ -29,8 +37,15 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<filtering>true</filtering>
+			</testResource>		
+		</testResources>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.6.0</version>
 				<configuration>
@@ -39,181 +54,111 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<warSourceDirectory>WebContent</warSourceDirectory>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
-				</configuration>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-			<plugin>
-				<!-- permet de lancer maven avec jetty:run, l'application est ensuite disponible à l'adresse http://localhost:8080 -->
-				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>9.3.3.v20150827</version>
-				<configuration>
-					<scanIntervalSeconds>3</scanIntervalSeconds>
-				</configuration>
-			</plugin>		
 		</plugins>
 	</build>
-	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>1.5.0.RC1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
-			<scope>provided</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-		<!-- jdbc, jpa and hibernate -->
 		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.38</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.4.1211</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-entitymanager</artifactId>
-			<version>${hibernate.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-java8</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-c3p0</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-
-		<!-- jta -->
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>javax.transaction-api</artifactId>
-			<version>1.2</version>
-		</dependency>
-
-		<!-- spring -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-orm</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context-support</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.mail</groupId>
-			<artifactId>javax.mail</artifactId>
-			<version>1.5.6</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>5.3.0.Final</version>
-		</dependency>
-
-		<!-- jackson, for serialisation -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<!-- logging -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<version>1.1.7</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>1.7.20</version>
 		</dependency>
 
 		<!-- for test -->
+
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-test</artifactId>
-			<version>${spring.version}</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.skyscreamer</groupId>
 			<artifactId>jsonassert</artifactId>
-			<version>1.4.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
 			<artifactId>json-path</artifactId>
-			<version>2.2.0</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency>		
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
+		    <groupId>com.fasterxml.jackson.dataformat</groupId>
+		    <artifactId>jackson-dataformat-yaml</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency>		
 	</dependencies>
 
 
 	<profiles>
-	<profile>
-		<id>aws</id>
-		<build>
-			<plugins>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>properties-maven-plugin</artifactId>
-					<version>1.0.0</version>
-					<executions>
-						<execution>
-							<phase>initialize</phase>
-							<goals>
-								<goal>read-project-properties</goal>
-							</goals>
-							<configuration>
-								<files>
-									<file>deploy.properties</file>
-								</files>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</build>
-	</profile>
+		<profile>
+			<id>aws</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>properties-maven-plugin</artifactId>
+						<version>1.0.0</version>
+						<executions>
+							<execution>
+								<phase>initialize</phase>
+								<goals>
+									<goal>read-project-properties</goal>
+								</goals>
+								<configuration>
+									<files>
+										<file>deploy.properties</file>
+									</files>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 </project>

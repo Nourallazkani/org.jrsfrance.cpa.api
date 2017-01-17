@@ -5,10 +5,10 @@ import javax.persistence.PersistenceContext;
 
 import org.junit.Before;
 import org.junit.runner.RunWith;
-import org.sjr.babel.SpringConfig4Tests;
-import org.sjr.babel.SpringConfig;
+import org.sjr.babel.MyApplication;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,11 +20,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = {MyApplication.class})
+@TestPropertySource("classpath:application-for-tests.properties")
 @WebAppConfiguration()
-@ContextConfiguration(classes = {SpringConfig.class, SpringConfig4Tests.class})
-//@ContextHierarchy(@ContextConfiguration(classes = {RestConfiguration.class, JpaConfig4Tests.class}))
-//@DirtiesContext(classMode=ClassMode.AFTER_CLASS)
 public abstract class AbstractEndpointTest {
+	
 	
 	@Autowired
 	protected WebApplicationContext context;

@@ -4,14 +4,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.sjr.babel.MyApplication;
 import org.sjr.babel.web.endpoint.AuthzEndpoint.SignInCommand;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = {MyApplication.class})
+@WebAppConfiguration()
 public class AuthzEndpointTest extends AbstractEndpointTest {
-
 	
 	@Test
 	public void testOrganisationSignInByMailAddressOk() throws JsonProcessingException, Exception {

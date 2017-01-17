@@ -1,0 +1,33 @@
+server:
+  port: 8080
+spring:
+  devtools:
+    restart:
+      enabled: true
+  datasource:
+    url: jdbc:postgresql://${db.server}:5432/${db.name}
+    driver-class-name: org.postgresql.Driver
+    password: ${db.password}
+    username: ${db.username}
+  jpa:
+    open-in-view: false
+    properties:
+      javax.persistence.sharedCache.mode: ENABLE_SELECTIVE
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL94Dialect
+        cache:
+          use_second_level_cache: true
+          region.factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+  mail:
+    default-encoding: UTF-8
+    host: email-smtp.eu-west-1.amazonaws.com
+    port: 465
+    password: AipV1kf46I6H7TkGHYil7TKBmSKNjfs2hS6nC+WOLsw9
+    username: AKIAJCQS4ZMC2SUBODMQ
+    protocol: smtps

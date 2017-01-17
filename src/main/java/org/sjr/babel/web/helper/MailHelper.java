@@ -8,11 +8,13 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.sjr.babel.SpringConfig.MailSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -27,8 +29,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Component
 public class MailHelper {
 
+	@Autowired
 	private JavaMailSenderImpl sender;
 		
+	
 	public enum MailType{
 		REFUGEE_SIGN_UP_CONFIRMATION, 
 		REFUGEE_UPDATE_PASSWORD_CONFIRMATION,
@@ -104,19 +108,18 @@ public class MailHelper {
 	private JsonNode templates;
 	
 	private boolean mock;
+
+	private Logger logger = LoggerFactory.getLogger(getClass());
 	
-	@Autowired
-	public MailHelper(MailSettings mailSettings) throws JsonProcessingException, IOException {
-		JavaMailSenderImpl sender = new JavaMailSenderImpl();
-		sender.setDefaultEncoding(mailSettings.defaultEncoding);
-		sender.setHost(mailSettings.smtpHost);
-		sender.setPort(mailSettings.port);
-		sender.setProtocol(mailSettings.smtpProtocol);
-		sender.setUsername(mailSettings.smtpUsername);
-		sender.setPassword(mailSettings.smtpPassword);
-		
-		this.sender = sender;
-		this.mock = mailSettings.mock;
+	@PostConstruct
+	public void initialize() throws JsonProcessingException, IOException{
+		if(this.sender.getJavaMailProperties()!=null && this.sender.getJavaMailProperties().containsKey("mock")){
+			this.mock = this.sender.getJavaMailProperties().getProperty("mock").equals("true");	
+		}
+		if(this.mock){
+			logger.info("won't send mail, mock=true");
+		}
+
 		ObjectMapper jackson = new ObjectMapper();
 		this.templates = jackson.readTree(getClass().getResourceAsStream("/mail-templates.json"));
 	}
@@ -163,7 +166,8 @@ public class MailHelper {
 				else{
 					for(Map.Entry<String, Object> entry : command.bodyVars.entrySet()){
 						String value = entry.getValue() == null ? "" : entry.getValue().toString();
-						body = bodyTemplate.replace(String.format("${%s}", entry.getKey()), value);
+						String toReplace = "${"+entry.getKey()+"}";
+						body = bodyTemplate.replace(toReplace, value);
 					}
 				}
 			}

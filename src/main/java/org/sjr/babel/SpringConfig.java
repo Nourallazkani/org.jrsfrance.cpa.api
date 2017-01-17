@@ -1,6 +1,7 @@
 package org.sjr.babel;
 
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -93,15 +95,17 @@ public class SpringConfig extends WebMvcConfigurerAdapter {
 	}
 	
 	@Bean
-	public MailSettings mailSettings(Environment env){
-		MailSettings mailSettings = new MailSettings();
-		mailSettings.defaultEncoding = "UTF-8";
-		mailSettings.smtpHost = env.getProperty("mail.smtp.host");
-		mailSettings.port = env.getProperty("mail.smtp.port", Integer.class);
-		mailSettings.smtpProtocol = env.getProperty("mail.smtp.protocol");
-		mailSettings.smtpUsername = env.getProperty("mail.smtp.username");
-		mailSettings.smtpPassword = env.getProperty("mail.smtp.password");
-		return mailSettings;
+	public JavaMailSenderImpl javaMailSender(Environment env){
+		JavaMailSenderImpl javaMailsender = new JavaMailSenderImpl();
+		javaMailsender.setHost(env.getProperty("mail.smtp.host"));
+		javaMailsender.setProtocol(env.getProperty("mail.smtp.protocol"));
+		javaMailsender.setDefaultEncoding("UTF-8");
+		javaMailsender.setPort(env.getProperty("mail.smtp.port", Integer.class));
+		javaMailsender.setUsername(env.getProperty("mail.smtp.username"));
+		javaMailsender.setPassword(env.getProperty("mail.smtp.password"));
+		javaMailsender.setJavaMailProperties(new Properties());
+		javaMailsender.getJavaMailProperties().put("mock", "false");
+		return javaMailsender;
 	}
 
 }

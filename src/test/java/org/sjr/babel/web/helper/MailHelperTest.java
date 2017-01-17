@@ -5,7 +5,6 @@ import java.io.IOException;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sjr.babel.SpringConfig;

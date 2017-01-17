@@ -1,5 +1,6 @@
 package org.sjr.babel;
 
+import java.util.Properties;
 import java.util.Set;
 
 import javax.persistence.Cacheable;
@@ -13,6 +14,7 @@ import org.sjr.babel.model.entity.AbstractEntity.CacheOnStartup;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 @Configuration
 public class SpringConfig4Tests {
@@ -36,10 +38,16 @@ public class SpringConfig4Tests {
 	}
 	
 	@Bean
-	public MailSettings mailSettings(Environment env){
-		MailSettings mailSettings = new MailSettings();
-		mailSettings.defaultEncoding = "UTF-8";
-		mailSettings.mock = true;
-		return mailSettings;
+	public JavaMailSenderImpl javaMailSender(Environment env){
+		JavaMailSenderImpl javaMailsender = new JavaMailSenderImpl();
+		javaMailsender.setHost(env.getProperty("mail.smtp.host"));
+		javaMailsender.setProtocol(env.getProperty("mail.smtp.protocol"));
+		javaMailsender.setDefaultEncoding("UTF-8");
+		javaMailsender.setPort(env.getProperty("mail.smtp.port", Integer.class));
+		javaMailsender.setUsername(env.getProperty("mail.smtp.username"));
+		javaMailsender.setPassword(env.getProperty("mail.smtp.password"));
+		javaMailsender.setJavaMailProperties(new Properties());
+		javaMailsender.getJavaMailProperties().put("mock", "true");
+		return javaMailsender;
 	}
 }

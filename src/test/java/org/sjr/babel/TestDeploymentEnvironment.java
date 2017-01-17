@@ -16,7 +16,7 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategyJpaCompliantImpl;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.dialect.PostgreSQL95Dialect;
+import org.hibernate.dialect.PostgreSQL94Dialect;
 import org.junit.Test;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -40,7 +40,7 @@ public class TestDeploymentEnvironment {
 		Map<String, String> hibernateProperties= new HashMap<>();
 		hibernateProperties.put("hibernate.connection.driver_class", org.postgresql.Driver.class.getName());
 		hibernateProperties.put("hibernate.hbm2ddl.auto", "validate");
-		hibernateProperties.put("hibernate.dialect", PostgreSQL95Dialect.class.getName());
+		hibernateProperties.put("hibernate.dialect", PostgreSQL94Dialect.class.getName());
 		
 		DocumentBuilder b = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		org.w3c.dom.Document doc = b.parse(getClass().getResourceAsStream("/META-INF/persistence.xml"));

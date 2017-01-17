@@ -5,14 +5,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.sjr.babel.model.component.Account;
 import org.sjr.babel.model.entity.Administrator;
-
 import org.sjr.babel.web.endpoint.AbstractEndpoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -67,7 +65,6 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/administrators", method = RequestMethod.POST)
 	@Transactional
-	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> post(@RequestBody AdministratorSummary input) {
 		if (input.id != null) {
 			return ResponseEntity.badRequest().build();
@@ -93,7 +90,6 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = "/administrators/{id}", method = RequestMethod.PUT)
 	@Transactional
-	@RolesAllowed("ADMIN")
 	public ResponseEntity<?> put(@RequestBody AdministratorSummary input, @PathVariable int id) {
 		if (input.id == null || ! (input.id.equals(id)) ) {
 			return ResponseEntity.badRequest().body("Id is not correct!");
@@ -116,7 +112,7 @@ public class AdministratorEndpoint extends AbstractEndpoint {
 
 	@RequestMapping(path = "/administrators/{id}", method = RequestMethod.DELETE)
 	@Transactional
-	@RolesAllowed("ADMIN")
+	
 	public ResponseEntity<Void> delete(@PathVariable int id) {
 		Optional<Administrator> admin = objectStore.getById(Administrator.class, id);
 		if (!admin.isPresent()) {

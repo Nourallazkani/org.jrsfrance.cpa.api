@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -385,7 +384,6 @@ public class EventEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"events/{id}/registrations", "workshops/{id}/registrations"}, method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({ "ORGANISATION" ,"ADMIN"})
 	public ResponseEntity<?> getInscriptions (@PathVariable int id, @RequestHeader String accessKey ){
 		Optional<AbstractEvent> _ae = objectStore.getById(AbstractEvent.class, id);
 		if (!_ae.isPresent()){

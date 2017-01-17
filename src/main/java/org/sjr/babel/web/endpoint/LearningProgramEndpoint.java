@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import javax.annotation.security.RolesAllowed;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -385,7 +384,6 @@ public class LearningProgramEndpoint extends AbstractEndpoint {
 	
 	@RequestMapping(path = {"language-programs/{id}/registrations", "professional-programs/{id}/registrations"}, method = RequestMethod.GET)
 	@Transactional
-	@RolesAllowed({ "ORGANISATION" ,"ADMIN"})
 	public ResponseEntity<?> getInscriptions (@PathVariable int id, @RequestHeader String accessKey ){
 		Optional<AbstractLearningProgram> alp = objectStore.getById(AbstractLearningProgram.class, id);
 		if (!alp.isPresent()){

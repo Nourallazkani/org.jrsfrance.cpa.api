@@ -19,12 +19,11 @@ public class MyApplication extends WebMvcConfigurerAdapter {
 	
 
 	public static void main(String[] args) throws Exception {
-		System.setProperty("com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL", "WARNING");
-		System.setProperty("com.mchange.v2.log.MLog", "com.mchange.v2.log.FallbackMLog");
 		SpringApplication.run(MyApplication.class, args);
 	}
 
 	private @Autowired EntityManagerFactory emf;
+	
 	
 	@PostConstruct
 	public void loadLevel2Cache(){

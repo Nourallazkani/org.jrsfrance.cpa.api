@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${server.port}
 spring:
   devtools:
     restart:
@@ -9,6 +9,8 @@ spring:
     driver-class-name: org.postgresql.Driver
     password: ${db.password}
     username: ${db.username}
+    min-active: 5
+    max-active: 20
   jpa:
     open-in-view: false
     properties:

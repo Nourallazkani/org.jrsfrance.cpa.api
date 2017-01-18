@@ -59,15 +59,6 @@ public class SpringConfig extends WebMvcConfigurerAdapter {
 		MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter(jackson);
 		converters.add(jsonConverter);
 	}
-
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry
-			.addMapping("/**")
-			.allowedHeaders("accessKey", "content-type")
-			.allowedMethods("PUT", "POST", "GET", "DELETE")
-			.allowedOrigins("*");
-	}
 	
 	@Bean
 	public EntityManagerFactory emf(){
